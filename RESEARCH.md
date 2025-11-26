@@ -18,6 +18,10 @@ Developer: (duplicate info, data verlies, ...)
 - Als een developer wil ik dat indien de write databank onbereikbaar is ik nog steeds informatie kan opvragen.
 - Als een developer wil ik dat indien er een onderdeel van de CQRS faalt er geen data verlies optreed.
 - Als een developer wil ik dat het verkeer van queries & commands verdeeld is over de databanken.
+- Als een developer wil ik een container opbouwen in één commando met een docker compose setup.
+- Als een developer wil ik een demo applicatie dat de synchronisatie flow aantoont.
+- Als een developer wil ik dat events die niet verwerkt kunnen worden, apart worden gezet (Dead Letter Queue) zodat ik deze kan analyseren en later opnieuw kan 'replayen' zonder de rest van de queue te blokkeren. (Could Have)
+- Als een developer wil ik wijzigingen kunnen aanbrengen in het lees-model van MySQL zonder dat dit impact heeft op de beschikbaarheid van het schrijf model MongoDB. (Could Have)
 - ...
 
 Product owner:
