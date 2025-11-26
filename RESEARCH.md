@@ -5,6 +5,23 @@ De bedoeling van de research is om de correcte architectuur te kiezen voor synch
 ## Identify stakeholders and use cases
 De stakeholders zullen vooral developers zijn alsook de product owner. De developers willen een schaalbaar, performant product afleveren hiervoor is CQRS een mogleijkheid. De product owner wilt dat de applicatie vlot draait en dat de impact van een downtime zo klein mogelijk is.
 
+Developer: (duplicate info, data verlies, ...)
+- Als een developer wil ik een performant product afleveren.
+- Als een developer wil ik databanken kunnen synchroniseren zonder problemen.
+- Als een developer wil ik databanken gemakkelijk terug synchronseren indien er een inconsistentie is.
+- Als een developer wil ik dat indien er bepaalde commands onbedoeld dubbel worden uitgezonden deze niet dubbel worden uitgevoerd (idempotent).
+- Als een developer wil ik dat indien de write databank onbereikbaar is ik nog steeds informatie kan opvragen.
+- Als een developer wil ik dat indien er een onderdeel van de CQRS faalt er geen data verlies optreed.
+- Als een developer wil ik dat het verkeer van queries & commands verdeeld is over de databanken.
+- ...
+
+Product owner:
+- Als de product owner wil ik dat mijn product zo vlot mogelijk kan werken
+- Als de product owner wil ik dat mijn product met zo weinig mogelijk down time kan werken
+- Als de product owner wil ik dat mijn product niet volledig plat valt indien er een databank niet meer werkt.
+- ...
+
+
 ## Master core concepts
 ## Compare existing solutions
 ## Define requirements
