@@ -110,6 +110,8 @@ Non functional volgens project
 - Reproducibility: one-command setup (Docker Compose).
 - Documentation: README and demo examples
 
+### Acceptance checkpoint
+De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie implementatie tussen een mysql (write databank) en mysql (read databank) dit met een hoge betrouwbaarheid en snelheid. 
 
 # Acceptance checkpoint (nog eens opzoeken wat hier bedoeld mee word)
 
