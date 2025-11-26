@@ -1,33 +1,39 @@
 # Research flow
 ## Define your research objective
-De bedoeling van de research is om de correcte architectuur te kiezen voor synchronisatie tussen 2 databanken (CQRS). En of er de mogelijkheid bestaat om later Event Sourcing te gebruiken. Verder is het ook belangrijk dat we een goede keuze maken voor de programmeertaal bepaalde talen zullen de implementatie moeilijker of makkelijker maken.
-
 - Wat probleem lossen we op?
+  - Synchronisatie tussen 2 databanken zonder dat er data verlies optreed voor CQRS doeleinden.
 - Wie zijn de gebruikers?
+  - Developers dat gebruik willen maken van CQRS (Command Query Responsibility Segregation)
 - Hoe weten we of het werkt?
+  - Indien we een write doen naar de write databank en deze veranderingen zichtbaar worden in de read databank.
 - Wat is in de scope wat is er buiten
+  - Binnen scope
+    - Synchronisatie
+      - Idempotent (geen dubbele events)
+      - Geen dataverlies
+      - Mogelijkheid tot herstel
+    - Ervoor zorgen dat de databanken loosly coupled zijn
+    - Event sourcing (op later moment)
 
 ## Identify stakeholders and use cases
-De stakeholders zullen vooral developers zijn alsook de product owner. De developers willen een schaalbaar, performant product afleveren hiervoor is CQRS een mogleijkheid. De product owner wilt dat de applicatie vlot draait en dat de impact van een downtime zo klein mogelijk is.
+De stakeholders zullen vooral developers zijn alsook de product owner.
 
 Developer: (duplicate info, data verlies, ...)
-- Als een developer wil ik een performant product afleveren.
-- Als een developer wil ik databanken kunnen synchroniseren zonder problemen.
-- Als een developer wil ik databanken gemakkelijk terug synchronseren indien er een inconsistentie is.
-- Als een developer wil ik dat indien er bepaalde commands onbedoeld dubbel worden uitgezonden deze niet dubbel worden uitgevoerd (idempotent).
-- Als een developer wil ik dat indien de write databank onbereikbaar is ik nog steeds informatie kan opvragen.
-- Als een developer wil ik dat indien er een onderdeel van de CQRS faalt er geen data verlies optreed.
-- Als een developer wil ik dat het verkeer van queries & commands verdeeld is over de databanken.
-- Als een developer wil ik een container opbouwen in één commando met een docker compose setup.
-- Als een developer wil ik een demo applicatie dat de synchronisatie flow aantoont.
-- Als een developer wil ik dat events die niet verwerkt kunnen worden, apart worden gezet (Dead Letter Queue) zodat ik deze kan analyseren en later opnieuw kan 'replayen' zonder de rest van de queue te blokkeren. (Could Have)
-- Als een developer wil ik wijzigingen kunnen aanbrengen in het lees-model van MySQL zonder dat dit impact heeft op de beschikbaarheid van het schrijf model MongoDB. (Could Have)
+- Als een developer wil ik een performant product afleveren zodat de gebruikers geen hinder ondervinden van wat er allemaal gebeurd achter hun rug.
+- Als een developer wil ik databanken kunnen synchroniseren zonder problemen zodat ik zonder problemen CQRS kan toepassen over 2 databanken.
+- Als een developer wil ik databanken gemakkelijk terug synchronseren indien er een inconsistentie is zodat de databanken gelijk lopen wat betreft data.
+- Als een developer wil ik dat indien er bepaalde commands onbedoeld dubbel worden uitgezonden deze niet dubbel worden uitgevoerd (idempotent) zodat mijn data niet inconsistent wordt.
+- Als een developer wil ik dat indien de write databank onbereikbaar is ik nog steeds informatie kan opvragen zodat het opvragen van gegevens geen impact ondervind.
+- Als een developer wil ik dat indien er een onderdeel van de synchronisatie faalt er geen data verlies optreed zodat ik er zeker van kan zijn dat mijn data tussen de 2 databanken gelijk is.
+- Als een developer wil ik dat het verkeer van queries & commands verdeeld is over de databanken zodat er bij veel verkeer geen impact is.
+- Als een developer wil ik gemakkelijk een container opbouwen van het CQRS systeem zodat deze gemakkelijk te integreren valt.
+- Als een developer wil ik een demo applicatie dat de synchronisatie flow aantoont zodat ik er zeker van ben dat het CQRS systeem werkt.
+- Als een developer wil ik dat events die niet verwerkt kunnen worden, apart worden gezet (Dead Letter Queue) zodat ik deze kan analyseren en later opnieuw kan 'replayen' zonder de rest van de queue te blokkeren zodat de events verder kunnen gaan zonder problemen. (Could Have)
 - ...
 
 Product owner:
-- Als de product owner wil ik dat mijn product zo vlot mogelijk kan werken
-- Als de product owner wil ik dat mijn product met zo weinig mogelijk down time kan werken
-- Als de product owner wil ik dat mijn product niet volledig plat valt indien er een databank niet meer werkt.
+- Als de product owner wil ik dat mijn product met zo weinig mogelijk down-time kan werken zodat ik geen klanten verlies omdat mijn product weeral offline is.
+- Als de product owner wil ik dat mijn product niet volledig kapot draait indien er een databank niet meer werkt zodat er steeds een deel werkend zal zijn.
 - ...
 
 ## Master core concepts
