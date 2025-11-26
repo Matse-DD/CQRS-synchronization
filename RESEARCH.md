@@ -21,9 +21,21 @@ Product owner:
 - Als de product owner wil ik dat mijn product niet volledig plat valt indien er een databank niet meer werkt.
 - ...
 
-
 ## Master core concepts
+UITLEG CQRS
+### CQRS concept
+### CQRS Synchronisatie mogelijkheden
+#### Direct projection
+#### Change stream
+#### Change Data Capture (niet 100% zeker)
+#### Outbox
+#### Broker
+### Event Sourcing
+
 ## Compare existing solutions
+- debezium
+
+
 ## Define requirements
 ## Evaluate technology options
 ## Run small Proofs of Concept (PoCs)
