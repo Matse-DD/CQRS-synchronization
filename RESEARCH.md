@@ -131,7 +131,18 @@ De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie
 
 ### Programmeertaal
 #### Low-level programmeertalen
+- Voordelen
+  - Performant
+  - Heel veel controle over wat er gebeurd
+- Nadelen
+  - Memory management
+  - Minder cadeau (zelf meer schrijven)
+    - een betrouwbare ORM waar je gemakkelijk mee kan werken is zelfdzaam dus dan zou je zelf veel meer databank connecties en dergelijke moeten verzorgen wat ook niet vanzelf sprekend is in een low level programmeertaal
+
 #### Typescript
+- Voordelen
+- Nadelen
+
 #### C#
 #### Java
 
