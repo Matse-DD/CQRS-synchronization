@@ -55,28 +55,15 @@ Op de write databank worden enkel de commands van de gebruiker uitgevoerd. Dit w
 ### Read databank
 De read databank word enkel gebruikt om queries uit te voeren dit wilt dus zeggen dat indien de gebruiker informatie wilt opvragen deze databank zal worden gebruikt.
 
-#### Direct projection 
-(Is geen echte term in CQRS by the way maar ik ga ervanuit dat hiermee een CDC bedoeld word met een projectie in)
-
-Deze architectuur zal gebruik maken van een CDC (Change Data Capture) deze zal kijken voor veranderingen in de data van de write databank. Eenmaal er een verandering word waargenomen zal deze verandering worden geprojecteerd door de projector zodat we de read databank kunnen aanpassen.
-
-![Foto van direct projection architectuur](images_research/direct_projector.png)
-
-
-#### Change stream
-
-#### Outbox
-
-#### Broker
-
-### Event Sourcing
-
+### CDC (Change Data Capture)
+Dit is een process dat kijkt naar veranderingen in een databank en op basis van deze veranderingen bepaalde handelingen kunnen worden ondernomen met de veranderde data. In deze context word het vaak gebruikt om te kijken naar veranderingen in een write databank en vervolgens deze veranderingen te projecteren en door te voeren op de read databank. Dit werkt meestal op basis van polling (het herhaadelijk aanvragen van bepaalde gegevens om veranderingen waar te nemen).
 
 ## Compare existing solutions
+### Debezium
+Dit is een CDC oplossing dit wilt zeggen 
 - debezium (CDC)
 - axoniq (event sourcing) (axon framework)
 - Django CQRS Library (python CQRS)
-- ...
 
 ## Define requirements
 Must haves volgens project
@@ -115,6 +102,30 @@ Non functional volgens project
   - broker
   - uitleg gekozen architectuur + schemas van de diagrammen
 - Evaluatie matrix van de bovenstaande onderdelen
+
+### Programmeertaal
+#### Low-level programmeertalen
+#### Typescript
+#### C#
+#### Java
+
+### CQRS Synchronisatie mogelijkheden
+#### Direct projection 
+(Is geen echte term in CQRS by the way maar ik ga ervanuit dat hiermee een CDC bedoeld word met een projectie in)
+
+Deze architectuur zal gebruik maken van een CDC (Change Data Capture) deze zal kijken voor veranderingen in de data van de write databank. Eenmaal er een verandering word waargenomen zal deze verandering worden geprojecteerd door de projector zodat we de read databank kunnen aanpassen.
+
+![Foto van direct projection architectuur](images_research/direct_projector.png)
+
+
+#### Change stream
+
+#### Outbox
+
+#### Broker
+
+### Event Sourcing
+
 
 ## Run small Proofs of Concept (PoCs)
 - code snippets 
