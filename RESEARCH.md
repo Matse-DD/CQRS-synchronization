@@ -3,7 +3,7 @@
 De bedoeling van de research is om de correcte architectuur te kiezen voor synchronisatie tussen 2 databanken (CQRS). En of er de mogelijkheid bestaat om later Event Sourcing te gebruiken. Verder is het ook belangrijk dat we een goede keuze maken voor de programmeertaal bepaalde talen zullen de implementatie moeilijker of makkelijker maken.
 
 ## Identify stakeholders and use cases
-
+De stakeholders zullen vooral developers zijn alsook de product owner. De developers willen een schaalbaar, performant product afleveren hiervoor is CQRS een mogleijkheid. De product owner wilt dat de applicatie vlot draait en dat de impact van een downtime zo klein mogelijk is.
 
 ## Master core concepts
 ## Compare existing solutions
