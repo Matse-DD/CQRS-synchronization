@@ -55,12 +55,12 @@ Op de write databank worden enkel de commands van de gebruiker uitgevoerd. Dit w
 ### Read databank
 De read databank word enkel gebruikt om queries uit te voeren dit wilt dus zeggen dat indien de gebruiker informatie wilt opvragen deze databank zal worden gebruikt.
 
-### CDC (Change Data Capture)
-Dit is een process dat kijkt naar veranderingen in een databank en op basis van deze veranderingen bepaalde handelingen kunnen worden ondernomen met de veranderde data. In deze context word het vaak gebruikt om te kijken naar veranderingen in een write databank en vervolgens deze veranderingen te projecteren en door te voeren op de read databank. Dit werkt meestal op basis van polling (het herhaadelijk aanvragen van bepaalde gegevens om veranderingen waar te nemen).
-
 ## Compare existing solutions
-### Debezium
-Dit is een CDC oplossing dit wilt zeggen 
+### Debezium (https://debezium.io/)
+Deze oplossing kijkt naar veranderingen in de write databank met behulp van polling eenmaal een verandering word opgemerkt en vertaalt naar events. Vervolgens worden deze events op een message broker (kafka) gepusht. Waar dan naar geluisterd kan worden door verschillende processen deze zullen dit event dan ontvangen. Onder deze processen zal dan een process zijn dat de ontvangen messages omzet naar de juiste commands en deze uitvoeren op de read databank.
+
+### Axon Framework door Axoniq
+
 - debezium (CDC)
 - axoniq (event sourcing) (axon framework)
 - Django CQRS Library (python CQRS)
