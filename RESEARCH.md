@@ -34,7 +34,7 @@ UITLEG CQRS
 
 ## Compare existing solutions
 - debezium (CDC)
-- axoniq (event sourcing)
+- axoniq (event sourcing) (axon framework)
 - Django CQRS Library (python CQRS)
 - ...
 
@@ -66,6 +66,7 @@ Non functional volgens project
   - .net
   - java
   - low level?
+  - gekozen .NET ZIE RESEARCH IN GOOGLE DRIVE
 - architectuur 
   - direct projection
   - change stream
