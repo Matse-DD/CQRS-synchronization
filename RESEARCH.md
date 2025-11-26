@@ -49,10 +49,16 @@ Zoals zonet vermeld kan je dus gaan voor aparte databanken voor CQRS. De moeilij
 ### Projector
 Een projector zet het evenement of de verandering in data om naar een correct command, zodat de read databank correct kan worden geüpdatet
 
+### Write databank
+Op de write databank worden enkel de commands van de gebruiker uitgevoerd. Dit wilt zeggen dat indien de gebruiker informatie wilt aanpassen deze databank zal worden gebruikt.
+
+### Read databank
+De read databank word enkel gebruikt om queries uit te voeren dit wilt dus zeggen dat indien de gebruiker informatie wilt opvragen deze databank zal worden gebruikt.
+
 #### Direct projection 
 (Is geen echte term in CQRS by the way maar ik ga ervanuit dat hiermee een CDC bedoeld word met een projectie in)
 
-Deze architectuur zal gebruik maken van een CDC (Change Data Capture) deze zal kijken voor veranderingen in de data van een databank. Eenmaal er een verandering word waargenomen zal deze verandering worden 
+Deze architectuur zal gebruik maken van een CDC (Change Data Capture) deze zal kijken voor veranderingen in de data van de write databank. Eenmaal er een verandering word waargenomen zal deze verandering worden geprojecteerd door de projector zodat we de read databank kunnen aanpassen.
 
 ![Foto van direct projection architectuur](images_research/direct_projector.png)
 
