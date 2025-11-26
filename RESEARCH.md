@@ -129,7 +129,7 @@ De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie
   - uitleg gekozen architectuur + schemas van de diagrammen
 - Evaluatie matrix van de bovenstaande onderdelen
 
-### Programmeertaal
+### Programmeertaal (extra voordelen/nadelen op schrijven is nu precies wat weinig)
 #### Low-level programmeertalen
 - Voordelen
   - Performant
@@ -141,10 +141,38 @@ De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie
 
 #### Typescript
 - Voordelen
+  - Lichte development stack
+  - Zeer goede documentatie
 - Nadelen
+  - Weak typing tijdens het draaien van de applicatie wat voor onverwachte problemen kan zorgen
+  - Veel libraries ondersteunen nog niet alles en vertrouwen ook op veel onderliggende libraries
+    - Een goede ORM dat voor verschillende databanken kan worden ingezet is moeilijk te vinden.
 
 #### C#
+- Voordelen
+  - Een zeer goede ORM (EntityFramwork)
+  - Strong typing
+  - Goede documentatie
+  - Containerisatie is ingebouwd
+- Nadelen
+  - Veel verschillende manieren om het zelfde te implementeren 
+    - Je hebt 3 verschillende manieren om een constructor te gebruiken in C#
+
 #### Java
+- Voordelen
+  - Strong typing
+  - Om iets te doen zal je syntax gewijs meestal maar 1 optie hebben
+    - Constructors
+  - Verbose
+- Nadelen
+  - Boilerplate
+  - Documentatie is minder goed
+
+#### Conclusie
+# HIER EEN TABLE MET DE VERSCHILLENDE OPTIES + VERGELIJKING voor bepaalde onderdelen, snelheid, documentatie, soor typing, duidelijkhied, betrouwbaarheid, ...
+Zeggen waarom typescript en low level niet
+
+Uiteindelijk besluit zowel Java als C# zijn goede kandidaten de reden dat er uiteindelijk voor C# en .NET gekozen is omdat de documentatie beter is. ... (nog wat redenen)
 
 ### CQRS Synchronisatie mogelijkheden
 #### Direct projection 
