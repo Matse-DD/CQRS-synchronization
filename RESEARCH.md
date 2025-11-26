@@ -29,12 +29,7 @@ Product owner:
 ## Master core concepts
 UITLEG CQRS
 ### CQRS concept
-### CQRS Synchronisatie mogelijkheden
-#### Direct projection
-#### Change stream
-#### Change Data Capture (niet 100% zeker)
-#### Outbox
-#### Broker
+### CQRS Synchronisatie (zien of we de verschillende opties moeten uitleggen)
 ### Event Sourcing
 
 ## Compare existing solutions
@@ -66,7 +61,44 @@ Non functional volgens project
 
 
 ## Evaluate technology options
+- Welke progremeer mogelijkheden en gekozen waarom
+  - typescript
+  - .net
+  - java
+  - low level?
+- architectuur 
+  - direct projection
+  - change stream
+  - change data capture
+  - outbox
+  - broker
+  - uitleg gekozen architectuur + schemas van de diagrammen
+- Evaluatie matrix van de bovenstaande onderdelen
+
 ## Run small Proofs of Concept (PoCs)
+- code snippets 
+  - change data stream
+  - uit testen van mogelijkheden
+- resultaat + conclusie
+
+## Publicatie & Open Source Strategy
+- Repo setup
+- Licentie + waarom (vergelijking apache & andere opties)
+- CI/CD basics (test coverage, pipeline, main niet pushen (repo rules), ...)
+- Release strategy (package registry, docker, scripts) (docker zal het waarschijnlijk zijn aangezien we containers moeten gebruiken vanuit de projectbeschrijving) toch de andere opties eens in overweging nemen
+- Release checlist (deliverable)
+
+## Plan & Milestones
+Denken aan de verschillende milestones (research, design, PoC, MVP, release) issues, usecases / epics
+
+## Alternatieven overwogen (bij elke optie bijschrijven wat we overwogen hebben en waarom niet linkjes en referenties nodig)
+
+
+
+
+
+
+# AL WAT DATA 
 
 # Research CQRS-synchronization
 ## Synchronization approach
