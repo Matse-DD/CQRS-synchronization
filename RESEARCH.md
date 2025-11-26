@@ -1,5 +1,7 @@
 # Research flow
 ## Define your research objective
+
+
 - Wat probleem lossen we op?
   - Synchronisatie tussen 2 databanken zonder dat er data verlies optreed voor CQRS doeleinden.
 - Wie zijn de gebruikers?
@@ -7,13 +9,12 @@
 - Hoe weten we of het werkt?
   - Indien we een write doen naar de write databank en deze veranderingen zichtbaar worden in de read databank.
 - Wat is in de scope wat is er buiten
-  - Binnen scope
-    - Synchronisatie
-      - Idempotent (geen dubbele events)
-      - Geen dataverlies
-      - Mogelijkheid tot herstel
-    - Ervoor zorgen dat de databanken loosly coupled zijn
-    - Event sourcing (op later moment)
+  - Synchronisatie
+    - Idempotent (geen dubbele events)
+    - Geen dataverlies
+    - Mogelijkheid tot herstel
+  - Ervoor zorgen dat de databanken loosly coupled zijn
+  - Event sourcing (op later moment)
 
 ## Identify stakeholders and use cases
 De stakeholders zullen vooral developers zijn alsook de product owner.
@@ -37,10 +38,33 @@ Product owner:
 - ...
 
 ## Master core concepts
-UITLEG CQRS
 ### CQRS concept
-### CQRS Synchronisatie (zien of we de verschillende opties moeten uitleggen)
+CQRS ook gekend als Command Query Responsibility Segregation is op het hoogste niveau niet meer dan het opsplitsen van hoe je commands (acties) en queries (opvragen van gegevens) uitvoert op een databanken. Deze opsplitsing gebeurd al op een architetureel niveau waardoor je een aparte service zal hebben voor de queries & commands.
+
+In dit project word er nog een stap verder gegaan en is de databank waar de commands op worden uitgevoerd een andere databank dan deze waar er word van gelezen. 
+
+### CQRS Synchronisatie
+Zoals zonet vermeld kan je dus gaan voor aparte databanken voor CQRS. De moeilijkheid hieraan is hoe ga je ervoor zorgen dat de gegevens tussen de twee databanken hetzelfde is. Hiervoor zijn er verschillende opties zoals hieronder te zien is.
+
+### Projector
+Een projector zet het evenement of de verandering in data om naar een correct command, zodat de read databank correct kan worden geüpdatet
+
+#### Direct projection 
+(Is geen echte term in CQRS by the way maar ik ga ervanuit dat hiermee een CDC bedoeld word met een projectie in)
+
+Deze architectuur zal gebruik maken van een CDC (Change Data Capture) deze zal kijken voor veranderingen in de data van een databank. Eenmaal er een verandering word waargenomen zal deze verandering worden 
+
+![Foto van direct projection architectuur](images_research/direct_projector.png)
+
+
+#### Change stream
+
+#### Outbox
+
+#### Broker
+
 ### Event Sourcing
+
 
 ## Compare existing solutions
 - debezium (CDC)
