@@ -1,3 +1,16 @@
+# Research flow
+## Define your research objective
+De bedoeling van de research is om de correcte architectuur te kiezen voor synchronisatie tussen 2 databanken (CQRS). En of er de mogelijkheid bestaat om later Event Sourcing te gebruiken. Verder is het ook belangrijk dat we een goede keuze maken voor de programmeertaal bepaalde talen zullen de implementatie moeilijker of makkelijker maken.
+
+## Identify stakeholders and use cases
+
+
+## Master core concepts
+## Compare existing solutions
+## Define requirements
+## Evaluate technology options
+## Run small Proofs of Concept (PoCs)
+
 # Research CQRS-synchronization
 ## Synchronization approach
 ### Direct projection
