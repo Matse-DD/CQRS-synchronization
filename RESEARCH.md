@@ -89,25 +89,7 @@ Niet functionele requirements:
 - Observeerbaar -> logs & metrics van de status
 - Reproduceerbaar
 - Documentatie, keuzes en gebruik van bepaalde mogelijkheden
-
-### Volgens project
-Must haves volgens project
-- Implement a domain model with entities (DDD-inspired) for the write side.
-- Detect changes in MongoDB.
-- Update MySQL projections using one of the chosen approaches.
-- Guarantee idempotent updates (no duplicates).
-- Provide recovery/replay so the system can catch up after restarts.
-- Deliver a demo app that shows synchronization flow.
-- Supply a Docker Compose setup (MongoDB, MySQL, and optional broker).
-- Document your setup, design choices, and usage.
-
-Non functional volgens project
-- Reliability: no data loss on restart; consistent updates.
-- Performance: synchronization within a few seconds.
-- Testability: ≥ 80% test coverage.
-- Observability: logs and metrics that show system state.
-- Reproducibility: one-command setup (Docker Compose).
-- Documentation: README and demo examples
+- Gebruik van DDD-model
 
 ### Acceptance checkpoint (IS DIT WELL CORRECT NAKIJKEN)
 De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie implementatie tussen een mongoDb (write databank) en mysql (read databank) dit met een hoge betrouwbaarheid en snelheid. 
