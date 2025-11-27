@@ -98,15 +98,14 @@ De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie
 - Programmeertalen en frameworks
   - TypeScript
   - Java
-  - **.NET (ASP.NET, MediatR, EFCore)**
-  - Go
-  - Systeemtalen (C / C++ / Rust)
+  - C#
+  - Systeemtalen (C / C++)
 - Architectuur 
-  - **Direct Projection**
-  - **Change Stream (MongoDB specifiek)**
+  - Direct Projection
+  - Change Stream (MongoDB specifiek)
   - CDC (Change Data Capture)
-  - **Outbox**
-  - Message / Event Broker
+  - Outbox
+  - Message/Event Broker
 
 | Technologie                  | Type        | Voordelen                                                                                                                     | Nadelen                                                                                                 | Conclusie                                                                                                                 |
 |:-----------------------------|:------------|:------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------|
@@ -185,19 +184,21 @@ Zowel Java als C# zijn zeer goede kandidaten. Ze zijn allebei zeer betrouwbaar e
 
 ### CQRS Synchronisatie mogelijkheden
 #### Direct projection 
-(Is geen echte term in CQRS by the way maar ik ga ervanuit dat hiermee een CDC bedoeld word met een projectie in)
-
-Deze architectuur zal gebruik maken van een CDC (Change Data Capture) deze zal kijken voor veranderingen in de data van de write databank. Eenmaal er een verandering word waargenomen zal deze verandering worden geprojecteerd door de projector zodat de read databank kan worden aangepast.
+Een direct projection zal kijken naar voor veranderingen in de data van de write databank. Eenmaal er een verandering word waargenomen zal deze verandering worden geprojecteerd door de projector zodat de read databank kan worden aangepast. Een direct projection is geen goede oplossing aangezien je later geen data zal kunnen recoveren en het gaat ook moeilijk worden indien er een verandering gemist word. Ook zullen veranderingen niet meer kunnen worden waargenomen eenmaal de verandering voorbij is. 
 
 ![Foto van direct projection architectuur](images_research/direct_projector.png)
 
 #### Outbox
+Deze architectuur houd de verschillende evenementen bij in een table/collectie in de databank. Vervolgens kan dan gekeken worden naar de outobox voor veranderingen dit opnieuw door polling op het log bestand. Als dan een verandering plaats vind word de verandering opnieuw door gegeven aan een projector. Waarna deze de aanpassing toepast op de read databank. Recovery is mogelijk indien je het laatste geslaagde event bij houd. Op basis van dit event kan je bepalen wat het volgende event is dat aanwezig is in de outbox. Verder is het atomisch door dat er gebruik word gemaakt van verschillende databank transacties. En omdat de projection kan zeggen tegen de outbox dat een event gelukt is. Dit zorgt ervoor dat deze optie atomisch is.
 
 #### Message Broker
-Deze optie maakt gebruik van een message broker en polling
+Deze optie maakt gebruik van een message broker en polling. Je kan een message broker dusdanig configureren dat deze de verschillende events persistent bijhoud wat dus wilt zeggen dat de events niet verloren indien de message broker neer zou gaan. Er is eigenlijk geen gemakkelijke manier om dit atomic te maken tenzij je een outbox toevoegt.
 
 #### Change stream
-Deze synchronisatie mogelijkheid zal gebruik maken van een mongodb specifiek feature. Namelijk Change stream dit is in staat om veranderingen in de databank te zien en vervolgens deze veranderingen te sturen naar verschillende processen dat hier op luisteren. Deze feature vervangt dus eigenlijk de polling & message broker combinatie. (Polling kijkt naar veranderingen de message broker stuurt deze veranderingen naar iederen dat wilt luisteren). Vervolgens zal er een projectie worden gemaakt om het event om te zetten en de read databank aan te passen. 
+Deze synchronisatie mogelijkheid zal gebruik maken van een mongodb specifiek feature. Namelijk Change stream dit is in staat om veranderingen in de databank te zien en vervolgens deze veranderingen te sturen naar verschillende processen dat hier op luisteren. Deze feature vervangt dus eigenlijk het polling mechanisme van een direct projector. Maar change stream alleen zal niet atomisch zijn en recovery zal ook niet mogelijk zijn.
+
+#### Conclusie
+
 
 ### Opslaan van events
 #### Event Sourcing
