@@ -226,6 +226,37 @@ Deze synchronisatie mogelijkheid zal gebruik maken van een mongodb specifiek fea
 
 
 ## Run small Proofs of Concept (PoCs)
+### Event Sourcing in Dotnet
+
+```cs
+var client = new MongoClient("mongodb://localhost:27017");
+var database = client.GetDatabase("testest");
+var collection = database.GetCollection<BsonDocument>("testest");
+var pipeline = new EmptyPipelineDefinition<ChangeStreamDocument<BsonDocument>>()
+  .Match("{operationType: { $in: ['insert', 'delete', 'update'] }}");
+
+var options = new ChangeStreamOptions
+{
+  FullDocument = ChangeStreamFullDocumentOption.UpdateLookup
+};
+
+using var cursor = collection.Watch(pipeline, options);
+
+Console.WriteLine("Watching for changes...");
+
+_ = Task.Run(async () =>
+  {
+  await Task.Delay(1000);
+    await collection.InsertOneAsync(new BsonDocument("Name", "Jack"));
+  });
+
+foreach (var change in cursor.ToEnumerable())
+  {
+    Console.WriteLine("Change detected!");
+    Console.WriteLine(change.FullDocument);
+  }
+```
+
 - code snippets 
   - change data stream
   - uit testen van mogelijkheden
