@@ -223,15 +223,10 @@ Uiteindelijk hebben we gekozen voor een combinatie van zowel de outbox als de ch
 Wat het volgende schema maakt:
 ![Foto gekozen architectuur combinatie outbox + change stream](./images_research/outbox_change_stream_sync.png)
 
-### Opslaan van events
-#### Event Sourcing
-
-#### Events
-
-
 ## Run small Proofs of Concept (PoCs)
-### Event Sourcing in Dotnet
+### Change Stream met MongoDB in Dotnet
 
+[Volledige code change stream](https://github.com/LanderDebeir/ChangestreamTryout)
 ```cs
 var client = new MongoClient("mongodb://localhost:27017");
 var database = client.GetDatabase("testest");
@@ -261,11 +256,61 @@ await cursor.ForEachAsync(change => {
 ```
 Dit codevoorbeeld toont hoe je aan event sourcing doet in dotnet. Als je kan zien is dit redelijk simpel. Je maakt gewoon een cursor object aan via de `Watch()` methode (`WatchAsync()` voor async applicaties). De informatie voor dit codevoorbeeld is verkregen via de [MongoDB docs](https://www.mongodb.com/docs/drivers/csharp/current/logging-and-monitoring/change-streams/)
 
+De change stream geeft volgende events weer bij het gebruik van BackingDocuments indien er een aanpassing is
+```js
+{ "_id" : { "_data" : "..." }, "operationType" : "update", "clusterTime" : Timestamp(...),
+"wallTime" : ISODate("..."), "ns" : { "db" : "sample_restaurants", "coll" : "restaurants" },
+"documentKey" : { "_id" : ObjectId("...") }, "updateDescription" : { "updatedFields" : { "cuisine" : "Irish" },
+"removedFields" : [], "truncatedArrays" : [] } }
+```
 
-- code snippets 
-  - change data stream
-  - uit testen van mogelijkheden
-- resultaat + conclusie
+De change stream stelt het ook mogelijk om het volledige aangepaste veld te zien bij een aanpassing met FulDocument
+```js
+{ "_id" : { "$oid" : "69285ec4b7355988a3e5083a" }, "address" : { "building" : "1007", "coord" : [-73.856076999999999, 40.848447], "street" : "Morris Park Ave", "zipcode" : "55555" }, "borough" : "Bronx", "cuisine" : "Bakery", "grades" : [{ "date" : { "$date" : "2014-03-03T00:00:00Z" }, "grade" : "A", "score" : 2 }, { "date" : { "$date" : "2013-09-11T00:00:00Z" }, "grade" : "A", "score" : 6 }, { "date" : { "$date" : "2013-01-24T00:00:00Z" }, "grade" : "A", "score" : 10 }, { "date" : { "$date" : "2011-11-23T00:00:00Z" }, "grade" : "A", "score" : 9 }, { "date" : { "$date" : "2011-03-10T00:00:00Z" }, "grade" : "B", "score" : 14 }], "name" : "Morris Park Bake Shop", "restaurant_id" : "30075445" }
+```
+
+#### Nu rest de vraag natuurlijk werkt dit ook in een container? 
+Dit werkt ook in een container in deze POC is er gekozen voor docker de aanpassingen om dit te laten werken voor een container zijn.
+
+Het aangeven aan de container dat het zal gebruikt worden als een replica-set [Replica set documentation](https://www.mongodb.com/docs/manual/reference/method/rs.initiate/) voor de rest zal de code er hetzelfde uitzien als in bovenstaande voorbeeld.
+
+[Volledige code change stream in container](https://github.com/Or3nges/POC-mongoDB-change-streams-in-docker)
+```js
+function initiateReplicaSet() {
+  try {
+    const status = rs.status();
+    if (status.ok === 1) {
+      print("Replica set already initialized.");
+      return;
+    }
+  } catch (e) {
+    print("Replica set not initialized, proceeding...");
+  }
+
+  rs.initiate({
+    _id: "rs0",
+    members: [{ _id: 0, host: "mongo-db:27017" }]
+  });
+
+  print("Replica set initiated.");
+}
+
+let retries = 10;
+while (retries > 0) {
+  try {
+    initiateReplicaSet();
+    break;
+  } catch (err) {
+    print("MongoDB not ready yet, retrying in 2s...");
+    sleep(2000);
+    retries--;
+  }
+}
+
+if (retries === 0) {
+  print("Failed to initiate replica set after multiple attempts.");
+}
+```
 
 ## Publicatie & Open Source Strategy
 - Repo setup
