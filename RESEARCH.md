@@ -114,21 +114,35 @@ Non functional volgens project
 ### Acceptance checkpoint (IS DIT WELL CORRECT NAKIJKEN)
 De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie implementatie tussen een mysql (write databank) en mysql (read databank) dit met een hoge betrouwbaarheid en snelheid. 
 
-## Evaluate technology options
-- Welke progremeer mogelijkheden en gekozen waarom
-  - typescript
-  - .net
-  - java
-  - low level?
-  - gekozen .NET ZIE RESEARCH IN GOOGLE DRIVE
-- architectuur 
-  - direct projection
-  - change stream
-  - change data capture
-  - outbox
-  - broker
-  - uitleg gekozen architectuur + schemas van de diagrammen
-- Evaluatie matrix van de bovenstaande onderdelen
+## Evaluatie Tech-stack
+- Programmeertalen en frameworks
+  - TypeScript
+  - Java
+  - **.NET (ASP.NET, MediatR, EFCore)**
+  - Go
+  - Systeemtalen (C / C++ / Rust)
+- Architectuur 
+  - **Direct Projection**
+  - **Change Stream (MongoDB specifiek)**
+  - CDC (Change Data Capture)
+  - **Outbox**
+  - Message / Event Broker
+
+| Technologie                  | Type        | Voordelen                                                                                                                     | Nadelen                                                                                                 | Conclusie                                                                                                                 |
+|:-----------------------------|:------------|:------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------|
+| **.NET (C#) / ASP.NET**      | Managed     | **Sterke Type-veiligheid** (ook runtime), volwassen ecosysteem (MediatR, EF Core), snelle development door krachtige tooling. | Iets zwaarder dan Go of Node.js, maar verwaarloosbaar voor deze use-case.                               | **Gekozen.** Biedt de beste balans tussen veiligheid, snelheid van ontwikkelen en robuuste frameworks voor CQRS.          |
+| **Java**                     | Managed     | Vergelijkbaar met C# qua robuustheid en type-veiligheid.                                                                      | Vaak meer boilerplate code nodig; team expertise ligt sterker bij C#.                                   | **Afgevallen.** Technisch capabel, maar minder efficiënt gezien de huidige stack-voorkeur.                                |
+| **TypeScript (Node/Deno)**   | Interpreted | Snel op te zetten, JSON-native (handig voor MongoDB).                                                                         | **Weak typing bij runtime**: data-integriteit is lastig te garanderen. Minder volwassen CQRS-tooling.   | **Afgevallen.** Risico op data-inconsistentie door gebrek aan strikte runtime types is te groot voor een sync-applicatie. |
+| **Go (Golang)**              | Compiled    | Zeer hoge performance, simpele concurrency.                                                                                   | Minder krachtige ORM's/Frameworks vergeleken met EF Core. Verbose error handling vertraagt development. | **Afgevallen.** Performance winst weegt niet op tegen het gemis aan enterprise features (zoals MediatR).                  |
+| **Systeemtalen (C++/Rust)**  | Low-level   | Maximale controle en performance.                                                                                             | **Hoge complexiteit.** Geheugenbeheer is handmatig. Development tijd is drastisch langer.               | **Afgevallen.** Te complex ("heavy lifting" zelf doen) voor een architectuur-gefocust probleem.                           |
+
+| Patroon                     | Omschrijving                                                                               | Voordelen                                                                                                   | Nadelen                                                                                           | Conclusie                                                                             |
+|:----------------------------|:-------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------|
+| **Outbox Pattern**          | Events eerst opslaan in een lokale tabel/collectie binnen dezelfde transactie als de data. | **Garandeert consistentie** (geen "dual-write" probleem). Events gaan nooit verloren als de broker down is. | Vereist een mechanisme om de outbox uit te lezen (polling of streaming).                          | **Gekozen.** Cruciaal voor betrouwbaarheid.                                           |
+| **Change Stream (MongoDB)** | Real-time stream van database wijzigingen (Oplog).                                         | Geen polling nodig (push-based), zeer efficiënt, native MongoDB feature.                                    | Specifiek voor MongoDB.                                                                           | **Gekozen.** Wordt gebruikt om de Outbox efficiënt uit te lezen zonder zware polling. |
+| **Direct Projection**       | Code schrijft direct naar beide databases.                                                 | Simpel te implementeren.                                                                                    | **Gevaarlijk:** Als de tweede write faalt, zijn de databases inconsistent. Geen retry mechanisme. | **Afgevallen.** Te foutgevoelig.                                                      |
+| **CDC (Debezium/Kafka)**    | Change Data Capture via database logs.                                                     | Zeer robuust, ontkoppeld.                                                                                   | **Hoge infrastructuur complexiteit** (vereist Kafka/Zookeeper). Overkill voor deze schaal.        | **Afgevallen.** Teveel overhead voor het huidige doel.                                |
+| **Message Broker**          | RabbitMQ / Azure Service Bus.                                                              | Goede buffering en ontkoppeling.                                                                            | Introduceert een extra component die beheerd moet worden.                                         | **Deels vervangen.** De Outbox + Sync Service fungeert hier als de broker.            |
 
 ### Programmeertaal (extra voordelen/nadelen op schrijven is nu precies wat weinig)
 #### Low-level programmeertalen
