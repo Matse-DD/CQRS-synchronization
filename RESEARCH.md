@@ -178,18 +178,13 @@ De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie
 | **Documentatie**    | Versnipperd          | Zeer goed                  | Verspreid               | Uitstekend (Gecentraliseerd) |
 | **Containerisatie** | Handmatig            | Goed                       | Goed                    | Uitstekend (Native)          |
 
-**Waarom geen Systeemtalen (C++ / C / Rust)?**
-Wij hebben low level systeemtalen laten vallen omdat deze zouden zorgen voor veel handmatig werk in vergelijking met wat talen met ORM en frameworks al voor ons kunnen doen.
-Bij C#, Java of TypeScript zijn er al frameworks of syntax die al veel "heavy lifting" kunnen doen wat efficiënter zou zijn met onze gelimiteerde development tijd.
+**Waarom geen Systeemtalen of TypeScript?**
 
-**Waarom geen TypeScript (Deno/Bun/Node)?**
-TypeScript viel af omdat het nog niet zo volwassen is als Java of C# wanneer het kwam bij CQRS of ORM. TypeScript heeft ook geen perfecte type veiligheid, wat integraal is voor een data synchronisatie 
-applicatie zoals dit. TypeScript biedt alleen type-veiligheid aan bij compile time, niet bij runtime (weak typing).
+Bij de taalkeuze zijn zowel low-level systeemtalen (C++, C, Rust) als TypeScript (Deno, Bun, Node) afgevallen, elk omwille van specifieke beperkingen ten opzichte van onze architecturale doelen.
 
-Er zal niet gekozen worden voor low-level programmeertalen aangezien deze een zeer hoge complexiteit hebben. Dit mede doordat je minder cadeau krijgt en het dus zelf zal moeten maken en omdat je dichter bij het systeem werkt en dus bijvoorbeeld geheugenbeheer zelf zal moeten afhandelen. Deze hoge talen zijn wel zeer snel en performant indien ze correct worden gebruikt. We willen echter focussen op de architectuur en er zeker van zijn dat de 2 databanken synchroon lopen. Dit is al een redelijk complex process waar de taal complexiteit niet echt gewenst is.
+**Systeemtalen** zijn niet weerhouden vanwege de hoge complexiteit en de aanzienlijke hoeveelheid handmatig werk. Hoewel deze talen zeer performant zijn indien correct gebruikt, krijg je "minder cadeau" van het platform; zaken zoals geheugenbeheer moet je zelf afhandelen. Gezien onze focus ligt op de architectuur van een complex synchronisatieproces tussen twee databanken, is deze extra laagdrempelige complexiteit niet gewenst. We verkiezen talen (zoals C# of Java) waarbij frameworks en ORM-ondersteuning het "heavy lifting" doen, wat efficiënter is voor onze gelimiteerde ontwikkeltijd.
 
-TypeScript hoewel een goede optie is uiteindelijk niet de keuze geworden omdat het eco-systeem nog een beetje moet worden uitgebreid. Ook is het zo dat TypeScript strongly typed is dit wilt zeggen dat je tijdens het programmeren rekening word gehouden met de types maar eenmaal dat de applicatie draait word het loosly typed dit wilt zeggen dat als er iets binnen komt dat een ander formaat heeft dan dat er word verwacht zal het programma niet klagen en gewoon verder doen. Wat problematisch is bij CQRS aangezien hier de structuren van de data curciaal is en we dus willen weten als deze foutief is.
-
+**TypeScript** viel af omdat het ecosysteem rondom CQRS en ORM nog niet zo volwassen is als dat van de gevestigde waarden. Daarnaast is de type-veiligheid een kritiek punt. TypeScript is strongly typed tijdens compile-time, maar wordt loosely typed tijdens runtime ("weak typing"). Dit betekent dat als data binnenkomt in een ander formaat dan verwacht, de applicatie niet noodzakelijk klaagt en gewoon verdergaat. Voor een datasync-applicatie die leunt op CQRS, waarbij de correctheid van datastructuren cruciaal is, vormt dit gebrek aan strikte runtime-controle een te groot risico.
 Zowel Java als C# zijn zeer goede kandidaten. Ze zijn allebei zeer betrouwbaar en goed uitgewerkt. Met een volwaarde eco-systeem en ondersteuning. V
 Uiteindelijk besluit zowel Java als C# zijn goede kandidaten de reden dat er uiteindelijk voor C# en .NET gekozen is omdat de documentatie beter is. ... (nog wat redenen)
 
