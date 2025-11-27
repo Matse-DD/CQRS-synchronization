@@ -168,8 +168,14 @@ De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie
   - Boilerplate
   - Documentatie is minder goed
 
-#### Conclusie
-# HIER EEN TABLE MET DE VERSCHILLENDE OPTIES + VERGELIJKING voor bepaalde onderdelen, snelheid, documentatie, soor typing, duidelijkhied, betrouwbaarheid, ...
+#### Conclusie (nakijken of dat deze tabel  wel klopt en dat de verschillende onderdelen wel relevant zijn)
+| | Complexiteit | Snelheid  | Ondersteuning (datastructuren, libraries, ...) | Typering | Documentatie |
+| ------------------------------- |--------- | --------- | --------- | --------- | --------- |
+| **Low-level programmeertalen**  | hoog | zeer goed | minder | afhankelijk van de taal meestal statically typed | eerder complex |
+| **TypeScript**                  | laag | goed   | minder | strongly typed tijdens schrijven loosly typed tijdens het draaien | zeer goed |
+| **Java**                        | gewoon | goed | zeer goed | strongly typed | minder goed |
+| **C#**                          | gewoon | goed    | zeer goed | strongly typed | goed |
+
 Zeggen waarom typescript en low level niet
 
 Uiteindelijk besluit zowel Java als C# zijn goede kandidaten de reden dat er uiteindelijk voor C# en .NET gekozen is omdat de documentatie beter is. ... (nog wat redenen)
