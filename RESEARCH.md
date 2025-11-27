@@ -168,13 +168,23 @@ De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie
   - Boilerplate
   - Documentatie is minder goed
 
-#### Conclusie (nakijken of dat deze tabel  wel klopt en dat de verschillende onderdelen wel relevant zijn)
-| | Complexiteit | Snelheid  | Ondersteuning (datastructuren, libraries, ...) | Typering | Documentatie |
-| ------------------------------- |--------- | --------- | --------- | --------- | --------- |
-| **Low-level programmeertalen**  | hoog | zeer goed | minder | afhankelijk van de taal meestal statically typed | eerder complex |
-| **TypeScript**                  | laag | goed   | minder | strongly typed tijdens schrijven loosly typed tijdens het draaien | zeer goed |
-| **Java**                        | gewoon | goed | zeer goed | strongly typed | minder goed |
-| **C#**                          | gewoon | goed    | zeer goed | strongly typed | goed |
+#### Conclusie
+| Criterium           | Low-level (C++/Rust) | TypeScript (Node.js)       | Java                    | C# (.NET)                    |
+|:--------------------|:---------------------|:---------------------------|:------------------------|:-----------------------------|
+| **Performantie**    | Extreem hoog         | Gemiddeld                  | Hoog                    | Hoog                         |
+| **Type Veiligheid** | Strikt               | Matig (enkel compile-time) | Strikt                  | Strikt                       |
+| **ORM Kwaliteit**   | Beperkt / Complex    | Matig                      | Goed (veel boilerplate) | Uitstekend (EF Core)         |
+| **Dev Snelheid**    | Laag                 | Zeer hoog                  | Gemiddeld               | Hoog                         |
+| **Documentatie**    | Versnipperd          | Zeer goed                  | Verspreid               | Uitstekend (Gecentraliseerd) |
+| **Containerisatie** | Handmatig            | Goed                       | Goed                    | Uitstekend (Native)          |
+
+**Waarom geen Systeemtalen (C++ / C / Rust)?**
+Wij hebben low level systeemtalen laten vallen omdat deze zouden zorgen voor veel handmatig werk in vergelijking met wat talen met ORM en frameworks al voor ons kunnen doen.
+Bij C#, Java of TypeScript zijn er al frameworks of syntax die al veel "heavy lifting" kunnen doen wat efficiënter zou zijn met onze gelimiteerde development tijd.
+
+**Waarom geen TypeScript (Deno/Bun/Node)?**
+TypeScript viel af omdat het nog niet zo volwassen is als Java of C# wanneer het kwam bij CQRS of ORM. TypeScript heeft ook geen perfecte type veiligheid, wat integraal is voor een data synchronisatie 
+applicatie zoals dit. TypeScript biedt alleen type-veiligheid aan bij compile time, niet bij runtime (weak typing).
 
 Er zal niet gekozen worden voor low-level programmeertalen aangezien deze een zeer hoge complexiteit hebben. Dit mede doordat je minder cadeau krijgt en het dus zelf zal moeten maken en omdat je dichter bij het systeem werkt en dus bijvoorbeeld geheugenbeheer zelf zal moeten afhandelen. Deze hoge talen zijn wel zeer snel en performant indien ze correct worden gebruikt. We willen echter focussen op de architectuur en er zeker van zijn dat de 2 databanken synchroon lopen. Dit is al een redelijk complex process waar de taal complexiteit niet echt gewenst is.
 
