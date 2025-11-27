@@ -169,18 +169,23 @@ De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie
   - Boilerplate
   - Documentatie is minder goed
 
-#### Conclusie (nakijken of dat deze tabel  wel klopt en dat de verschillende onderdelen wel relevant zijn)
-| | Complexiteit | Snelheid  | Ondersteuning (datastructuren, libraries, ...) | Typering | Documentatie |
-| ------------------------------- |--------- | --------- | --------- | --------- | --------- |
-| **Low-level programmeertalen**  | hoog | zeer goed | minder | afhankelijk van de taal meestal statically typed | eerder complex |
-| **TypeScript**                  | laag | goed   | minder | strongly typed tijdens schrijven loosly typed tijdens het draaien | zeer goed |
-| **Java**                        | gewoon | goed | zeer goed | strongly typed | minder goed |
-| **C#**                          | gewoon | goed    | zeer goed | strongly typed | goed |
+#### Conclusie
+| Criterium           | Low-level (C++/Rust) | TypeScript (Node.js)       | Java                    | C# (.NET)                    |
+|:--------------------|:---------------------|:---------------------------|:------------------------|:-----------------------------|
+| **Performantie**    | Extreem hoog         | Gemiddeld                  | Hoog                    | Hoog                         |
+| **Type Veiligheid** | Strikt               | Matig (enkel compile-time) | Strikt                  | Strikt                       |
+| **ORM Kwaliteit**   | Beperkt / Complex    | Matig                      | Goed (veel boilerplate) | Uitstekend (EF Core)         |
+| **Dev Snelheid**    | Laag                 | Zeer hoog                  | Gemiddeld               | Hoog                         |
+| **Documentatie**    | Versnipperd          | Zeer goed                  | Verspreid               | Uitstekend (Gecentraliseerd) |
+| **Containerisatie** | Handmatig            | Goed                       | Goed                    | Uitstekend (Native)          |
 
-Er zal niet gekozen worden voor low-level programmeertalen aangezien deze een zeer hoge complexiteit hebben. Dit mede doordat je minder cadeau krijgt en het dus zelf zal moeten maken en omdat je dichter bij het systeem werkt en dus bijvoorbeeld geheugenbeheer zelf zal moeten afhandelen. Deze hoge talen zijn wel zeer snel en performant indien ze correct worden gebruikt. We willen echter focussen op de architectuur en er zeker van zijn dat de 2 databanken synchroon lopen. Dit is al een redelijk complex process waar de taal complexiteit niet echt gewenst is.
+**Waarom geen Systeemtalen of TypeScript?**
 
-TypeScript hoewel een goede optie is uiteindelijk niet de keuze geworden omdat het eco-systeem nog een beetje moet worden uitgebreid. Ook is het zo dat TypeScript strongly typed is dit wilt zeggen dat je tijdens het programmeren rekening word gehouden met de types maar eenmaal dat de applicatie draait word het loosly typed dit wilt zeggen dat als er iets binnen komt dat een ander formaat heeft dan dat er word verwacht zal het programma niet klagen en gewoon verder doen. Wat problematisch is bij CQRS aangezien hier de structuren van de data curciaal is en we dus willen weten als deze foutief is.
+Bij de taalkeuze zijn zowel low-level systeemtalen (C++, C, Rust) als TypeScript (Deno, Bun, Node) afgevallen, elk omwille van specifieke beperkingen ten opzichte van onze architecturale doelen.
 
+**Systeemtalen** zijn niet weerhouden vanwege de hoge complexiteit en de aanzienlijke hoeveelheid handmatig werk. Hoewel deze talen zeer performant zijn indien correct gebruikt, krijg je "minder cadeau" van het platform; zaken zoals geheugenbeheer moet je zelf afhandelen. Gezien onze focus ligt op de architectuur van een complex synchronisatieproces tussen twee databanken, is deze extra laagdrempelige complexiteit niet gewenst. We verkiezen talen (zoals C# of Java) waarbij frameworks en ORM-ondersteuning het "heavy lifting" doen, wat efficiënter is voor onze gelimiteerde ontwikkeltijd.
+
+**TypeScript** viel af omdat het ecosysteem rondom CQRS en ORM nog niet zo volwassen is als dat van de gevestigde waarden. Daarnaast is de type-veiligheid een kritiek punt. TypeScript is strongly typed tijdens compile-time, maar wordt loosely typed tijdens runtime ("weak typing"). Dit betekent dat als data binnenkomt in een ander formaat dan verwacht, de applicatie niet noodzakelijk klaagt en gewoon verdergaat. Voor een datasync-applicatie die leunt op CQRS, waarbij de correctheid van datastructuren cruciaal is, vormt dit gebrek aan strikte runtime-controle een te groot risico.
 Zowel Java als C# zijn zeer goede kandidaten. Ze zijn allebei zeer betrouwbaar en goed uitgewerkt. Met een volwaarde eco-systeem en ondersteuning. V
 Uiteindelijk besluit zowel Java als C# zijn goede kandidaten de reden dat er uiteindelijk voor C# en .NET gekozen is omdat de documentatie beter is. ... (nog wat redenen)
 
@@ -214,7 +219,7 @@ Deze synchronisatie mogelijkheid zal gebruik maken van een mongodb specifiek fea
 
 ## Publicatie & Open Source Strategy
 - Repo setup
-- Licentie + waarom (vergelijking apache & andere opties)
+- Licentie: We hebben gekozen voor een MIT-License voor maximale vrijheid, eenvoudigheid en omdat dit de standaard is voor .NET projecten zoals dit. MIT is permissief en staat non-commercieel en commercieel (en zelf closed source) gebruik toe zonder enige complexe patentclausules.
 - CI/CD basics (test coverage, pipeline, main niet pushen (repo rules), ...)
 - Release strategy (package registry, docker, scripts) (docker zal het waarschijnlijk zijn aangezien we containers moeten gebruiken vanuit de projectbeschrijving) toch de andere opties eens in overweging nemen
 - Release checlist (deliverable)
