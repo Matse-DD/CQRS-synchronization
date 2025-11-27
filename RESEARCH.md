@@ -209,7 +209,7 @@ Deze architectuur zal gebruik maken van een CDC (Change Data Capture) deze zal k
 
 ## Publicatie & Open Source Strategy
 - Repo setup
-- Licentie + waarom (vergelijking apache & andere opties)
+- Licentie: We hebben gekozen voor een MIT-License voor maximale vrijheid, eenvoudigheid en omdat dit de standaard is voor .NET projecten zoals dit. MIT is permissief en staat non-commercieel en commercieel (en zelf closed source) gebruik toe zonder enige complexe patentclausules.
 - CI/CD basics (test coverage, pipeline, main niet pushen (repo rules), ...)
 - Release strategy (package registry, docker, scripts) (docker zal het waarschijnlijk zijn aangezien we containers moeten gebruiken vanuit de projectbeschrijving) toch de andere opties eens in overweging nemen
 - Release checlist (deliverable)
