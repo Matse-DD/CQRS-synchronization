@@ -56,6 +56,7 @@ Op de write databank worden enkel de commands van de gebruiker uitgevoerd. Dit w
 De read databank word enkel gebruikt om queries uit te voeren dit wilt dus zeggen dat indien de gebruiker informatie wilt opvragen deze databank zal worden gebruikt.
 
 ### Event Sourcing
+Dit is het principe van het opslaan van verschillende events en deze events toe te passen op data. Het is dan mogelijk om naar een vorige staat van de data terug te keren door de events terug af te spelen vanaf de start staat. Of door het omgekeerde van de events uit te voeren dit hangt af van de implementatie. Event sourcing zorgt voor een duidelijk overzicht van welke acties allemaal ondernomen zijn op de data waardoor de momentele staat bereikt is. 
 
 ## Compare existing solutions
 ### Debezium (https://debezium.io/)
@@ -198,7 +199,7 @@ Deze architectuur zal gebruik maken van een CDC (Change Data Capture) deze zal k
 
 #### Broker
 
-### Event Sourcing
+### Event Sourcing // MOET DIT HIER???
 
 
 ## Run small Proofs of Concept (PoCs)
