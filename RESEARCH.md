@@ -240,7 +240,7 @@ var options = new ChangeStreamOptions
   FullDocument = ChangeStreamFullDocumentOption.UpdateLookup
 };
 
-using var cursor = collection.Watch(pipeline, options);
+using var cursor = await collection.WatchAsync(pipeline, options);
 
 Console.WriteLine("Watching for changes...");
 
@@ -250,12 +250,13 @@ _ = Task.Run(async () =>
     await collection.InsertOneAsync(new BsonDocument("Name", "Jack"));
   });
 
-foreach (var change in cursor.ToEnumerable())
-  {
-    Console.WriteLine("Change detected!");
-    Console.WriteLine(change.FullDocument);
-  }
+await cursor.ForEachAsync(change => {
+  Console.WriteLine("Change detected!");
+  Console.WriteLine(change.FullDocument);
+})
 ```
+Dit codevoorbeeld toont hoe je aan event sourcing doet in dotnet. Als je kan zien is dit redelijk simpel. Je maakt gewoon een cursor object aan via de `Watch()` methode (`WatchAsync()` voor async applicaties). De informatie voor dit codevoorbeeld is verkregen via de [MongoDB docs](https://www.mongodb.com/docs/drivers/csharp/current/logging-and-monitoring/change-streams/)
+
 
 - code snippets 
   - change data stream
