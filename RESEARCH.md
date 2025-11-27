@@ -1,7 +1,5 @@
 # Research flow
 ## Define your research objective
-
-
 - Wat probleem lossen we op?
   - Synchronisatie tussen 2 databanken zonder dat er data verlies optreed voor CQRS doeleinden.
 - Wie zijn de gebruikers?
