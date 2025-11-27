@@ -176,8 +176,11 @@ De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie
 | **Java**                        | gewoon | goed | zeer goed | strongly typed | minder goed |
 | **C#**                          | gewoon | goed    | zeer goed | strongly typed | goed |
 
-Zeggen waarom typescript en low level niet
+Er zal niet gekozen worden voor low-level programmeertalen aangezien deze een zeer hoge complexiteit hebben. Dit mede doordat je minder cadeau krijgt en het dus zelf zal moeten maken en omdat je dichter bij het systeem werkt en dus bijvoorbeeld geheugenbeheer zelf zal moeten afhandelen. Deze hoge talen zijn wel zeer snel en performant indien ze correct worden gebruikt. We willen echter focussen op de architectuur en er zeker van zijn dat de 2 databanken synchroon lopen. Dit is al een redelijk complex process waar de taal complexiteit niet echt gewenst is.
 
+TypeScript hoewel een goede optie is uiteindelijk niet de keuze geworden omdat het eco-systeem nog een beetje moet worden uitgebreid. Ook is het zo dat TypeScript strongly typed is dit wilt zeggen dat je tijdens het programmeren rekening word gehouden met de types maar eenmaal dat de applicatie draait word het loosly typed dit wilt zeggen dat als er iets binnen komt dat een ander formaat heeft dan dat er word verwacht zal het programma niet klagen en gewoon verder doen. Wat problematisch is bij CQRS aangezien hier de structuren van de data curciaal is en we dus willen weten als deze foutief is.
+
+Zowel Java als C# zijn zeer goede kandidaten. Ze zijn allebei zeer betrouwbaar en goed uitgewerkt. Met een volwaarde eco-systeem en ondersteuning. V
 Uiteindelijk besluit zowel Java als C# zijn goede kandidaten de reden dat er uiteindelijk voor C# en .NET gekozen is omdat de documentatie beter is. ... (nog wat redenen)
 
 ### CQRS Synchronisatie mogelijkheden
