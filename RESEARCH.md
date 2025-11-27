@@ -192,12 +192,30 @@ Een direct projection zal kijken naar voor veranderingen in de data van de write
 Deze architectuur houd de verschillende evenementen bij in een table/collectie in de databank. Vervolgens kan dan gekeken worden naar de outobox voor veranderingen dit opnieuw door polling op het log bestand. Als dan een verandering plaats vind word de verandering opnieuw door gegeven aan een projector. Waarna deze de aanpassing toepast op de read databank. Recovery is mogelijk indien je het laatste geslaagde event bij houd. Op basis van dit event kan je bepalen wat het volgende event is dat aanwezig is in de outbox. Verder is het atomisch door dat er gebruik word gemaakt van verschillende databank transacties. En omdat de projection kan zeggen tegen de outbox dat een event gelukt is. Dit zorgt ervoor dat deze optie atomisch is.
 
 #### Message Broker
-Deze optie maakt gebruik van een message broker en polling. Je kan een message broker dusdanig configureren dat deze de verschillende events persistent bijhoud wat dus wilt zeggen dat de events niet verloren indien de message broker neer zou gaan. Er is eigenlijk geen gemakkelijke manier om dit atomic te maken tenzij je een outbox toevoegt.
+Deze optie maakt gebruik van een message broker en polling. Je kan een message broker dusdanig configureren dat deze de verschillende events persistent bijhoud wat dus wilt zeggen dat de events niet verloren indien de message broker neer zou gaan. Er is eigenlijk geen gemakkelijke manier om dit atomic te maken tenzij je een outbox toevoegt of gebruik maakt van saga's.
 
 #### Change stream
-Deze synchronisatie mogelijkheid zal gebruik maken van een mongodb specifiek feature. Namelijk Change stream dit is in staat om veranderingen in de databank te zien en vervolgens deze veranderingen te sturen naar verschillende processen dat hier op luisteren. Deze feature vervangt dus eigenlijk het polling mechanisme van een direct projector. Maar change stream alleen zal niet atomisch zijn en recovery zal ook niet mogelijk zijn.
+Deze synchronisatie mogelijkheid zal gebruik maken van een mongodb specifiek feature. Namelijk Change stream dit is in staat om veranderingen in de databank te zien en vervolgens deze veranderingen te sturen naar verschillende processen dat hier op luisteren. De projector zal dan luisteren en de veranderingen toepassen. De feature vervangt dus eigenlijk het polling mechanisme van een direct projector. Het grote verschil met polling is dat er niet constant een process is dat kijkt of er iets veranderd is inplaats hiervan zal de mongodb zelf zeggen er is iets veranderd alsjeblieft hier heb je de informatie van wat er precies gebeurd is. Dit wilt dus ook zeggen dat change stream dus ook niet atomisch is en recovery geen optie zal zijn net zoals bij een polling mechanisme het is echter wel veel performanter want je gaat niet steeds de mongodb bevragen.
 
 #### Conclusie
+|                      | Atomic | Schaalbaarheid | Recovery | Event Sourcing later | Snelheid | Complexiteit |
+| -------------------- | ------ | -------------- | -------- | ----------------------- | -------- | ------------ |
+| **Change stream** | niet | zeer goed | niet | niet | zeer goed | zeer simpel |
+| **Direct Projector** | niet | niet | niet | slecht | normaal | zeer simpel |
+| **Outbox** | zeer goed | goed | goed | goed | goed | complex |
+| **Message Broker** | mogelijkheid tot (meer complexiteit) | zeer goed | goed | goed | zeer goed |zeer complex |
+
+De direct projector en change stream zijn duidelijk geen goede opties aangezien ze bij een mogelijk falen van de databank niet kunnen recoveren. Verder is de change stream mongodb specifiek en zal dus niet van toepassing zijn op andere soorten databanken.
+
+De message broker is de meeste schaalbare optie maar is zeer complex om te implementeren verder kan je niet zonder extra complexiteit garanderen dat een event uitgevoert is op de read databank.
+
+De outbox is stabiel en betrouwbaar het is ook de enige manier dat zonder veel moeite kan garanderen dat een event of wel uitgevoert is of niet. 
+
+Uiteindelijk hebben we gekozen voor een combinatie van zowel de outbox als de change stream. Deze combinatie zorgt ervoor dat we er voor kunnen zorgen dat alles atomic verloopt. De change stream zorgt er dan weer voor dat we niet constant moeten pollen en dus minder overhead zullen hebben binnen mongodb. Door middel van ports & adapters kunnen we er dan voor zorgen dat we gemakkelijk kunnen schakelen naar een polling mechanisme indien de databank zou veranderen. Wat voor een volgend resultaat zou zorgen in dezelfde evaluatie matrix als hierboven.
+
+|                      | Atomic | Schaalbaarheid | Recovery | Event Sourcing later | Snelheid | Complexiteit |
+| -------------------- | ------ | -------------- | -------- | ----------------------- | -------- | ------------ |
+| **Outbox + Change stream** | zeer goed | goed | goed | goed | zeer goed | complex |
 
 
 ### Opslaan van events
