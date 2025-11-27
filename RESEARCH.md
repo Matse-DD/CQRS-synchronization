@@ -188,18 +188,22 @@ Uiteindelijk besluit zowel Java als C# zijn goede kandidaten de reden dat er uit
 #### Direct projection 
 (Is geen echte term in CQRS by the way maar ik ga ervanuit dat hiermee een CDC bedoeld word met een projectie in)
 
-Deze architectuur zal gebruik maken van een CDC (Change Data Capture) deze zal kijken voor veranderingen in de data van de write databank. Eenmaal er een verandering word waargenomen zal deze verandering worden geprojecteerd door de projector zodat we de read databank kunnen aanpassen.
+Deze architectuur zal gebruik maken van een CDC (Change Data Capture) deze zal kijken voor veranderingen in de data van de write databank. Eenmaal er een verandering word waargenomen zal deze verandering worden geprojecteerd door de projector zodat de read databank kan worden aangepast.
 
 ![Foto van direct projection architectuur](images_research/direct_projector.png)
 
-
-#### Change stream
-
 #### Outbox
 
-#### Broker
+#### Message Broker
+Deze optie maakt gebruik van een message broker en polling
 
-### Event Sourcing // MOET DIT HIER???
+#### Change stream
+Deze synchronisatie mogelijkheid zal gebruik maken van een mongodb specifiek feature. Namelijk Change stream dit is in staat om veranderingen in de databank te zien en vervolgens deze veranderingen te sturen naar verschillende processen dat hier op luisteren. Deze feature vervangt dus eigenlijk de polling & message broker combinatie. (Polling kijkt naar veranderingen de message broker stuurt deze veranderingen naar iederen dat wilt luisteren). Vervolgens zal er een projectie worden gemaakt om het event om te zetten en de read databank aan te passen. 
+
+### Opslaan van events
+#### Event Sourcing
+
+#### Events
 
 
 ## Run small Proofs of Concept (PoCs)
