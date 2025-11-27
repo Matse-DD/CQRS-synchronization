@@ -112,7 +112,7 @@ Non functional volgens project
 - Documentation: README and demo examples
 
 ### Acceptance checkpoint (IS DIT WELL CORRECT NAKIJKEN)
-De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie implementatie tussen een mysql (write databank) en mysql (read databank) dit met een hoge betrouwbaarheid en snelheid. 
+De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie implementatie tussen een mongoDb (write databank) en mysql (read databank) dit met een hoge betrouwbaarheid en snelheid. 
 
 ## Evaluate technology options
 - Welke progremeer mogelijkheden en gekozen waarom
