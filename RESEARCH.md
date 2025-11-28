@@ -192,12 +192,12 @@ Deze methode zal de databank regelmatig aanvragen en kijken of de current state 
 #### Change Stream
 Deze optie is ingebouwd in MongoDB en is dus mongoDB specifiek. MongoDB zal steeds naar iedereen dat het horen wilt sturen wat er veranderd is aan de databank. Hier kan dan op worden gesubscribed.
 
-|     | Schaalbaarheid | Impact | Latentie | Volledigheid |
-| --- | -------------- | ------ | -------- | ------------ |
-| Log-based | zeer goed | zeer laag | laag | volledig |
-| Trigger-based | laag | hoog | gemiddeld | volledig |
-| Query-based | minder goed | gemiddeld | hoog | laag |
-| Change stream | zeer goed | zeer laag | zeer laag | volledig |
+|               | Schaalbaarheid | Impact    | Latentie  | Volledigheid |
+|---------------|----------------|-----------|-----------|--------------|
+| Log-based     | Zeer goed      | Zeer laag | Laag      | Volledig     |
+| Trigger-based | Laag           | Hoog      | Gemiddeld | Volledig     |
+| Query-based   | Minder goed    | Gemiddeld | Hoog      | Laag         |
+| Change stream | Zeer goed      | Zeer laag | Zeer laag | Volledig     |
 
 Er is gekozen voor de change stream optie voor de vollegende reden. Change stream heeft bijna dezelfde voordelen als log-based maar scoort beter op latentie dit komt doordat er niet moet worden gepolled (constant vragen of er iets nieuw is). Verder zal er gedurende het project gewerkt worden met mongoDb zoals beschreven in de projectbeschrijving. Indien we toch een andere write databank zouden willen gebruiken is de overstap niet groot naar een andere CDC optie. Het enige wat de CDC uiteindelijk moet doen is aangeven wat er veranderd is in de databank.
 
@@ -220,11 +220,11 @@ Deze optie maakt gebruik van een message broker en polling. Je kan een message b
 
 
 #### Conclusie
-|                      | Atomic | Schaalbaarheid | Recovery | Event Sourcing later | Snelheid | Complexiteit |
-| -------------------- | ------ | -------------- | -------- | ----------------------- | -------- | ------------ |
-| **Direct Projector** | niet | niet | niet | slecht | normaal | zeer simpel |
-| **Outbox** | zeer goed | goed | goed | goed | goed | complex |
-| **Message Broker** | mogelijkheid tot (meer complexiteit) | zeer goed | goed | goed | zeer goed |zeer complex |
+|                       | Atomic                               | Schaalbaarheid | Recovery | Event Sourcing later | Snelheid  | Complexiteit |
+|-----------------------|--------------------------------------|----------------|----------|----------------------|-----------|--------------|
+| **Direct Projector**  | Niet                                 | Niet           | Niet     | Slecht               | Normaal   | Zeer simpel  |
+| **Outbox**            | Zeer goed                            | Goed           | Goed     | Goed                 | Goed      | Complex      |
+| **Message Broker**    | Mogelijkheid tot (meer complexiteit) | Zeer goed      | Goed     | Goed                 | Zeer goed | Zeer complex |
 
 De direct projector is geen goede opties aangezien ze bij een mogelijk falen van de databank niet zal kunnen recoveren.
 
