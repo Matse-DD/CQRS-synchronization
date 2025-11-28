@@ -106,7 +106,11 @@ De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie
 ## Technologie & Architectuur Opties
 ### Programmeertalen
 #### C#
-Dit is een programmeertaal gemeaakt door Microsoft. Een groot voordeel aan C# is het .NET eco-systeem hier zijn verschillende libraries aanwezig waar handig gebruik kan worden van gemaakt. E
+Dit is een programmeertaal gemaakt door Microsoft. Een groot voordeel aan C# is het de sterke typering van de datatypes en het .NET eco-systeem hier zijn verschillende libraries en mogelijkheden aanwezig waar handig gebruik van kan worden van gemaakt.
+
+#### Java
+Dit is een programmeertaal gemaakt door Oracle. Een groot voordeel aan 
+
 
 | Technologie                  | Type        | Voordelen                                                                                                                     | Nadelen                                                                                                 | Conclusie                                                                                                                 |
 |:-----------------------------|:------------|:------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------|
@@ -279,7 +283,7 @@ De change stream geeft volgende events weer bij het gebruik van BackingDocuments
 "removedFields" : [], "truncatedArrays" : [] } }
 ```
 
-De change stream stelt het ook mogelijk om het volledige aangepaste veld te zien bij een aanpassing met FulDocument
+De change stream stelt het ook mogelijk om het volledige aangepaste veld te zien bij een aanpassing met FullDocument
 ```js
 { "_id" : { "$oid" : "69285ec4b7355988a3e5083a" }, "address" : { "building" : "1007", "coord" : [-73.856076999999999, 40.848447], "street" : "Morris Park Ave", "zipcode" : "55555" }, "borough" : "Bronx", "cuisine" : "Bakery", "grades" : [{ "date" : { "$date" : "2014-03-03T00:00:00Z" }, "grade" : "A", "score" : 2 }, { "date" : { "$date" : "2013-09-11T00:00:00Z" }, "grade" : "A", "score" : 6 }, { "date" : { "$date" : "2013-01-24T00:00:00Z" }, "grade" : "A", "score" : 10 }, { "date" : { "$date" : "2011-11-23T00:00:00Z" }, "grade" : "A", "score" : 9 }, { "date" : { "$date" : "2011-03-10T00:00:00Z" }, "grade" : "B", "score" : 14 }], "name" : "Morris Park Bake Shop", "restaurant_id" : "30075445" }
 ```
