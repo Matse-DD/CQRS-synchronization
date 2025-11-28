@@ -410,3 +410,65 @@ if (retries === 0) {
 Denken aan de verschillende milestones (research, design, PoC, MVP, release) issues, usecases / epics
 
 ## Alternatieven overwogen (bij elke optie bijschrijven wat we overwogen hebben en waarom niet linkjes en referenties nodig)
+
+
+
+## Bronnen
+
+CQRS:
+- https://cqrs.wordpress.com/about/ (als je binnen deze site wilt navigeren zal u het domein moeten veranderen naar cqrs.wordpress.com)
+- https://awesome-architecture.com/cqrs/
+- https://medium.com/@90mandalchandan/cqrs-architecture-how-it-works-5f18a36886ea 
+- https://www.linkedin.com/pulse/how-do-you-build-fast-lightweight-solution-cqrs-event-daniel-miller-ymjqc/
+- https://github.com/leandrocp/awesome-cqrs-event-sourcing 
+- https://www.arnaudlanglade.com/difference-between-cqs-and-cqrs-patterns/ 
+- https://www.cncf.io/blog/2020/08/13/49940/
+- https://eventuate.io/docs/manual/eventuate-tram/latest/distributed-data-management.html
+
+CQRS synhronisatie: 
+- https://ricofritzsche.me/cqrs-event-sourcing-projections/ 
+- https://en.wikipedia.org/wiki/Change_data_capture
+- https://www.mongodb.com/docs/manual/changestreams/
+- https://microservices.io/patterns/data/transactional-outbox.html
+- https://www.bennyjohns.com/posts/20201115-commands-and-queries-with-a-message-broker
+- https://medium.com/@nemagan/handling-data-consistency-in-kafka-techniques-for-exactly-once-processing-40f41b1a0364
+- https://microservices.io/patterns/data/transactional-outbox.html
+
+CQRS implementaties:
+- Kim van Renterghem (C#): https://github.com/kimVanRenterghemNew/EventSourcingAndCQRS 
+- Gregor Young(C#): https://github.com/gregoryyoung/m-r
+- Carl Hoberg(Ruby): https://github.com/cavalle/banksimplistic
+- Mark Nijhof (C#) https://github.com/MarkNijhof/Fohjin
+- (Java) https://github.com/ddd-by-examples/event-source-cqrs-sample/tree/master
+
+Event Sourcing:
+- https://awesome-architecture.com/event-sourcing/
+- https://www.kurrent.io/webinar-recording-introduction-to-event-sourcing?utm_campaign=Webinar%20-%20Introduction%20to%20Event%20Sourcing&utm_medium=email&_hsmi=348022371&utm_content=348022371&utm_source=hs_automation
+- https://microservices.io/patterns/data/event-sourcing.html 
+- https://www.baeldung.com/cqrs-event-sourcing-java
+- https://www.kurrent.io/event-sourcing
+- https://www.kurrent.io/blog/why-event-sourcing/
+- https://dev.to/lukasniessen/event-sourcing-cqrs-and-micro-services-real-fintech-example-from-my-consulting-career-1j9b
+- https://craigjcox.com/guides/event-sourcing
+
+CDC (Change Data Capture)
+- https://en.wikipedia.org/wiki/Change_data_capture
+- https://medium.com/@marekchodak/change-data-capture-with-mongodb-change-streams-539a02cf401d
+- https://debezium.io/blog/2020/02/10/event-sourcing-vs-cdc/
+- https://amsayed.medium.com/the-various-methods-of-change-data-capture-cdc-with-examples-and-code-snippets-e5d6ea14dc88
+- https://www.reddit.com/r/dataengineering/comments/moopot/can_someone_help_me_understand_the_difference/
+- https://solace.com/blog/cdc-solace-cqrs-enabled-application/
+- https://satyadeepmaheshwari.medium.com/understanding-cqrs-and-cdc-a-practical-guide-with-real-world-analogies-f0fce76fc2e6
+
+Debezium:
+- https://debezium.io/documentation/faq/  
+- https://debezium.io/documentation/reference/stable/architecture.html 
+- https://debezium.io/documentation/reference/stable/connectors/mongodb-sink.html 
+- https://debezium.io/documentation/reference/stable/connectors/jdbc.html 
+
+Axon Framework:
+- https://docs.axoniq.io/axon-framework-reference/4.11/ 
+- https://www.baeldung.com/axon-cqrs-event-sourcing  
+- https://medium.com/fively/axon-framework-explaining-the-power-of-event-driven-architecture-208b30f5f737 
+- https://medium.com/axoniq/demystifying-tracking-event-processors-in-axon-framework-1917c2f16e59 
+- https://javadoc.io/doc/org.axonframework/axon-core/3.3.6/org/axonframework/eventhandling/TrackingEventProcessor.html 
