@@ -105,13 +105,6 @@ De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie
 
 ## Technologie & Architectuur Opties
 ### Programmeertalen
-#### C#
-Dit is een programmeertaal gemaakt door Microsoft. Een groot voordeel aan C# is het de sterke typering van de datatypes en het .NET eco-systeem hier zijn verschillende libraries en mogelijkheden aanwezig waar handig gebruik van kan worden van gemaakt.
-
-#### Java
-Dit is een programmeertaal gemaakt door Oracle. Een groot voordeel aan 
-
-
 | Technologie                  | Type        | Voordelen                                                                                                                     | Nadelen                                                                                                 | Conclusie                                                                                                                 |
 |:-----------------------------|:------------|:------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------|
 | **.NET (C#) / ASP.NET**      | Managed     | **Sterke Type-veiligheid** (ook runtime), volwassen ecosysteem (MediatR, EF Core), snelle development door krachtige tooling. | Iets zwaarder dan Go of Node.js, maar verwaarloosbaar voor deze use-case.                               | **Gekozen.** Biedt de beste balans tussen veiligheid, snelheid van ontwikkelen en robuuste frameworks voor CQRS.          |
