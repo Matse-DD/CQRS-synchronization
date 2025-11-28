@@ -103,19 +103,10 @@ Niet functionele requirements:
 ### Acceptance checkpoint (IS DIT WELL CORRECT NAKIJKEN)
 De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie implementatie tussen een mongoDb (write databank) en mysql (read databank) dit met een hoge betrouwbaarheid en snelheid. 
 
-## Technology & Architecture Options
-- Programmeertalen en frameworks
-  - TypeScript
-  - Java
-  - C#
-  - Systeemtalen (C / C++)
-- Architectuur 
-  - Direct Projection
-  - Outbox
-  - Message/Event Broker
-- Veranderingen zien in de databank
-  - Change Stream (MongoDB specifiek)
-  - CDC (Change Data Capture)
+## Technologie & Architectuur Opties
+### Programmeertalen
+#### C#
+Dit is een programmeertaal gemeaakt door Microsoft. Een groot voordeel aan C# is het .NET eco-systeem hier zijn verschillende libraries aanwezig waar handig gebruik kan worden van gemaakt. E
 
 | Technologie                  | Type        | Voordelen                                                                                                                     | Nadelen                                                                                                 | Conclusie                                                                                                                 |
 |:-----------------------------|:------------|:------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------|
@@ -125,13 +116,7 @@ De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie
 | **Go (Golang)**              | Compiled    | Zeer hoge performance, simpele concurrency.                                                                                   | Minder krachtige ORM's/Frameworks vergeleken met EF Core. Verbose error handling vertraagt development. | **Afgevallen.** Performance winst weegt niet op tegen het gemis aan enterprise features (zoals MediatR).                  |
 | **Systeemtalen (C++/Rust)**  | Low-level   | Maximale controle en performance.                                                                                             | **Hoge complexiteit.** Geheugenbeheer is handmatig. Development tijd is drastisch langer.               | **Afgevallen.** Te complex ("heavy lifting" zelf doen) voor een architectuur-gefocust probleem.                           |
 
-| Patroon                     | Omschrijving                                                                               | Voordelen                                                                                                   | Nadelen                                                                                           | Conclusie                                                                             |
-|:----------------------------|:-------------------------------------------------------------------------------------------|:------------------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------------------|:--------------------------------------------------------------------------------------|
-| **Outbox Pattern**          | Events eerst opslaan in een lokale tabel/collectie binnen dezelfde transactie als de data. | **Garandeert consistentie** (geen "dual-write" probleem). Events gaan nooit verloren als de broker down is. | Vereist een mechanisme om de outbox uit te lezen (polling of streaming).                          | **Gekozen.** Cruciaal voor betrouwbaarheid.                                           |
-| **Change Stream (MongoDB)** | Real-time stream van database wijzigingen (Oplog).                                         | Geen polling nodig (push-based), zeer efficiënt, native MongoDB feature.                                    | Specifiek voor MongoDB.                                                                           | **Gekozen.** Wordt gebruikt om de Outbox efficiënt uit te lezen zonder zware polling. |
-| **Direct Projection**       | Code schrijft direct naar beide databases.                                                 | Simpel te implementeren.                                                                                    | **Gevaarlijk:** Als de tweede write faalt, zijn de databases inconsistent. Geen retry mechanisme. | **Afgevallen.** Te foutgevoelig.                                                      |
-| **CDC (Debezium/Kafka)**    | Change Data Capture via database logs.                                                     | Zeer robuust, ontkoppeld.                                                                                   | **Hoge infrastructuur complexiteit** (vereist Kafka/Zookeeper). Overkill voor deze schaal.        | **Afgevallen.** Teveel overhead voor het huidige doel.                                |
-| **Message Broker**          | RabbitMQ / Azure Service Bus.                                                              | Goede buffering en ontkoppeling.                                                                            | Introduceert een extra component die beheerd moet worden.                                         | **Deels vervangen.** De Outbox + Sync Service fungeert hier als de broker.            |
+| Patroon                     | Omschrijving                                                                               | Voordelen                                                                                                   | Nadelen                                                                                           | Conclusie                                                                          
 
 ### Programmeertaal (extra voordelen/nadelen op schrijven is nu precies wat weinig)
 #### Low-level programmeertalen
@@ -193,7 +178,7 @@ Bij de taalkeuze zijn zowel low-level systeemtalen (C++, C, Rust) als TypeScript
 Zowel Java als C# zijn zeer goede kandidaten. Ze zijn allebei zeer betrouwbaar en goed uitgewerkt. Met een volwaarde eco-systeem en ondersteuning. Uiteindelijk  zowel Java als C# zijn goede kandidaten de reden dat er uiteindelijk voor C# en .NET gekozen is omdat de documentatie beter is. ... (nog wat redenen)
 
 ### CDC mogelijkheden
-Dit is een design pattern dat gebruikt word om veranderingen waar te nemen in een databank. Er zijn verschillende mogelijkheden hieronder enkele opties
+Ook gekend als Change Data Capture dit is een design pattern dat gebruikt word om veranderingen waar te nemen in een databank. Er zijn verschillende mogelijkheden hieronder enkele opties.
 
 ### Log-based
 Deze methode zal de veranderingen waarnemen door steeds naar de transactie logs te vragen. En hier dus veranderingen in zal waarnemen.
@@ -240,7 +225,6 @@ Deze optie maakt gebruik van een message broker en polling. Je kan een message b
 | **Direct Projector** | niet | niet | niet | slecht | normaal | zeer simpel |
 | **Outbox** | zeer goed | goed | goed | goed | goed | complex |
 | **Message Broker** | mogelijkheid tot (meer complexiteit) | zeer goed | goed | goed | zeer goed |zeer complex |
-| **Outbox + Change stream** | zeer goed | goed | goed | goed | zeer goed | complex |
 
 De direct projector is geen goede opties aangezien ze bij een mogelijk falen van de databank niet zal kunnen recoveren.
 
@@ -248,7 +232,8 @@ De message broker is de meeste schaalbare optie maar is zeer complex om te imple
 
 De outbox is stabiel en betrouwbaar het is ook de enige manier dat zonder veel moeite kan garanderen dat een event of wel uitgevoert is of niet. 
 
-Uiteindelijk hebben we gekozen voor een combinatie van zowel de outbox als de change stream. Deze combinatie zorgt ervoor dat we er voor kunnen zorgen dat alles atomic verloopt. De change stream zorgt er dan weer voor dat we niet constant moeten pollen en dus minder overhead zullen hebben binnen mongodb. Door middel van ports & adapters kunnen we er dan voor zorgen dat we gemakkelijk kunnen schakelen naar een polling mechanisme indien de databank zou veranderen.
+### Uitkomst
+Uiteindelijk is er gekozen voor de volgende technologieën & architectuur opties. C# als programmeertaal, Change Stream als CDC (data veranderingen waarnemen) en voor outbox om de CQRS synchronisatie te regelen.
 
 Wat het volgende schema maakt:
 ![Foto gekozen architectuur combinatie outbox + change stream](./images_research/outbox_change_stream_sync.png)
