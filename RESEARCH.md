@@ -390,7 +390,6 @@ if (retries === 0) {
 ```
 
 ## Publicatie & Open Source Strategy
-
 - Repo setup
 - Licentie: We hebben gekozen voor een MIT-License voor maximale vrijheid, eenvoudigheid en omdat dit de standaard is voor .NET projecten zoals dit. MIT is permissief en staat non-commercieel en commercieel (en zelf closed source) gebruik toe zonder enige complexe patentclausules.
 - CI/CD basics (test coverage, pipeline, main niet pushen (repo rules), ...)
@@ -402,10 +401,10 @@ if (retries === 0) {
 | # | Milestone                 | Date  | Description                                                                                     |
 | - | ------------------------- | ----- | ----------------------------------------------------------------------------------------------- |
 | 1 | Research                  | 30/11 | Probleemanalyse, technologievergelijking, requirements definiëren en architectuur vastleggen.  |
-| 2 | Start Core Implementation | 07/12 | Opzetten projectstructuur, CI/CD pipelines en valideren van technische keuzes via PoCs.         |
-| 3 | Core Implementation       | 19/12 | Bouwen van de Sync Service, Outbox implementatie en de koppeling tussen MongoDB en MySQL (MVP). |
-| 4 | Code Finalisation         | 09/01 | Uitgebreid testen (unit/integratie), bugfixing, refactoring en afwerken van de demo-applicatie. |
-| 5 | Thesis Finalisation       | 16/01 | Schrijven en afronden van de scriptie, documentatie en formuleren van conclusies.               |
+| 2 | Start Core Implementation | 07/12 | Opzetten projectstructuur, CI/CD pipelines en start implementatie.         |
+| 3 | Core Implementation       | 19/12 | Verder bouwen van de Sync Service, Outbox implementatie en de koppeling tussen MongoDB en MySQL alsook de demo applicatie voor de flow (MVP). |
+| 4 | Code Finalisation         | 09/01 | Uitgebreid testen (unit/integratie), bugfixing, refactoring en afwerken van de CQRS implementatie & demo applicatie. |
+| 5 | Thesis Finalisation       | 16/01 | Afronden van de scriptie, documentatie en formuleren van conclusies.               |
 
 Denken aan de verschillende milestones (research, design, PoC, MVP, release) issues, usecases / epics
 
