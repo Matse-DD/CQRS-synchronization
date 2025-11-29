@@ -241,19 +241,25 @@ Er is gekozen voor de change stream optie voor de vollegende reden. Change strea
 
 #### Direct projection
 
-Een direct projection zal kijken naar voor veranderingen in de data van de write databank. Eenmaal er een verandering word waargenomen zal deze verandering worden geprojecteerd door de projector zodat de read databank kan worden aangepast. Een direct projection is geen goede oplossing aangezien je later geen data zal kunnen recoveren en het gaat ook moeilijk worden indien er een verandering gemist word. Ook zullen veranderingen niet meer kunnen worden waargenomen eenmaal de verandering voorbij is.
+Een direct projection controleert de write database continu op veranderingen in de data. Zodra een verandering wordt waargenomen, projecteert de projector deze direct naar de read database, die vervolgens wordt bijgewerkt.
+
+Een direct projection is echter geen optimale oplossing: het biedt geen mogelijkheid om data later te herstellen en het wordt moeilijk om gemiste veranderingen alsnog te verwerken. Bovendien kunnen veranderingen niet meer worden gedetecteerd zodra ze zijn gepasseerd.
 
 ![Foto van direct projection architectuur](images_research/direct_projector_synchronisation.png)
 
 #### Outbox
 
-Deze architectuur houd de verschillende evenementen bij in een table/collectie in de databank. Vervolgens kan dan gekeken worden naar de outbox voor veranderingen. Als dan een verandering plaats vind word de verandering opnieuw door gegeven aan een projector. Waarna deze de aanpassing toepast op de read databank. Recovery is mogelijk indien je het laatste geslaagde event bij houd. Op basis van dit event kan je bepalen wat het volgende event is dat aanwezig is in de outbox. Verder is dit atomisch door dat er gebruik word gemaakt van de databank transacties. En omdat de projection kan zeggen tegen de outbox dat een event gelukt is of niet. Dit zorgt ervoor dat er geen Dual-write problem is.
+Deze architectuur slaat de verschillende events op in een table/collectie in de databank. Vervolgens kan dan gekeken worden naar de outbox voor de verschillende evenementen. Wanneer er een verandering optreedt, wordt deze doorgegeven aan een projector, die de aanpassing toepast op de query databank.
+
+Recovery is mogelijk door het laatste geslaagde event bij te houden. Op basis van dit event kan je bepalen wat het volgende event is dat aanwezig is in de outbox. 
+
+Verder is dit atomisch door dat er gebruik word gemaakt van de databank transacties. En omdat de projection kan zeggen tegen de outbox dat een event gelukt is of niet. Dit zorgt ervoor dat er geen Dual-write problem is.
 
 ![Foto van outbox architectuur](images_research/outbox_synchronisation.png)
 
 #### Message/Event Broker
 
-Deze optie maakt gebruik van een message broker en polling. Je kan een message broker dusdanig configureren dat deze de verschillende events persistent bijhoudt, wat dus wilt zeggen dat de events niet verloren zal gaan indien de message broker neer zou gaan. Er is eigenlijk geen gemakkelijke manier om dit dual-write problem op te lossen. Tenzij je gebruik zou maken van een outbox hiervoor.
+Deze oplossing maakt gebruik van een message broker en polling. Je kan een message broker zo worden geconfigureerd dat deze de verschillende events persistent bijhoudt, wat dus wilt zeggen dat de events niet verloren zal gaan indien de message broker uitvalt. Er is eigenlijk geen gemakkelijke manier om het dual-write problem op te lossen. Tenzij je gebruik zou maken van een outbox hiervoor.
 
 ![Foto van broker architectuur](images_research/broker_synchronisation.png)
 
