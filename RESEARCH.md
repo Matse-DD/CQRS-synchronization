@@ -7,7 +7,7 @@
 - Wie zijn de gebruikers?
   - Developers dat gebruik willen maken van CQRS (Command Query Responsibility Segregation)
 - Hoe weten we of het werkt?
-  - Indien we een write doen naar de write databank en deze veranderingen zichtbaar worden in de read databank.
+  - Indien we een write doen naar de command databank en deze veranderingen zichtbaar worden in de query databank.
 - Wat is in de scope wat is er buiten
   - Synchronisatie
     - Idempotent (geen dubbele events)
@@ -26,7 +26,7 @@ Developer: (duplicate info, data verlies, ...)
 - Als een developer wil ik databanken kunnen synchroniseren zonder problemen zodat ik zonder problemen CQRS kan toepassen over 2 databanken.
 - Als een developer wil ik databanken gemakkelijk terug synchronseren indien er een inconsistentie is zodat de databanken gelijk lopen wat betreft data.
 - Als een developer wil ik dat indien er bepaalde commands onbedoeld dubbel worden uitgezonden deze niet dubbel worden uitgevoerd (idempotent) zodat mijn data niet inconsistent wordt.
-- Als een developer wil ik dat indien de write databank onbereikbaar is ik nog steeds informatie kan opvragen zodat het opvragen van gegevens geen impact ondervind.
+- Als een developer wil ik dat indien de command databank onbereikbaar is ik nog steeds informatie kan opvragen zodat het opvragen van gegevens geen impact ondervind.
 - Als een developer wil ik dat indien er een onderdeel van de synchronisatie faalt er geen data verlies optreed zodat ik er zeker van kan zijn dat mijn data tussen de 2 databanken gelijk is.
 - Als een developer wil ik dat het verkeer van queries & commands verdeeld is over de databanken zodat er bij veel verkeer geen impact is.
 - Als een developer wil ik gemakkelijk een container opbouwen van het CQRS systeem zodat deze gemakkelijk te integreren valt.
@@ -61,15 +61,15 @@ Zoals zonet vermeld kan je dus gaan voor aparte databanken voor CQRS. De moeilij
 
 ### Projector
 
-Een projector zet het evenement of de verandering in data om naar een correct command, zodat de read databank correct kan worden geüpdatet
+Een projector zet het evenement of de verandering in data om naar een correct command, zodat de query databank correct kan worden geüpdatet
 
-### Write databank
+### Command databank
 
-Op de write databank worden enkel de commands van de gebruiker uitgevoerd. Dit wilt zeggen dat indien de gebruiker informatie wilt aanpassen deze databank zal worden gebruikt.
+Op de command databank worden enkel de commands van de gebruiker uitgevoerd. Dit wilt zeggen dat indien de gebruiker informatie wilt aanpassen deze databank zal worden gebruikt.
 
-### Read databank
+### Query databank
 
-De read databank word enkel gebruikt om queries uit te voeren dit wilt dus zeggen dat indien de gebruiker informatie wilt opvragen deze databank zal worden gebruikt.
+De query databank word enkel gebruikt om queries uit te voeren dit wilt dus zeggen dat indien de gebruiker informatie wilt opvragen deze databank zal worden gebruikt.
 
 ### Event Sourcing
 
@@ -82,15 +82,15 @@ Dit is het principe van het opslaan van verschillende events en deze events toe 
 
 ### Debezium (https://debezium.io/)
 
-Deze oplossing kijkt naar veranderingen in de write databank met behulp van polling eenmaal een verandering word opgemerkt en vertaalt naar events. Vervolgens worden deze events op een message broker (kafka) gepusht. Waar dan naar geluisterd kan worden door verschillende processen deze zullen dit event dan ontvangen. Onder deze processen zal dan een process zijn dat de ontvangen messages omzet naar de juiste commands en deze uitvoeren op de read databank.
+Deze oplossing kijkt naar veranderingen in de command databank met behulp van polling eenmaal een verandering word opgemerkt en vertaalt naar events. Vervolgens worden deze events op een message broker (kafka) gepusht. Waar dan naar geluisterd kan worden door verschillende processen deze zullen dit event dan ontvangen. Onder deze processen zal dan een process zijn dat de ontvangen messages omzet naar de juiste commands en deze uitvoeren op de query databank.
 
 ### Axon Framework door Axoniq (https://www.axoniq.io/framework)
 
 Deze oplossing is meer Event Sourcing specifiek en zal dus evenementen opslaan in een databank ook gekend als de event store. Er is ook een Tracking Event Processor dat door polling op de hoogte word gebracht van nieuwe events. De Tracking Event Processor houd bij welk event het laatst afgehandeld is. Dit is op basis van de Tracking Token deze geeft weer op welke positie het event is in de event store. De Tracking Event Processor kan dan gewoon kijken naar het volgende Tracking Token voor het volgende event.
 
-De read databank word aangepast door met projections van de events naar een correct commando voor de write databank. Eenmaal dit gelukt is word de Tracking Token geupdate naar de Tracking Token van het zojuiste geslaagde event.
+De query databank word aangepast door met projections van de events naar een correct commando voor de command databank. Eenmaal dit gelukt is word de Tracking Token geupdate naar de Tracking Token van het zojuiste geslaagde event.
 
-Deze oplossing zal ook kijken naar veranderingen in de write databank maar de write databank zal events bevatten (Event Sourcing)
+Deze oplossing zal ook kijken naar veranderingen in de command databank maar de command databank zal events bevatten (Event Sourcing)
 
 ### Nog een bestaande oplossing
 
@@ -123,7 +123,7 @@ Niet functionele requirements:
 
 ### Acceptance checkpoint (IS DIT WELL CORRECT NAKIJKEN)
 
-De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie implementatie tussen een mongoDb (write databank) en mysql (read databank) dit met een hoge betrouwbaarheid en snelheid.
+De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie implementatie tussen een mongoDb (command databank) en mysql (query databank) dit met een hoge betrouwbaarheid en snelheid.
 
 ## Technologie & Architectuur Opties
 
@@ -235,7 +235,7 @@ Deze optie is ingebouwd in MongoDB en is dus mongoDB specifiek. MongoDB zal stee
 | Query-based   | Minder goed    | Gemiddeld | Hoog      | Laag         |
 | Change stream | Zeer goed      | Zeer laag | Zeer laag | Volledig     |
 
-Er is gekozen voor de change stream optie voor de vollegende reden. Change stream heeft bijna dezelfde voordelen als log-based maar scoort beter op latentie dit komt doordat er niet moet worden gepolled (constant vragen of er iets nieuw is). Verder zal er gedurende het project gewerkt worden met mongoDb zoals beschreven in de projectbeschrijving. Indien we toch een andere write databank zouden willen gebruiken is de overstap niet groot naar een andere CDC optie. Het enige wat de CDC uiteindelijk moet doen is aangeven wat er veranderd is in de databank.
+Er is gekozen voor de change stream optie voor de vollegende reden. Change stream heeft bijna dezelfde voordelen als log-based maar scoort beter op latentie dit komt doordat er niet moet worden gepolled (constant vragen of er iets nieuw is). Verder zal er gedurende het project gewerkt worden met mongoDb zoals beschreven in de projectbeschrijving. Indien we toch een andere command databank zouden willen gebruiken is de overstap niet groot naar een andere CDC optie. Het enige wat de CDC uiteindelijk moet doen is aangeven wat er veranderd is in de databank.
 
 ### CQRS Synchronisatie mogelijkheden
 
@@ -273,7 +273,7 @@ Deze oplossing maakt gebruik van een message broker en polling. Je kan een messa
 
 De direct projector is geen goede optie aangezien het bij een mogelijk falen van de databank niet zal kunnen recoveren.
 
-De message broker is de meest schaalbare optie maar is zeer complex om te implementeren, verder kan je niet zonder extra complexiteit garanderen dat een event uitgevoert is op de read databank.
+De message broker is de meest schaalbare optie maar is zeer complex om te implementeren, verder kan je niet zonder extra complexiteit garanderen dat een event uitgevoert is op de query databank.
 
 De outbox is stabiel en betrouwbaar en is ook de enige manier die zonder veel moeite kan garanderen of een event wel uitgevoerd is of niet.
 
