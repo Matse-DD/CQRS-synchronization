@@ -281,6 +281,7 @@ Wat het volgende schema maakt:
 ## Run small Proofs of Concept (PoCs)
 
 ### Change Stream met MongoDB in Dotnet
+Dit codevoorbeeld toont hoe je subscribed op een change stream in dotnet. Als je kan zien is dit redelijk simpel. Je maakt een cursor object aan via de `Watch()` methode (`WatchAsync()` voor async applicaties). De informatie voor dit codevoorbeeld is verkregen via de [MongoDB docs](https://www.mongodb.com/docs/drivers/csharp/current/logging-and-monitoring/change-streams/)
 
 [Volledige code change stream](https://github.com/LanderDebeir/ChangestreamTryout)
 
@@ -326,8 +327,6 @@ foreach (var change in cursor.ToEnumerable())
 }
 
 ```
-
-Dit codevoorbeeld toont hoe je aan event sourcing doet in dotnet. Als je kan zien is dit redelijk simpel. Je maakt gewoon een cursor object aan via de `Watch()` methode (`WatchAsync()` voor async applicaties). De informatie voor dit codevoorbeeld is verkregen via de [MongoDB docs](https://www.mongodb.com/docs/drivers/csharp/current/logging-and-monitoring/change-streams/)
 
 De change stream geeft volgende events weer bij het gebruik van BackingDocuments indien er een aanpassing is
 
