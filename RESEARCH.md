@@ -9,12 +9,17 @@
 - Hoe weten we of het werkt?
   - Indien we een write doen naar de command databank en deze veranderingen zichtbaar worden in de query databank.
 - Wat is in de scope wat is er buiten
-  - Synchronisatie
-    - Idempotent (geen dubbele events)
-    - Geen dataverlies
-    - Mogelijkheid tot herstel
-  - Ervoor zorgen dat de databanken loosly coupled zijn
-  - Event sourcing (op later moment)
+  - Binnen
+    - Synchronisatie
+      - Geen dataverlies
+      - Mogelijkheid tot herstel
+      - Geen data inconsistentie
+    - Ervoor zorgen dat de databanken loosly coupled zijn
+    - Event sourcing (op later moment)
+  - Buiten
+    - Meerdere query/command databanken
+    - Zeer complexe commands
+    - ... 
 
 ## Identify stakeholders and use cases
 
