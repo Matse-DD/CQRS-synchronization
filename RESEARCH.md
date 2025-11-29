@@ -114,10 +114,16 @@ Niet functionele requirements:
 - Documentatie, keuzes en gebruik van bepaalde mogelijkheden
 - Gebruik van DDD-model
 - Gemakkelijk te gebruiken
+- Gebruik van best practices
 
-### Acceptance checkpoint (IS DIT WELL CORRECT NAKIJKEN)
+### Acceptance checkpoint
 
-De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie implementatie tussen een mongoDb (command databank) en mysql (query databank) dit met een hoge betrouwbaarheid en snelheid.
+De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie implementatie tussen een mongoDb (command databank) en mysql (query databank) dit met een hoge betrouwbaarheid en snelheid dit voor simpele INSERT, UPDATE, DELETE commands.
+
+De CQRS implementatie moet voldoen aan volgende pipeline onderdelen:
+- 80% test coverage
+- kwaliteit code linted 
+- testen moeten volledig slagen
 
 ## Technologie & Architectuur Opties
 
