@@ -247,25 +247,25 @@ Een direct projection zal kijken naar voor veranderingen in de data van de write
 
 #### Outbox
 
-Deze architectuur houd de verschillende evenementen bij in een table/collectie in de databank. Vervolgens kan dan gekeken worden naar de outbox voor veranderingen. Als dan een verandering plaats vind word de verandering opnieuw door gegeven aan een projector. Waarna deze de aanpassing toepast op de read databank. Recovery is mogelijk indien je het laatste geslaagde event bij houd. Op basis van dit event kan je bepalen wat het volgende event is dat aanwezig is in de outbox. Verder is het atomisch door dat er gebruik word gemaakt van verschillende databank transacties. En omdat de projection kan zeggen tegen de outbox dat een event gelukt is. Dit zorgt ervoor dat deze optie atomisch is.
+Deze architectuur houd de verschillende evenementen bij in een table/collectie in de databank. Vervolgens kan dan gekeken worden naar de outbox voor veranderingen. Als dan een verandering plaats vind word de verandering opnieuw door gegeven aan een projector. Waarna deze de aanpassing toepast op de read databank. Recovery is mogelijk indien je het laatste geslaagde event bij houd. Op basis van dit event kan je bepalen wat het volgende event is dat aanwezig is in de outbox. Verder is dit atomisch door dat er gebruik word gemaakt van de databank transacties. En omdat de projection kan zeggen tegen de outbox dat een event gelukt is of niet. Dit zorgt ervoor dat er geen Dual-write problem is.
 
 ![Foto van outbox architectuur](images_research/outbox_synchronisation.png)
 
 #### Message/Event Broker
 
-Deze optie maakt gebruik van een message broker en polling. Je kan een message broker dusdanig configureren dat deze de verschillende events persistent bijhoudt, wat dus wilt zeggen dat de events niet verloren zal gaan indien de message broker neer zou gaan. Er is eigenlijk geen gemakkelijke manier om dit atomic te maken tenzij je een outbox toevoegt of gebruik maakt van saga's.
+Deze optie maakt gebruik van een message broker en polling. Je kan een message broker dusdanig configureren dat deze de verschillende events persistent bijhoudt, wat dus wilt zeggen dat de events niet verloren zal gaan indien de message broker neer zou gaan. Er is eigenlijk geen gemakkelijke manier om dit dual-write problem op te lossen. Tenzij je gebruik zou maken van een outbox hiervoor.
 
 ![Foto van broker architectuur](images_research/broker_synchronisation.png)
 
 #### Conclusie
 
-|                            | Atomic                               | Schaalbaarheid | Recovery | Event Sourcing later | Snelheid  | Complexiteit |
+|                            | Dual-write problem                               | Schaalbaarheid | Recovery | Event Sourcing later | Snelheid  | Complexiteit |
 | -------------------------- | ------------------------------------ | -------------- | -------- | -------------------- | --------- | ------------ |
-| **Direct Projector** | Niet                                 | Niet           | Niet     | Slecht               | Normaal   | Zeer simpel  |
-| **Outbox**           | Zeer goed                            | Goed           | Goed     | Goed                 | Goed      | Complex      |
+| **Direct Projector** | Aanwezig                                 | Niet           | Niet     | Slecht               | Normaal   | Zeer simpel  |
+| **Outbox**           | Opgelost                            | Goed           | Goed     | Goed                 | Goed      | Complex      |
 | **Message Broker**   | Mogelijkheid tot (meer complexiteit) | Zeer goed      | Goed     | Goed                 | Zeer goed | Zeer complex |
 
-De direct projector is geen goede optie aangezien ze bij een mogelijk falen van de databank niet zal kunnen recoveren.
+De direct projector is geen goede optie aangezien het bij een mogelijk falen van de databank niet zal kunnen recoveren.
 
 De message broker is de meest schaalbare optie maar is zeer complex om te implementeren, verder kan je niet zonder extra complexiteit garanderen dat een event uitgevoert is op de read databank.
 
