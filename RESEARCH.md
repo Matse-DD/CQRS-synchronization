@@ -88,20 +88,13 @@ Deze oplossing kijkt naar veranderingen in de command databank met behulp van po
 
 Deze oplossing is meer Event Sourcing specifiek en zal dus evenementen opslaan in een databank ook gekend als de event store. Er is ook een Tracking Event Processor dat door polling op de hoogte word gebracht van nieuwe events. De Tracking Event Processor houd bij welk event het laatst afgehandeld is. Dit is op basis van de Tracking Token deze geeft weer op welke positie het event is in de event store. De Tracking Event Processor kan dan gewoon kijken naar het volgende Tracking Token voor het volgende event.
 
-De query databank word aangepast door met projections van de events naar een correct commando voor de command databank. Eenmaal dit gelukt is word de Tracking Token geupdate naar de Tracking Token van het zojuiste geslaagde event.
+De query databank word aangepast door met projections van de events naar een correct commando. Eenmaal dit gelukt is word de Tracking Token geupdate naar de Tracking Token van het zojuiste geslaagde event.
 
-Deze oplossing zal ook kijken naar veranderingen in de command databank maar de command databank zal events bevatten (Event Sourcing)
+### Revo Framework (https://docs.revoframework.net/)
 
-### Nog een bestaande oplossing
-
-- debezium (CDC)
-- axoniq (event sourcing) (axon framework)
-- Django CQRS Library (python CQRS)
-- andere opties met meer documentatie dan django???
+De verschillende events worden in deze oplossing ook opgeslagen in een Event Store en op een event bus gezet. De nieuwe events komen via de event bus in een async event queue terecht waarna eventlisteners de projectors op de hoogte brengen. Deze projectors zetten de events dan opnieuw om naar commands voor de query databank. Door de event store kan gemiste events worden afgehandeld bij heropstart.
 
 ## Define requirements
-
-### Doen we project + ons maar meer gefiltert of enkel ons
 
 Functionele requirements:
 
@@ -113,13 +106,14 @@ Functionele requirements:
 
 Niet functionele requirements:
 
-- Betrouwbaar -> geen data verlies bij heropstarts, ...
+- Betrouwbaar -> geen data verlies, ...
 - Performantie -> synchronisatie binnen enkele seconden
 - Testbaarheid -> meer dan 80% test coverage
 - Observeerbaar -> logs & metrics van de status
 - Reproduceerbaar
 - Documentatie, keuzes en gebruik van bepaalde mogelijkheden
 - Gebruik van DDD-model
+- Gemakkelijk te gebruiken
 
 ### Acceptance checkpoint (IS DIT WELL CORRECT NAKIJKEN)
 
@@ -279,7 +273,7 @@ De outbox is stabiel en betrouwbaar en is ook de enige manier die zonder veel mo
 
 ### Uitkomst
 
-Uiteindelijk is er gekozen voor de volgende technologieën & architectuur opties. C# als programmeertaal, Change Stream als CDC (data veranderingen waarnemen) en voor outbox om de CQRS synchronisatie te regelen.
+Uiteindelijk is er gekozen voor de volgende technologieën & architectuur opties. C# als programmeertaal, Change Stream als CDC (data veranderingen waarnemen) en voor outbox om de CQRS synchronisatie te regelen. Dit met enkele veranderingen om exactly-once processing te verkrijgen.
 
 Wat het volgende schema maakt:
 ![Foto gekozen architectuur combinatie outbox + change stream](./images_research/outbox_change_stream_sync.png)
