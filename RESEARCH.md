@@ -19,13 +19,16 @@
   - Buiten
     - Meerdere query/command databanken
     - Zeer complexe commands
-    - ... 
+    - andere
 
 ## Identify stakeholders and use cases
 
 De stakeholders zullen vooral developers zijn alsook de product owner.
 
-Developer: (duplicate info, data verlies, ...)
+De belangrijkste use case is "Als een developer wil ik databanken gemakkelijk kunnen syncroniseren zodat ik een aparte query en command databank kan hebben".
+
+Andere use cases:
+Developer: 
 
 - Als een developer wil ik een performant product afleveren zodat de gebruikers geen hinder ondervinden van wat er allemaal gebeurd achter hun rug.
 - Als een developer wil ik databanken kunnen synchroniseren zonder problemen zodat ik zonder problemen CQRS kan toepassen over 2 databanken.
@@ -37,13 +40,11 @@ Developer: (duplicate info, data verlies, ...)
 - Als een developer wil ik gemakkelijk een container opbouwen van het CQRS systeem zodat deze gemakkelijk te integreren valt.
 - Als een developer wil ik een demo applicatie dat de synchronisatie flow aantoont zodat ik er zeker van ben dat het CQRS systeem werkt.
 - Als een developer wil ik dat events die niet verwerkt kunnen worden, apart worden gezet (Dead Letter Queue) zodat ik deze kan analyseren en later opnieuw kan 'replayen' zonder de rest van de queue te blokkeren zodat de events verder kunnen gaan zonder problemen. (Could Have)
-- ...
 
 Product owner:
 
 - Als de product owner wil ik dat mijn product met zo weinig mogelijk down-time kan werken zodat ik geen klanten verlies omdat mijn product weeral offline is.
-- Als de product owner wil ik dat mijn product niet volledig kapot draait indien er een databank niet meer werkt zodat er steeds een deel werkend zal zijn.
-- ...
+- Als de product owner wil ik dat mijn product niet volledig kapot gaat indien er een databank niet meer werkt zodat er steeds een deel werkend zal zijn.
 
 ## Master core concepts
 
@@ -350,7 +351,7 @@ De volgende repo's zullen aanwezig zijn. group-05-CQRS-synchronization & group-0
 
 ### Licentie
 
-We hebben gekozen voor een MIT-License voor maximale vrijheid en eenvoud. MIT is permissief en staat non-commercieel en commercieel (en zelf closed source) gebruik toe zonder enige complexe patentclausules. 
+We hebben gekozen voor een MIT-License voor maximale vrijheid en eenvoud. MIT is permissief en staat non-commercieel en commercieel (en zelf closed source) gebruik toe zonder enige complexe patentclausules. Hierdoor zal de software zeer toegangkelijk zijn om te gebruiken door verschillende developers.
 
 https://choosealicense.com/licenses/
 
