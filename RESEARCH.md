@@ -97,13 +97,13 @@ Dit is het principe van het opslaan van verschillende events en deze events toe 
 
 ### Debezium (https://debezium.io/)
 
-Deze oplossing kijkt naar veranderingen in de command databank met behulp van polling eenmaal een verandering word opgemerkt en vertaalt naar events. Vervolgens worden deze events op een message broker (kafka) gepusht. Waar dan naar geluisterd kan worden door verschillende processen deze zullen dit event dan ontvangen. Onder deze processen zal dan een process zijn dat de ontvangen messages omzet naar de juiste commands en deze uitvoeren op de query databank.
+Deze oplossing kijkt naar veranderingen in de command databank met behulp van polling eenmaal een verandering wordt opgemerkt en vertaalt naar events. Vervolgens worden deze events op een message broker (kafka) gepusht. Waar dan naar geluisterd kan worden door verschillende processen deze zullen dit event dan ontvangen. Onder deze processen zal dan een process zijn dat de ontvangen messages omzet naar de juiste commands en deze uitvoeren op de query databank.
 
 ### Axon Framework door Axoniq (https://www.axoniq.io/framework)
 
-Deze oplossing is meer Event Sourcing specifiek en zal dus evenementen opslaan in een databank ook gekend als de event store. Er is ook een Tracking Event Processor dat door polling op de hoogte word gebracht van nieuwe events. De Tracking Event Processor houd bij welk event het laatst afgehandeld is. Dit is op basis van de Tracking Token deze geeft weer op welke positie het event is in de event store. De Tracking Event Processor kan dan gewoon kijken naar het volgende Tracking Token voor het volgende event.
+Deze oplossing is meer Event Sourcing specifiek en zal dus evenementen opslaan in een databank ook gekend als de event store. Er is ook een Tracking Event Processor dat door polling op de hoogte wordt gebracht van nieuwe events. De Tracking Event Processor houdt bij welk event het laatst afgehandeld is. Dit is op basis van de Tracking Token deze geeft weer op welke positie het event is in de event store. De Tracking Event Processor kan dan gewoon kijken naar het volgende Tracking Token voor het volgende event.
 
-De query databank word aangepast door met projections van de events naar een correct commando. Eenmaal dit gelukt is word de Tracking Token geupdate naar de Tracking Token van het zojuiste geslaagde event.
+De query databank wordt aangepast door met projections van de events naar een correct commando. Eenmaal dit gelukt is, wordt de Tracking Token geupdate naar de Tracking Token van het zojuiste geslaagde event.
 
 ### Revo Framework (https://docs.revoframework.net/)
 
@@ -121,10 +121,10 @@ Functionele requirements:
 
 Niet functionele requirements:
 
-- Betrouwbaar -> geen data verlies, ...
-- Performantie -> synchronisatie binnen enkele seconden
-- Testbaarheid -> meer dan 80% test coverage
-- Observeerbaar -> logs & metrics van de status
+- Betrouwbaar → geen data verlies, ...
+- Performantie → synchronisatie binnen enkele seconden
+- Testbaarheid → meer dan 80% test coverage
+- Observeerbaar → logs & metrics van de status
 - Reproduceerbaar
 - Documentatie, keuzes en gebruik van bepaalde mogelijkheden
 - Gebruik van DDD-model
@@ -133,9 +133,9 @@ Niet functionele requirements:
 
 ### Acceptance checkpoint
 
-De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie implementatie tussen een mongoDb (command databank) en mysql (query databank) dit met een hoge betrouwbaarheid en snelheid dit voor simpele INSERT, UPDATE, DELETE commands.
+De MVP is een demo-applicatie dat gebruik maakt van CQRS met onze synchronisatie implementatie tussen een mongoDb (command databank) en mysql (query databank) dit met een hoge betrouwbaarheid en snelheid dit voor simpele INSERT, UPDATE, DELETE commands.
 
-De CQRS implementatie moet voldoen aan volgende pipeline onderdelen:
+De CQRS-implementatie moet voldoen aan volgende pipeline onderdelen:
 - 80% test coverage
 - Kwaliteit code linted 
 - Testen moeten volledig slagen
@@ -160,13 +160,13 @@ Een sterke typering is het meest gewenst voor onze use case dit omdat je verschi
 
 De documentatie moet gemakkelijk te navigeren zijn en duidelijk uit leggen wat bepaalde methodes doen. 
 
-De complexiteit tegenover performantie we willen niet te complex gaan waardoor we plots zeer veel zelf zullen moeten doen maar de performantie moet nog steeds goed blijven.
+De complexiteit tegenover performantie we willen niet te complex gaan waardoor we plots zeer veel zelf zullen moeten doen, maar de performantie moet nog steeds goed blijven.
 
 We hebben rekening gehouden met deze punten en daarom hebben we uiteindelijk gekozen voor C#. Deze taal heeft een goede documentatie, een sterke typering en de complexiteit tegenover performantie is zeer goed.
 
 ### CDC Mogelijkheden
 
-Ook gekend als Change Data Capture dit is een design pattern dat gebruikt word om veranderingen waar te nemen in een databank. Er zijn verschillende mogelijkheden hieronder enkele opties.
+Ook gekend als Change Data Capture dit is een design pattern dat gebruikt wordt om veranderingen waar te nemen in een databank. Er zijn verschillende mogelijkheden hieronder enkele opties.
 
 #### Log-Based
 
@@ -182,7 +182,7 @@ Deze methode zal de databank regelmatig aanvragen en kijken of de current state 
 
 #### Change Stream
 
-Deze optie is ingebouwd in MongoDB en is dus mongoDB specifiek. MongoDB zal steeds naar iedereen dat het horen wilt sturen wat er veranderd is aan de databank. Hier kan dan op worden gesubscribed.
+Deze optie is ingebouwd in MongoDB en is dus mongoDB specifiek. MongoDB zal steeds naar iedereen dat het horen wil sturen wat er veranderd is aan de databank. Hier kan dan op worden gesubscribed.
 
 #### Conclusie 
 |               | Schaalbaarheid | Impact    | Latentie  | Volledigheid |
