@@ -28,6 +28,7 @@ De stakeholders zullen vooral developers zijn alsook de product owner.
 De belangrijkste use case is "Als een developer wil ik databanken gemakkelijk kunnen syncroniseren zodat ik een aparte query en command databank kan hebben".
 
 Andere use cases:
+
 Developer: 
 
 - Als een developer wil ik een performant product afleveren zodat de gebruikers geen hinder ondervinden van wat er allemaal gebeurd achter hun rug.
@@ -63,6 +64,8 @@ In dit project word er nog een stap verder gegaan en is de databank waar de comm
 Zoals zonet vermeld kan je dus gaan voor aparte databanken voor CQRS. De moeilijkheid hieraan is hoe ga je ervoor zorgen dat de gegevens tussen de twee databanken hetzelfde is. Hiervoor zijn er verschillende opties zoals in dit research document te zien is.
 
 - https://eventuate.io/docs/manual/eventuate-tram/latest/distributed-data-management.html
+- https://blog.bytedoodle.com/cqrs-schema-design-synchronization-and-consistency-considerations/
+- https://medium.com/@dinesharney/understanding-cqrs-patterns-implementation-strategies-and-data-synchronization-9f35acdf0e71 
 
 ### Projector
 
@@ -74,16 +77,21 @@ Een projector zet het evenement of de verandering in data om naar een correct co
 
 Op de command databank worden enkel de commands van de gebruiker uitgevoerd. Dit wilt zeggen dat indien de gebruiker informatie wilt aanpassen deze databank zal worden gebruikt.
 
+- https://www.sciencedirect.com/topics/computer-science/database-command 
+
 ### Query databank
 
 De query databank word enkel gebruikt om queries uit te voeren dit wilt dus zeggen dat indien de gebruiker informatie wilt opvragen deze databank zal worden gebruikt.
+
+- https://www.techtarget.com/searchdatamanagement/definition/query 
 
 ### Event Sourcing
 
 Dit is het principe van het opslaan van verschillende events en deze events toe te passen op data. Het is dan mogelijk om naar een vorige staat van de data terug te keren door de events terug af te spelen vanaf de start staat. Of door het omgekeerde van de events uit te voeren dit hangt af van de implementatie. Event sourcing zorgt voor een duidelijk overzicht van welke acties allemaal ondernomen zijn op de data waardoor de momentele staat bereikt is.
 
+- https://medium.com/@alxkm/event-sourcing-explained-benefits-challenges-and-use-cases-d889dc96fc18 
 - https://microservices.io/patterns/data/event-sourcing.html
-- 
+- https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing 
 
 ## Compare existing solutions
 
