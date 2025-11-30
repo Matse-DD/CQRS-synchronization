@@ -19,7 +19,7 @@
   - Buiten
     - Meerdere query/command databanken
     - Zeer complexe commands
-    - andere
+    - Andere
 
 ## Identify stakeholders and use cases
 
@@ -137,8 +137,8 @@ De MVP is een demo applicatie dat gebruik maakt van CQRS met onze synchronisatie
 
 De CQRS implementatie moet voldoen aan volgende pipeline onderdelen:
 - 80% test coverage
-- kwaliteit code linted 
-- testen moeten volledig slagen
+- Kwaliteit code linted 
+- Testen moeten volledig slagen
 
 ## Technologie & Architectuur Opties
 
@@ -369,9 +369,9 @@ Het zal niet mogelijk zijn om naar main te pushen. Elke verandering moet dus ver
 
 #### Pipeline
 Verder zal de pipeline er als volgt uit zien:
-- meer dan 80% testcoverage 
-- code linted zonder problemen
-- maken van container 
+- Meer dan 80% testcoverage 
+- Code linted zonder problemen
+- Maken van container 
 
 #### Release strategy
 Er is gekozen voor het gebruik van containers omdat containers ervoor zorgen dat de cqrs implementatie op verschillende platformen kan worden opgezet en gebruikt. Ook zorgen containers ervoor dat de implementatie gemakkelijk kan verdeeld worden en dat we er zeker van zijn dat als onze container werkt dit ook het geval zal zijn bij de andere containers. Verder is het ook aangegeven in de opdracht dat er gebruik moet worden gemaakt van containers.
@@ -394,16 +394,16 @@ Er is gekozen voor het gebruik van containers omdat containers ervoor zorgen dat
 In parallel met deze milestones zal er natuurlijk ook gewerkt worden aan de bachelorproef.
 
 ## Alternatives considered
-- Java -> documentatie van C# is iets beter
-- TypeScript -> lose typing tijdens runtime
-- Systeemtalen -> zeer complex
+- Java -> Documentatie van C# is iets beter
+- TypeScript -> Lose typing tijdens runtime
+- Systeemtalen -> Zeer complex
 
-- message broker -> meer complexiteit
-- direct projection -> geen recovery mechanisme
+- Message Broker -> Meer complexiteit
+- Direct Projection -> Geen recovery mechanisme
 
-- query-based CDC -> een hoge latentie 
-- log-based CDC -> change stream was net iets beter doordat er mongodb word gebruikt
-- trigger-based CDC -> te hoge impact om de databank
+- Query-Based CDC -> Een hoge latentie 
+- Log-Based CDC -> Change stream was net iets beter doordat er mongodb word gebruikt
+- Trigger-Based CDC -> Te hoge impact om de databank
 
 ## Bronnen
 CQRS:
