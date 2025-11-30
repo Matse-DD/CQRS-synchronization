@@ -222,11 +222,11 @@ Deze oplossing maakt gebruik van een message broker en polling. Je kan een messa
 
 #### Conclusie
 
-|                            | Dual-write problem                               | Schaalbaarheid | Recovery | Event Sourcing later | Snelheid  | Complexiteit |
-| -------------------------- | ------------------------------------ | -------------- | -------- | -------------------- | --------- | ------------ |
-| **Direct Projector** | Aanwezig                                 | Niet           | Niet     | Slecht               | Normaal   | Zeer simpel  |
-| **Outbox**           | Opgelost                            | Goed           | Goed     | Goed                 | Goed      | Complex      |
-| **Message Broker**   | Mogelijkheid tot (meer complexiteit) | Zeer goed      | Goed     | Goed                 | Zeer goed | Zeer complex |
+|                      | Dual-write problem                                 | Schaalbaarheid | Recovery | Event Sourcing later | Snelheid  | Complexiteit |
+|----------------------|----------------------------------------------------| -------------- | -------- | -------------------- | --------- | ------------ |
+| **Direct Projector** | Aanwezig                                           | Niet           | Niet     | Slecht               | Normaal   | Zeer simpel  |
+| **Outbox**           | Opgelost                                           | Goed           | Goed     | Goed                 | Goed      | Complex      |
+| **Message Broker**   | Mogelijkheid tot (meer complexiteit)               | Zeer goed      | Goed     | Goed                 | Zeer goed | Zeer complex |
 
 De direct projector is geen goede optie aangezien het bij een mogelijk falen van de databank niet zal kunnen recoveren.
 
