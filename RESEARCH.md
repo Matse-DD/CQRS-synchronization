@@ -47,9 +47,9 @@ Product owner:
 - Als de product owner wil ik dat mijn product met zo weinig mogelijk down-time kan werken zodat ik geen klanten verlies omdat mijn product weeral offline is.
 - Als de product owner wil ik dat mijn product niet volledig kapot gaat indien er een databank niet meer werkt zodat er steeds een deel werkend zal zijn.
 
-## Master core concepts
+## Master Core Concepts
 
-### CQRS concept
+### CQRS Concept
 
 CQRS ook gekend als Command Query Responsibility Segregation is op het hoogste niveau niet meer dan het opsplitsen van hoe je commands (acties) en queries (opvragen van gegevens) uitvoert op een databanken. Deze opsplitsing gebeurd al op een architetureel niveau waardoor je een aparte service zal hebben voor de queries & commands.
 
@@ -73,13 +73,13 @@ Een projector zet het evenement of de verandering in data om naar een correct co
 
 - https://event-driven.io/en/projections_and_read_models_in_event_driven_architecture/
 
-### Command databank
+### Command Databank
 
 Op de command databank worden enkel de commands van de gebruiker uitgevoerd. Dit wilt zeggen dat indien de gebruiker informatie wilt aanpassen deze databank zal worden gebruikt.
 
 - https://www.sciencedirect.com/topics/computer-science/database-command 
 
-### Query databank
+### Query Databank
 
 De query databank word enkel gebruikt om queries uit te voeren dit wilt dus zeggen dat indien de gebruiker informatie wilt opvragen deze databank zal worden gebruikt.
 
@@ -164,19 +164,19 @@ De complexiteit tegenover performantie we willen niet te complex gaan waardoor w
 
 We hebben rekening gehouden met deze punten en daarom hebben we uiteindelijk gekozen voor C#. Deze taal heeft een goede documentatie, een sterke typering en de complexiteit tegenover performantie is zeer goed.
 
-### CDC mogelijkheden
+### CDC Mogelijkheden
 
 Ook gekend als Change Data Capture dit is een design pattern dat gebruikt word om veranderingen waar te nemen in een databank. Er zijn verschillende mogelijkheden hieronder enkele opties.
 
-#### Log-based
+#### Log-Based
 
 Deze methode zal de veranderingen waarnemen door steeds naar de transactie logs te vragen. En hier dus veranderingen in zal waarnemen.
 
-#### Trigger-based
+#### Trigger-Based
 
 Deze optie maakt gebruik van databank triggers om veranderingen te zien. Indien er iets veranderd in de databank zal dan een stukje code worden getriggerd en veranderingen aangeven.
 
-#### Query-based
+#### Query-Based
 
 Deze methode zal de databank regelmatig aanvragen en kijken of de current state gelijk is met de vorige state dat het heeft binnen gevraagd. De verschillende veranderingen worden dan gezien.
 
