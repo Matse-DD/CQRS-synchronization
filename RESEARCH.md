@@ -393,6 +393,18 @@ Er is gekozen voor het gebruik van containers omdat containers ervoor zorgen dat
 
 In parallel met deze milestones zal er natuurlijk ook gewerkt worden aan de bachelorproef.
 
+## Alternatives considered
+- Java -> documentatie van C# is iets beter
+- TypeScript -> lose typing tijdens runtime
+- Systeemtalen -> zeer complex
+
+- message broker -> meer complexiteit
+- direct projection -> geen recovery mechanisme
+
+- query-based CDC -> een hoge latentie 
+- log-based CDC -> change stream was net iets beter doordat er mongodb word gebruikt
+- trigger-based CDC -> te hoge impact om de databank
+
 ## Bronnen
 CQRS:
 - https://cqrs.wordpress.com/about/ (als je binnen deze site wilt navigeren zal u het domein moeten veranderen naar cqrs.wordpress.com)
