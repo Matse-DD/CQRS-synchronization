@@ -348,14 +348,29 @@ if (retries === 0) {
 
 De volgende repo's zullen aanwezig zijn. group-05-CQRS-synchronization & group-05-CQRS-demo-applicatie (effectieve naam demo ligt nog niet vast). In de synchronization repo zal de implementatie van het CQRS systeem worden gemaakt terwijl de demo repo het CQRS systeem zal implementeren om te kunnen demonstreren dat de flow/CQRS implementatie werkt. Elke repo zal een README.md bevatten met een verdere uitleg over de repo. Hoe deze te gebruiken valt, extra uitleg, bugs en dergelijke.
 
-### Licentie 
+### Licentie
 
-We hebben gekozen voor een MIT-License voor maximale vrijheid, eenvoudigheid en omdat dit de standaard is voor .NET projecten zoals dit. MIT is permissief en staat non-commercieel en commercieel (en zelf closed source) gebruik toe zonder enige complexe patentclausules.
+We hebben gekozen voor een MIT-License voor maximale vrijheid en eenvoud. MIT is permissief en staat non-commercieel en commercieel (en zelf closed source) gebruik toe zonder enige complexe patentclausules. 
+
+https://choosealicense.com/licenses/
 
 ### CI/CD basics (test coverage, pipeline, main niet pushen (repo rules), ...)
-De volgende 
-- Release strategy (package registry, docker, scripts) (docker zal het waarschijnlijk zijn, aangezien we containers moeten gebruiken vanuit de projectbeschrijving), toch de andere opties eens in overweging nemen
-- Release checklist (deliverable)
+#### Reporegels
+Het zal niet mogelijk zijn om naar main te pushen. Elke verandering moet dus verlopen via een branch dat vervolgens gemerged kan worden indien 2 teamleden de code hebben nagekeken en geapproved hebben.
+
+#### Pipeline
+Verder zal de pipeline er als volgt uit zien:
+- meer dan 80% testcoverage 
+- code linted zonder problemen
+- maken van container 
+
+#### Release strategy
+Er is gekozen voor het gebruik van containers omdat containers ervoor zorgen dat de cqrs implementatie op verschillende platformen kan worden opgezet en gebruikt. Ook zorgen containers ervoor dat de implementatie gemakkelijk kan verdeeld worden en dat we er zeker van zijn dat als onze container werkt dit ook het geval zal zijn bij de andere containers. Verder is het ook aangegeven in de opdracht dat er gebruik moet worden gemaakt van containers.
+
+##### Release checklist
+- [ ] CQRS implementatie dat gemakkelijk te configureren valt
+- [ ] Demo applicatie dat de CQRS implementatie gebruikt en aangeeft dat het werkt alsook hoe het kan worden gebruikt.
+- [ ] Slagen van de verschillende pipelines
 
 ## Plan & Milestones 
 
@@ -427,3 +442,4 @@ Axon Framework:
 - https://medium.com/fively/axon-framework-explaining-the-power-of-event-driven-architecture-208b30f5f737 
 - https://medium.com/axoniq/demystifying-tracking-event-processors-in-axon-framework-1917c2f16e59 
 - https://javadoc.io/doc/org.axonframework/axon-core/3.3.6/org/axonframework/eventhandling/TrackingEventProcessor.html 
+
