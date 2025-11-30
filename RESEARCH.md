@@ -3,7 +3,7 @@
 ## Define your research objective
 
 - Wat probleem lossen we op?
-  - Synchronisatie tussen 2 databanken zonder dat er data verlies optreed voor CQRS doeleinden.
+  - Synchronisatie tussen 2 databanken zonder dat er data verlies optreedt voor CQRS-doeleinden.
 - Wie zijn de gebruikers?
   - Developers dat gebruik willen maken van CQRS (Command Query Responsibility Segregation)
 - Hoe weten we of het werkt?
@@ -38,22 +38,22 @@ Developer:
 - Als een developer wil ik dat indien de command databank onbereikbaar is ik nog steeds informatie kan opvragen zodat het opvragen van gegevens geen impact ondervind.
 - Als een developer wil ik dat indien er een onderdeel van de synchronisatie faalt er geen data verlies optreed zodat ik er zeker van kan zijn dat mijn data tussen de 2 databanken gelijk is.
 - Als een developer wil ik dat het verkeer van queries & commands verdeeld is over de databanken zodat er bij veel verkeer geen impact is.
-- Als een developer wil ik gemakkelijk een container opbouwen van het CQRS systeem zodat deze gemakkelijk te integreren valt.
-- Als een developer wil ik een demo applicatie dat de synchronisatie flow aantoont zodat ik er zeker van ben dat het CQRS systeem werkt.
+- Als een developer wil ik gemakkelijk een container opbouwen van het CQRS-systeem zodat deze gemakkelijk te integreren valt.
+- Als een developer wil ik een demo-applicatie dat de synchronisatie flow aantoont zodat ik er zeker van ben dat het CQRS-systeem werkt.
 - Als een developer wil ik dat events die niet verwerkt kunnen worden, apart worden gezet (Dead Letter Queue) zodat ik deze kan analyseren en later opnieuw kan 'replayen' zonder de rest van de queue te blokkeren zodat de events verder kunnen gaan zonder problemen. (Could Have)
 
 Product owner:
 
-- Als de product owner wil ik dat mijn product met zo weinig mogelijk down-time kan werken zodat ik geen klanten verlies omdat mijn product weeral offline is.
+- Als de product owner wil ik dat mijn product met zo weinig mogelijk down-time kan werken zodat ik geen klanten verlies omdat mijn product opnieuw offline is.
 - Als de product owner wil ik dat mijn product niet volledig kapot gaat indien er een databank niet meer werkt zodat er steeds een deel werkend zal zijn.
 
 ## Master Core Concepts
 
 ### CQRS Concept
 
-CQRS ook gekend als Command Query Responsibility Segregation is op het hoogste niveau niet meer dan het opsplitsen van hoe je commands (acties) en queries (opvragen van gegevens) uitvoert op een databanken. Deze opsplitsing gebeurd al op een architetureel niveau waardoor je een aparte service zal hebben voor de queries & commands.
+CQRS ook gekend als Command Query Responsibility Segregation is op het hoogste niveau niet meer dan het opsplitsen van hoe je commands (acties) en queries (opvragen van gegevens) uitvoert op een databanken. Deze opsplitsing gebeurt al op een architetureel niveau waardoor je een aparte service zal hebben voor de queries & commands.
 
-In dit project word er nog een stap verder gegaan en is de databank waar de commands op worden uitgevoerd een andere databank dan deze waar er word van gelezen.
+In dit project wordt er nog een stap verder gegaan en is de databank waar de commands op worden uitgevoerd een andere databank dan deze waar er wordt van gelezen.
 
 - https://www.geeksforgeeks.org/system-design/cqrs-command-query-responsibility-segregation/
 - https://cqrs.wordpress.com/about/
@@ -61,7 +61,7 @@ In dit project word er nog een stap verder gegaan en is de databank waar de comm
 
 ### CQRS Synchronisatie
 
-Zoals vermeld kan je dus gaan voor aparte databanken voor CQRS. De moeilijkheid hieraan is hoe je ervoor gaat zorgen dat gegevens tussen de twee databanken gesynchroniseerd blijven. Hiervoor zijn er verschillende opties dat we gaan overlopen in dit document..
+Zoals vermeld kan je dus gaan voor aparte databanken voor CQRS. De moeilijkheid hieraan is hoe je ervoor gaat zorgen dat gegevens tussen de twee databanken gesynchroniseerd blijven. Hiervoor zijn er verschillende opties dat we gaan overlopen in dit document.
 
 - https://eventuate.io/docs/manual/eventuate-tram/latest/distributed-data-management.html
 - https://blog.bytedoodle.com/cqrs-schema-design-synchronization-and-consistency-considerations/
@@ -81,13 +81,13 @@ Op de command databank worden enkel de commands van de gebruiker uitgevoerd. Dit
 
 ### Query Databank
 
-De query databank word enkel gebruikt om queries uit te voeren dit wilt dus zeggen dat indien de gebruiker informatie wilt opvragen deze databank zal worden gebruikt.
+De query databank wordt enkel gebruikt om queries uit te voeren dit wilt dus zeggen dat indien de gebruiker informatie wilt opvragen deze databank zal worden gebruikt.
 
 - https://www.techtarget.com/searchdatamanagement/definition/query 
 
 ### Event Sourcing
 
-Dit is het principe van het opslaan van verschillende events en deze events toe te passen op data. Het is dan mogelijk om naar een vorige staat van de data terug te keren door de events terug af te spelen vanaf de start staat. Of door het omgekeerde van de events uit te voeren dit hangt af van de implementatie. Event sourcing zorgt voor een duidelijk overzicht van welke acties allemaal ondernomen zijn op de data waardoor de momentele staat bereikt is.
+Dit is het principe van het opslaan van verschillende events en deze events toe te passen op data. Het is dan mogelijk om naar een vorige staat van de data terug te keren door de events weer af te spelen vanaf de start staat. Of door het omgekeerde van de events uit te voeren dit hangt af van de implementatie. Event sourcing zorgt voor een duidelijk overzicht van welke acties allemaal ondernomen zijn op de data waardoor de momentele staat bereikt is.
 
 - https://medium.com/@alxkm/event-sourcing-explained-benefits-challenges-and-use-cases-d889dc96fc18 
 - https://microservices.io/patterns/data/event-sourcing.html
@@ -291,7 +291,7 @@ foreach (var change in cursor.ToEnumerable())
 
 ```
 
-De change stream geeft volgende events weer bij het gebruik van BackingDocuments indien er een aanpassing is
+De change stream geeft de volgende events weer bij het gebruik van BackingDocuments indien er een aanpassing is
 
 ```js
 { "_id" : { "_data" : "..." }, "operationType" : "update", "clusterTime" : Timestamp(...),
@@ -355,17 +355,17 @@ if (retries === 0) {
 
 ### Repo setup
 
-De volgende repo's zullen aanwezig zijn. group-05-CQRS-synchronization & group-05-CQRS-demo-applicatie (effectieve naam demo ligt nog niet vast). In de synchronization repo zal de implementatie van het CQRS systeem worden gemaakt terwijl de demo repo het CQRS systeem zal implementeren om te kunnen demonstreren dat de flow/CQRS implementatie werkt. Elke repo zal een README.md bevatten met een verdere uitleg over de repo. Hoe deze te gebruiken valt, extra uitleg, bugs en dergelijke.
+De volgende repos zullen aanwezig zijn. group-05-CQRS-synchronization & group-05-CQRS-demo-applicatie (effectieve naam demo ligt nog niet vast). In de synchronization repo zal de implementatie van het CQRS-systeem worden gemaakt terwijl de demo repo het CQRS-systeem zal implementeren om te kunnen demonstreren dat de flow/CQRS-implementatie werkt. Elke repo zal een README.md bevatten met een verdere uitleg over de repo. Hoe deze te gebruiken valt, extra uitleg, bugs en dergelijke.
 
 ### Licentie
 
-We hebben gekozen voor een MIT-License voor maximale vrijheid en eenvoud. MIT is permissief en staat non-commercieel en commercieel (en zelf closed source) gebruik toe zonder enige complexe patentclausules. Hierdoor zal de software zeer toegangkelijk zijn om te gebruiken door verschillende developers.
+We hebben gekozen voor een MIT-License voor maximale vrijheid en eenvoud. MIT is permissief en staat beide non-commercieel en commercieel (incl. closed-source) gebruik toe zonder enige complexe patentclausules. Hierdoor zal de software zeer toegankelijk zijn om te gebruiken door verschillende developers.
 
 https://choosealicense.com/licenses/
 
 ### CI/CD basics (test coverage, pipeline, main niet pushen (repo rules), ...)
 #### Reporegels
-Het zal niet mogelijk zijn om naar main te pushen. Elke verandering moet dus verlopen via een branch dat vervolgens gemerged kan worden indien 2 teamleden de code hebben nagekeken en geapproved hebben.
+Het zal niet mogelijk zijn om naar main te pushen. Elke verandering moet dus verlopen via een branch dat vervolgens gemerged kan worden indien 2 teamleden de code hebben nagekeken en accepteren.
 
 #### Pipeline
 Verder zal de pipeline er als volgt uit zien:
