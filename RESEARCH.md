@@ -62,11 +62,12 @@ In dit project word er nog een stap verder gegaan en is de databank waar de comm
 Zoals zonet vermeld kan je dus gaan voor aparte databanken voor CQRS. De moeilijkheid hieraan is hoe ga je ervoor zorgen dat de gegevens tussen de twee databanken hetzelfde is. Hiervoor zijn er verschillende opties zoals in dit research document te zien is.
 
 - https://eventuate.io/docs/manual/eventuate-tram/latest/distributed-data-management.html
-- 
 
 ### Projector
 
 Een projector zet het evenement of de verandering in data om naar een correct command, zodat de query databank correct kan worden geüpdatet
+
+- https://event-driven.io/en/projections_and_read_models_in_event_driven_architecture/
 
 ### Command databank
 
@@ -133,85 +134,26 @@ De CQRS implementatie moet voldoen aan volgende pipeline onderdelen:
 ## Technologie & Architectuur Opties
 
 ### Programmeertalen
-
-#### C#
-
-Dit is een programmeertaal gemeaakt door Microsoft. Een groot voordeel aan C# is het .NET eco-systeem hier zijn verschillende libraries aanwezig waar handig gebruik kan worden van gemaakt. E
-
-| Technologie                       | Type        | Voordelen                                                                                                                           | Nadelen                                                                                                     | Conclusie                                                                                                                       |
-| :-------------------------------- | :---------- | :---------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------ |
-| **.NET (C#) / ASP.NET**     | Managed     | **Sterke Type-veiligheid** (ook runtime), volwassen ecosysteem (MediatR, EF Core), snelle development door krachtige tooling. | Iets zwaarder dan Go of Node.js, maar verwaarloosbaar voor deze use-case.                                   | **Gekozen.** Biedt de beste balans tussen veiligheid, snelheid van ontwikkelen en robuuste frameworks voor CQRS.          |
-| **Java**                    | Managed     | Vergelijkbaar met C# qua robuustheid en type-veiligheid.                                                                            | Vaak meer boilerplate code nodig; team expertise ligt sterker bij C#.                                       | **Afgevallen.** Technisch capabel, maar minder efficiënt gezien de huidige stack-voorkeur.                               |
-| **TypeScript (Node/Deno)**  | Interpreted | Snel op te zetten, JSON-native (handig voor MongoDB).                                                                               | **Weak typing bij runtime**: data-integriteit is lastig te garanderen. Minder volwassen CQRS-tooling. | **Afgevallen.** Risico op data-inconsistentie door gebrek aan strikte runtime types is te groot voor een sync-applicatie. |
-| **Go (Golang)**             | Compiled    | Zeer hoge performance, simpele concurrency.                                                                                         | Minder krachtige ORM's/Frameworks vergeleken met EF Core. Verbose error handling vertraagt development.     | **Afgevallen.** Performance winst weegt niet op tegen het gemis aan enterprise features (zoals MediatR).                  |
-| **Systeemtalen (C++/Rust)** | Low-level   | Maximale controle en performance.                                                                                                   | **Hoge complexiteit.** Geheugenbeheer is handmatig. Development tijd is drastisch langer.             | **Afgevallen.** Te complex ("heavy lifting" zelf doen) voor een architectuur-gefocust probleem.                           |
-
-| Patroon                     | Omschrijving                                                                               | Voordelen                                                                                                   | Nadelen                                                                                           | Conclusie
-
-### Programmeertaal (extra voordelen/nadelen op schrijven is nu precies wat weinig)
-
-#### Low-level programmeertalen
-
-- Voordelen
-  - Performant
-  - Heel veel controle over wat er gebeurd
-- Nadelen
-  - Memory management
-  - Minder cadeau (zelf meer schrijven)
-    - een betrouwbare ORM waar je gemakkelijk mee kan werken is zelfdzaam dus dan zou je zelf veel meer databank connecties en dergelijke moeten verzorgen wat ook niet vanzelf sprekend is in een low level programmeertaal
-
-#### Typescript
-
-- Voordelen
-  - Lichte development stack
-  - Zeer goede documentatie
-- Nadelen
-  - Weak typing tijdens het draaien van de applicatie wat voor onverwachte problemen kan zorgen
-  - Veel libraries ondersteunen nog niet alles en vertrouwen ook op veel onderliggende libraries
-    - Een goede ORM dat voor verschillende databanken kan worden ingezet is moeilijk te vinden.
-
-#### C#
-
-- Voordelen
-  - Een zeer goede ORM (EntityFramwork)
-  - Strong typing
-  - Goede documentatie
-  - Containerisatie is ingebouwd
-- Nadelen
-  - Veel verschillende manieren om het zelfde te implementeren
-    - Je hebt 3 verschillende manieren om een constructor te gebruiken in C#
-
-#### Java
-
-- Voordelen
-  - Strong typing
-  - Om iets te doen zal je syntax gewijs meestal maar 1 optie hebben
-    - Constructors
-  - Verbose
-- Nadelen
-  - Boilerplate
-  - Documentatie is minder goed
+| Onderwerp | C# | Java | TypeScript | Systeemtalen |
+|----------|----|------|------------|--------------|
+| Performantie | goed | goed | minder | zeer goed |
+| Typering | sterke typering | sterke typering | losse typering tijdens runtime | (vaak) sterke typering |
+| Documentatie | goed | minder | goed | wisselend |
+| Complexiteit | gewoon | gewoon | gemakkelijk | complex |
+| Syntax mogelijkheden | verschillende mogelijkheden om hetzelfde te doen | 1 optie om iets te doen (syntax) | flexibel | strikt |
+| Ingebouwde functionaliteit & Uitbreidingen | veel | veel | minder | niet ingebouwd, wel uit te breiden |
+| Extra | uitgebreid .NET-ecosysteem | Platformonafhankelijk (JVM) | Javascript met types | memory management |
 
 #### Conclusie
+We hebben onze keuze gemaakt op basis van de typering, documentatie en complexiteit tegenover performantie.
 
-| Criterium                 | Low-level (C++/Rust) | TypeScript (Node.js)       | Java                    | C# (.NET)                    |
-| :------------------------ | :------------------- | :------------------------- | :---------------------- | :--------------------------- |
-| **Performantie**    | Extreem hoog         | Gemiddeld                  | Hoog                    | Hoog                         |
-| **Type Veiligheid** | Strikt               | Matig (enkel compile-time) | Strikt                  | Strikt                       |
-| **ORM Kwaliteit**   | Beperkt / Complex    | Matig                      | Goed (veel boilerplate) | Uitstekend (EF Core)         |
-| **Dev Snelheid**    | Laag                 | Zeer hoog                  | Gemiddeld               | Hoog                         |
-| **Documentatie**    | Versnipperd          | Zeer goed                  | Verspreid               | Uitstekend (Gecentraliseerd) |
-| **Containerisatie** | Handmatig            | Goed                       | Goed                    | Uitstekend (Native)          |
+Een sterke typering is het meest gewenst voor onze use case dit omdat je verschillende events zal binnen krijgen en er zal moeten bepaald worden wat hier in zit. Indien hier iets fout in gebeurd willen we hier het liefst een error van krijgen en niet dat het programma verder gaat zonder problemen.
 
-**Waarom geen Systeemtalen of TypeScript?**
+De documentatie moet gemakkelijk te navigeren zijn en duidelijk uit leggen wat bepaalde methodes doen. 
 
-Bij de taalkeuze zijn zowel low-level systeemtalen (C++, C, Rust) als TypeScript (Deno, Bun, Node) afgevallen, elk omwille van specifieke beperkingen ten opzichte van onze architecturale doelen.
+De complexiteit tegenover performantie we willen niet te complex gaan waardoor we plots zeer veel zelf zullen moeten doen maar de performantie moet nog steeds goed blijven.
 
-**Systeemtalen** zijn niet weerhouden vanwege de hoge complexiteit en de aanzienlijke hoeveelheid handmatig werk. Hoewel deze talen zeer performant zijn indien correct gebruikt, krijg je "minder cadeau" van het platform; zaken zoals geheugenbeheer moet je zelf afhandelen. Gezien onze focus ligt op de architectuur van een complex synchronisatieproces tussen twee databanken, is deze extra laagdrempelige complexiteit niet gewenst. We verkiezen talen (zoals C# of Java) waarbij frameworks en ORM-ondersteuning het "heavy lifting" doen, wat efficiënter is voor onze gelimiteerde ontwikkeltijd.
-
-**TypeScript** viel af omdat het ecosysteem rondom CQRS en ORM nog niet zo volwassen is als dat van de gevestigde waarden. Daarnaast is de type-veiligheid een kritiek punt. TypeScript is strongly typed tijdens compile-time, maar wordt loosely typed tijdens runtime ("weak typing"). Dit betekent dat als data binnenkomt in een ander formaat dan verwacht, de applicatie niet noodzakelijk klaagt en gewoon verdergaat. Voor een datasync-applicatie die leunt op CQRS, waarbij de correctheid van datastructuren cruciaal is, vormt dit gebrek aan strikte runtime-controle een te groot risico.
-
-Zowel Java als C# zijn zeer goede kandidaten. Ze zijn allebei zeer betrouwbaar en goed uitgewerkt. Met een volwaarde eco-systeem en ondersteuning. Uiteindelijk  zowel Java als C# zijn goede kandidaten de reden dat er uiteindelijk voor C# en .NET gekozen is omdat de documentatie beter is. ... (nog wat redenen)
+We hebben rekening gehouden met deze punten en daarom hebben we uiteindelijk gekozen voor C#. Deze taal heeft een goede documentatie, een sterke typering en de complexiteit tegenover performantie is zeer goed.
 
 ### CDC mogelijkheden
 
