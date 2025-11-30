@@ -186,13 +186,13 @@ Deze optie is ingebouwd in MongoDB en is dus mongoDB specifiek. MongoDB zal stee
 
 #### Conclusie 
 |               | Schaalbaarheid | Impact    | Latentie  | Volledigheid |
-| ------------- | -------------- | --------- | --------- | ------------ |
+|---------------|----------------|-----------|-----------|--------------|
 | Log-based     | Zeer goed      | Zeer laag | Laag      | Volledig     |
 | Trigger-based | Laag           | Hoog      | Gemiddeld | Volledig     |
 | Query-based   | Minder goed    | Gemiddeld | Hoog      | Laag         |
 | Change stream | Zeer goed      | Zeer laag | Zeer laag | Volledig     |
 
-Er is gekozen voor de change stream optie voor de vollegende reden. Change stream heeft bijna dezelfde voordelen als log-based maar scoort beter op latentie dit komt doordat er niet moet worden gepolled (constant vragen of er iets nieuw is). Verder zal er gedurende het project gewerkt worden met mongoDb zoals beschreven in de projectbeschrijving. Indien we toch een andere command databank zouden willen gebruiken is de overstap niet groot naar een andere CDC optie. Het enige wat de CDC uiteindelijk moet doen is aangeven wat er veranderd is in de databank.
+Er is gekozen voor de change stream optie voor de volgende reden. Change stream heeft bijna dezelfde voordelen als log-based, maar scoort beter op latentie dit komt doordat er niet moet worden gepolled (constant vragen of er iets nieuw is). Verder zal er gedurende het project gewerkt worden met mongoDb zoals beschreven in de projectbeschrijving. Indien we toch een andere command databank zouden willen gebruiken is de overstap niet groot naar een andere CDC-optie. Het enige wat de CDC uiteindelijk moet doen is aangeven wat er veranderd is in de databank.
 
 ### CQRS Synchronisatie mogelijkheden
 
@@ -210,33 +210,33 @@ Deze architectuur slaat de verschillende events op in een table/collectie in de 
 
 Recovery is mogelijk door het laatste geslaagde event bij te houden. Op basis van dit event kan je bepalen wat het volgende event is dat aanwezig is in de outbox. 
 
-Verder is dit atomisch door dat er gebruik word gemaakt van de databank transacties. En omdat de projection kan zeggen tegen de outbox dat een event gelukt is of niet. Dit zorgt ervoor dat er geen Dual-write problem is.
+Verder is dit atomisch door dat er gebruik wordt gemaakt van de databank transacties. En omdat de projection kan zeggen tegen de outbox dat een event gelukt is of niet. Dit zorgt ervoor dat er geen Dual-write problem is.
 
 ![Foto van outbox architectuur](images_research/outbox_synchronisation.png)
 
 #### Message/Event Broker
 
-Deze oplossing maakt gebruik van een message broker en polling. Je kan een message broker zo worden geconfigureerd dat deze de verschillende events persistent bijhoudt, wat dus wilt zeggen dat de events niet verloren zal gaan indien de message broker uitvalt. Er is eigenlijk geen gemakkelijke manier om het dual-write problem op te lossen. Tenzij je gebruik zou maken van een outbox hiervoor.
+Deze oplossing maakt gebruik van een message broker en polling. Je kan een message broker zo worden geconfigureerd dat deze de verschillende events persistent bijhoudt, wat dus wilt zeggen dat de events niet verloren zal gaan indien de messagebroker uitvalt. Er is eigenlijk geen gemakkelijke manier om het dual-write problem op te lossen. Tenzij je gebruik zou maken van een outbox hiervoor.
 
 ![Foto van broker architectuur](images_research/broker_synchronisation.png)
 
 #### Conclusie
 
-|                      | Dual-write problem                                 | Schaalbaarheid | Recovery | Event Sourcing later | Snelheid  | Complexiteit |
-|----------------------|----------------------------------------------------| -------------- | -------- | -------------------- | --------- | ------------ |
-| **Direct Projector** | Aanwezig                                           | Niet           | Niet     | Slecht               | Normaal   | Zeer simpel  |
-| **Outbox**           | Opgelost                                           | Goed           | Goed     | Goed                 | Goed      | Complex      |
-| **Message Broker**   | Mogelijkheid tot (meer complexiteit)               | Zeer goed      | Goed     | Goed                 | Zeer goed | Zeer complex |
+|                      | Dual-write problem                   | Schaalbaarheid | Recovery | Event Sourcing later | Snelheid  | Complexiteit |
+|----------------------|--------------------------------------|----------------|----------|----------------------|-----------|--------------|
+| **Direct Projector** | Aanwezig                             | Niet           | Niet     | Slecht               | Normaal   | Zeer simpel  |
+| **Outbox**           | Opgelost                             | Goed           | Goed     | Goed                 | Goed      | Complex      |
+| **Message Broker**   | Mogelijkheid tot (meer complexiteit) | Zeer goed      | Goed     | Goed                 | Zeer goed | Zeer complex |
 
 De direct projector is geen goede optie aangezien het bij een mogelijk falen van de databank niet zal kunnen recoveren.
 
-De message broker is de meest schaalbare optie maar is zeer complex om te implementeren, verder kan je niet zonder extra complexiteit garanderen dat een event uitgevoert is op de query databank.
+De messagebroker is de meest schaalbare optie, maar is zeer complex om te implementeren, verder kan je niet zonder extra complexiteit garanderen dat een event uitgevoert is op de query databank.
 
 De outbox is stabiel en betrouwbaar en is ook de enige manier die zonder veel moeite kan garanderen of een event wel uitgevoerd is of niet.
 
 ### Uitkomst
 
-Uiteindelijk is er gekozen voor de volgende technologieën & architectuur opties. C# als programmeertaal, Change Stream als CDC (data veranderingen waarnemen) en voor outbox om de CQRS synchronisatie te regelen. Dit met enkele veranderingen om exactly-once processing te verkrijgen.
+Uiteindelijk is er gekozen voor de volgende technologieën & architectuur opties. C# als programmeertaal, Change Stream als CDC (data veranderingen waarnemen) en voor outbox om de CQRS-synchronisatie te regelen. Dit met enkele veranderingen om exactly-once processing te verkrijgen.
 
 Wat het volgende schema maakt:
 ![Foto gekozen architectuur combinatie outbox + change stream](./images_research/outbox_change_stream_sync.png)
@@ -364,7 +364,7 @@ We hebben gekozen voor een MIT-License voor maximale vrijheid en eenvoud. MIT is
 https://choosealicense.com/licenses/
 
 ### CI/CD basics (test coverage, pipeline, main niet pushen (repo rules), ...)
-#### Reporegels
+#### Repo Regels
 Het zal niet mogelijk zijn om naar main te pushen. Elke verandering moet dus verlopen via een branch dat vervolgens gemerged kan worden indien 2 teamleden de code hebben nagekeken en accepteren.
 
 #### Pipeline
@@ -374,17 +374,17 @@ Verder zal de pipeline er als volgt uit zien:
 - Maken van container 
 
 #### Release strategy
-Er is gekozen voor het gebruik van containers omdat containers ervoor zorgen dat de cqrs implementatie op verschillende platformen kan worden opgezet en gebruikt. Ook zorgen containers ervoor dat de implementatie gemakkelijk kan verdeeld worden en dat we er zeker van zijn dat als onze container werkt dit ook het geval zal zijn bij de andere containers. Verder is het ook aangegeven in de opdracht dat er gebruik moet worden gemaakt van containers.
+Er is gekozen voor het gebruik van containers omdat containers ervoor zorgen dat de CQRS-implementatie op verschillende platformen kan worden opgezet en gebruikt. Ook zorgen containers ervoor dat de implementatie gemakkelijk kan verdeeld worden en dat we er zeker van zijn dat als onze container werkt dit ook het geval zal zijn bij de andere containers. Verder is het ook aangegeven in de opdracht dat er gebruik moet worden gemaakt van containers.
 
 ##### Release checklist
-- [ ] CQRS implementatie dat gemakkelijk te configureren valt
-- [ ] Demo applicatie dat de CQRS implementatie gebruikt en aangeeft dat het werkt alsook hoe het kan worden gebruikt.
+- [ ] CQRS-implementatie dat gemakkelijk te configureren valt
+- [ ] Demo applicatie dat de CQRS-implementatie gebruikt en aangeeft dat het werkt alsook hoe het kan worden gebruikt.
 - [ ] Slagen van de verschillende pipelines
 
 ## Plan & Milestones 
 
 | # | Milestone                   | Duratie       | Beschrijving                                                                                                                                  |
-| - |-----------------------------|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+|---|-----------------------------|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
 | 1 | Onderzoek                   | 24/11 - 30/11 | Probleemanalyse, technologievergelijking, requirements definiëren en architectuur vastleggen.                                                 |
 | 2 | Op start Core implementatie | 01/12 - 07/12 | Opzetten development omgeving (projectstructuur, CI/CD pipelines, ...) en start implementatie.                                                |
 | 3 | Core Implentatie            | 08/12 - 21/12 | Verder bouwen van de Sync Service, Outbox implementatie en de koppeling tussen MongoDB en MySQL alsook de demo applicatie voor de flow (MVP). |
@@ -394,16 +394,16 @@ Er is gekozen voor het gebruik van containers omdat containers ervoor zorgen dat
 In parallel met deze milestones zal er natuurlijk ook gewerkt worden aan de bachelorproef.
 
 ## Alternatives considered
-- Java -> Documentatie van C# is iets beter
-- TypeScript -> Lose typing tijdens runtime
-- Systeemtalen -> Zeer complex
+- Java → Documentatie van C# is iets beter
+- TypeScript → Lose typing tijdens runtime
+- Systeemtalen → Zeer complex
 
-- Message Broker -> Meer complexiteit
-- Direct Projection -> Geen recovery mechanisme
+- Message Broker → Meer complexiteit
+- Direct Projection → Geen recovery mechanisme
 
-- Query-Based CDC -> Een hoge latentie 
-- Log-Based CDC -> Change stream was net iets beter doordat er mongodb word gebruikt
-- Trigger-Based CDC -> Te hoge impact om de databank
+- Query-Based CDC → Een hoge latentie 
+- Log-Based CDC → Change stream was net iets beter doordat er mongodb word gebruikt
+- Trigger-Based CDC → Te hoge impact om de databank
 
 ## Bronnen
 CQRS:
