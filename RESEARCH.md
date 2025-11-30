@@ -143,15 +143,15 @@ De CQRS implementatie moet voldoen aan volgende pipeline onderdelen:
 ## Technologie & Architectuur Opties
 
 ### Programmeertalen
-| Onderwerp | C# | Java | TypeScript | Systeemtalen |
-|----------|----|------|------------|--------------|
-| Performantie | goed | goed | minder | zeer goed |
-| Typering | sterke typering | sterke typering | losse typering tijdens runtime | (vaak) sterke typering |
-| Documentatie | goed | minder | goed | wisselend |
-| Complexiteit | gewoon | gewoon | gemakkelijk | complex |
-| Syntax mogelijkheden | verschillende mogelijkheden om hetzelfde te doen | 1 optie om iets te doen (syntax) | flexibel | strikt |
-| Ingebouwde functionaliteit & Uitbreidingen | veel | veel | minder | niet ingebouwd, wel uit te breiden |
-| Extra | uitgebreid .NET-ecosysteem | Platformonafhankelijk (JVM) | Javascript met types | memory management |
+| Onderwerp                                  | C#                                               | Java                             | TypeScript                     | Systeemtalen                       |
+|--------------------------------------------|--------------------------------------------------|----------------------------------|--------------------------------|------------------------------------|
+| Performantie                               | Goed                                             | Goed                             | Minder                         | Zeer goed                          |
+| Typering                                   | Sterke typering                                  | Sterke typering                  | Losse typering tijdens runtime | (Vaak) sterke typering             |
+| Documentatie                               | Goed                                             | Minder                           | Goed                           | Wisselend                          |
+| Complexiteit                               | Gemiddeld                                        | Gemiddeld                        | Laag                           | Hoog                               |
+| Syntax mogelijkheden                       | Meerdere manieren om hetzelfde te bereiken       | Eén manier per functionaliteit   | Flexibel                       | Strikt                             |
+| Ingebouwde functionaliteit & Uitbreidingen | Veel                                             | Veel                             | Minder                         | Beperkt, maar uitbreidbaar         |
+| Extra                                      | Uitgebreid .NET-ecosysteem                       | Platformonafhankelijk (JVM)      | JavaScript met types           | Handmatig memory management        |
 
 #### Conclusie
 We hebben onze keuze gemaakt op basis van de typering, documentatie en complexiteit tegenover performantie.
@@ -383,13 +383,13 @@ Er is gekozen voor het gebruik van containers omdat containers ervoor zorgen dat
 
 ## Plan & Milestones 
 
-| # | Milestone                 | Duratie  | Beschrijving                                                                                     |
-| - | ------------------------- | ----- | ----------------------------------------------------------------------------------------------- |
-| 1 | Onderzoek                  | 24/11 - 30/11 | Probleemanalyse, technologievergelijking, requirements definiëren en architectuur vastleggen.  |
-| 2 | Op start Core implementatie | 01/12 - 07/12 | Opzetten development omgeving (projectstructuur, CI/CD pipelines, ...) en start implementatie.         |
-| 3 | Core Implentatie       | 08/12 - 21/12 | Verder bouwen van de Sync Service, Outbox implementatie en de koppeling tussen MongoDB en MySQL alsook de demo applicatie voor de flow (MVP). |
-| 4 | Code Finalisatie         | 22/12 - 09/01 | Verder uitwerken, extra features, bugfixing, refactoring van CQRS implementatie & demo applicatie. |
-| 5 | Thesis Finalisatie       | 10/01 - 18/01 | Afronden van de scriptie, documentatie en formuleren van conclusies.               |
+| # | Milestone                   | Duratie       | Beschrijving                                                                                                                                  |
+| - |-----------------------------|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| 1 | Onderzoek                   | 24/11 - 30/11 | Probleemanalyse, technologievergelijking, requirements definiëren en architectuur vastleggen.                                                 |
+| 2 | Op start Core implementatie | 01/12 - 07/12 | Opzetten development omgeving (projectstructuur, CI/CD pipelines, ...) en start implementatie.                                                |
+| 3 | Core Implentatie            | 08/12 - 21/12 | Verder bouwen van de Sync Service, Outbox implementatie en de koppeling tussen MongoDB en MySQL alsook de demo applicatie voor de flow (MVP). |
+| 4 | Code Finalisatie            | 22/12 - 09/01 | Verder uitwerken, extra features, bugfixing, refactoring van CQRS implementatie & demo applicatie.                                            |
+| 5 | Thesis Finalisatie          | 10/01 - 18/01 | Afronden van de scriptie, documentatie en formuleren van conclusies.                                                                          |
 
 In parallel met deze milestones zal er natuurlijk ook gewerkt worden aan de bachelorproef.
 
