@@ -61,7 +61,7 @@ In dit project word er nog een stap verder gegaan en is de databank waar de comm
 
 ### CQRS Synchronisatie
 
-Zoals zonet vermeld kan je dus gaan voor aparte databanken voor CQRS. De moeilijkheid hieraan is hoe ga je ervoor zorgen dat de gegevens tussen de twee databanken hetzelfde is. Hiervoor zijn er verschillende opties zoals in dit research document te zien is.
+Zoals vermeld kan je dus gaan voor aparte databanken voor CQRS. De moeilijkheid hieraan is hoe je ervoor gaat zorgen dat gegevens tussen de twee databanken gesynchroniseerd blijven. Hiervoor zijn er verschillende opties dat we gaan overlopen in dit document..
 
 - https://eventuate.io/docs/manual/eventuate-tram/latest/distributed-data-management.html
 - https://blog.bytedoodle.com/cqrs-schema-design-synchronization-and-consistency-considerations/
