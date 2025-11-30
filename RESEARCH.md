@@ -159,7 +159,7 @@ We hebben rekening gehouden met deze punten en daarom hebben we uiteindelijk gek
 
 Ook gekend als Change Data Capture dit is een design pattern dat gebruikt word om veranderingen waar te nemen in een databank. Er zijn verschillende mogelijkheden hieronder enkele opties.
 
-### Log-based
+#### Log-based
 
 Deze methode zal de veranderingen waarnemen door steeds naar de transactie logs te vragen. En hier dus veranderingen in zal waarnemen.
 
@@ -175,6 +175,7 @@ Deze methode zal de databank regelmatig aanvragen en kijken of de current state 
 
 Deze optie is ingebouwd in MongoDB en is dus mongoDB specifiek. MongoDB zal steeds naar iedereen dat het horen wilt sturen wat er veranderd is aan de databank. Hier kan dan op worden gesubscribed.
 
+#### Conclusie 
 |               | Schaalbaarheid | Impact    | Latentie  | Volledigheid |
 | ------------- | -------------- | --------- | --------- | ------------ |
 | Log-based     | Zeer goed      | Zeer laag | Laag      | Volledig     |
@@ -342,30 +343,33 @@ if (retries === 0) {
 ```
 
 ## Publicatie & Open Source Strategy
-- Repo setup
-- Licentie: We hebben gekozen voor een MIT-License voor maximale vrijheid, eenvoudigheid en omdat dit de standaard is voor .NET projecten zoals dit. MIT is permissief en staat non-commercieel en commercieel (en zelf closed source) gebruik toe zonder enige complexe patentclausules.
-- CI/CD basics (test coverage, pipeline, main niet pushen (repo rules), ...)
+
+### Repo setup
+
+De volgende repo's zullen aanwezig zijn. group-05-CQRS-synchronization & group-05-CQRS-demo-applicatie (effectieve naam demo ligt nog niet vast). In de synchronization repo zal de implementatie van het CQRS systeem worden gemaakt terwijl de demo repo het CQRS systeem zal implementeren om te kunnen demonstreren dat de flow/CQRS implementatie werkt. Elke repo zal een README.md bevatten met een verdere uitleg over de repo. Hoe deze te gebruiken valt, extra uitleg, bugs en dergelijke.
+
+### Licentie 
+
+We hebben gekozen voor een MIT-License voor maximale vrijheid, eenvoudigheid en omdat dit de standaard is voor .NET projecten zoals dit. MIT is permissief en staat non-commercieel en commercieel (en zelf closed source) gebruik toe zonder enige complexe patentclausules.
+
+### CI/CD basics (test coverage, pipeline, main niet pushen (repo rules), ...)
+De volgende 
 - Release strategy (package registry, docker, scripts) (docker zal het waarschijnlijk zijn, aangezien we containers moeten gebruiken vanuit de projectbeschrijving), toch de andere opties eens in overweging nemen
 - Release checklist (deliverable)
 
-## Plan & Milestones
+## Plan & Milestones 
 
-| # | Milestone                 | Duratie  | Description                                                                                     |
+| # | Milestone                 | Duratie  | Beschrijving                                                                                     |
 | - | ------------------------- | ----- | ----------------------------------------------------------------------------------------------- |
 | 1 | Onderzoek                  | 24/11 - 30/11 | Probleemanalyse, technologievergelijking, requirements definiëren en architectuur vastleggen.  |
-| 2 | Op start Core implementatie | 01/12 - 07/12 | Opzetten projectstructuur, CI/CD pipelines en start implementatie.         |
+| 2 | Op start Core implementatie | 01/12 - 07/12 | Opzetten development omgeving (projectstructuur, CI/CD pipelines, ...) en start implementatie.         |
 | 3 | Core Implentatie       | 08/12 - 21/12 | Verder bouwen van de Sync Service, Outbox implementatie en de koppeling tussen MongoDB en MySQL alsook de demo applicatie voor de flow (MVP). |
 | 4 | Code Finalisatie         | 22/12 - 09/01 | Verder uitwerken, extra features, bugfixing, refactoring van CQRS implementatie & demo applicatie. |
 | 5 | Thesis Finalisatie       | 10/01 - 18/01 | Afronden van de scriptie, documentatie en formuleren van conclusies.               |
 
-Denken aan de verschillende milestones (research, design, PoC, MVP, release) issues, usecases / epics
-
-## Alternatieven overwogen (bij elke optie bijschrijven wat we overwogen hebben en waarom niet linkjes en referenties nodig)
-
-
+In parallel met deze milestones zal er natuurlijk ook gewerkt worden aan de bachelorproef.
 
 ## Bronnen
-
 CQRS:
 - https://cqrs.wordpress.com/about/ (als je binnen deze site wilt navigeren zal u het domein moeten veranderen naar cqrs.wordpress.com)
 - https://awesome-architecture.com/cqrs/
