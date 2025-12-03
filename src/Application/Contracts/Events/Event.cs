@@ -1,27 +1,27 @@
 ﻿using Application.Contracts.Events.Payloads;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Application.Contracts.Events;
 
-public abstract class Event(Guid eventId, DateTime occuredAt, string aggregateName, Status status, EventType eventType)
+public abstract class Event(string incomingEvent)
 {
     [JsonPropertyName("event_id")]
-    private Guid EventId { get; init; } = eventId;
-    
+    private Guid EventId { get; init; }
+  
     [JsonPropertyName("occured_at")]
-    public DateTime OccuredAt { get; init; } = occuredAt; 
+    public DateTime OccuredAt { get; init; }
 
     [JsonPropertyName("aggregate_name")]
-    public string AggregateName { get; init; } = aggregateName;
+    public string AggregateName { get; init; }
 
     [JsonPropertyName("status")]
-    public Status Status { get; init; } = status;
+    public Status Status { get; init; } 
 
     [JsonPropertyName("event_type")]
-    public EventType EventType { get; init; } = eventType;
+    public EventType EventType { get; init; }
 
-    public IDynamicPayload PayLoad { get; private set; }
+    public IPayload PayLoad { get; set; }
 
     public abstract string GetCommand();
-    //Payload will be implemented later
 }
