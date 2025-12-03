@@ -36,7 +36,7 @@ public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent
                $"WHERE {MapWhereClause(Condition)}";
     }
 
-    private string MapSetClause(Dictionary<string, string> change)
+    private string MapSetClause(IDictionary<string, string> change)
     {
         return string.Join(", ", change.Select(changePair=>
         {
@@ -44,11 +44,11 @@ public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent
         }));
     }
 
-    private string MapWhereClause(Dictionary<string, string> condition)
+    private string MapWhereClause(IDictionary<string, string> condition)
     {
         if (condition == null || !condition.Any()) return "True";
 
-        return string.Join(" AND ", Condition.Select(conditionPair =>
+        return string.Join(" AND ", condition.Select(conditionPair =>
         {
             string key = conditionPair.Key;
             string value = conditionPair.Value.Trim();
