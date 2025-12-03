@@ -14,37 +14,18 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
 
     private string GetKeysReduced(IEnumerable<string> keys)
     {
-        return keys.ToList().Aggregate("", (currentAccumulation, nextKey) =>
-        {
-            if (string.IsNullOrEmpty(currentAccumulation))
-            {
-                return nextKey;
-            }
-            else
-            {
-                return currentAccumulation + ", " + nextKey;
-            }
-        });
+        return string.Join(", ", keys);
     }
 
     private string GetValuesReduced(IEnumerable<object> incomingValues)
     {
-        return incomingValues.Aggregate("", (currentAccumulation, nextValue) =>
-        {
-            string convertedValue = ConvertValue(nextValue);
-            if (string.IsNullOrEmpty(currentAccumulation))
-            {
-                return convertedValue;
-            }
-            else
-            {
-                return currentAccumulation + ", " + convertedValue;
-            }
-        });
+        IEnumerable<string> convertedValues = incomingValues.Select(value => ConvertValue(value));
+        return string.Join(", ", convertedValues);
     }
 
     private string ConvertValue(object incomingValue)
     {
+        Console.WriteLine(incomingValue.GetType().Name);
         if (incomingValue is JsonElement value)
         {
             if (value.ValueKind == JsonValueKind.String)
