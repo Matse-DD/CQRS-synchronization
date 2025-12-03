@@ -76,7 +76,6 @@ jobs:
             --threshold 80 \
             --threshold-type line \
             --include-files "**/Application.dll"
-          
 
   build:
     name: Build
