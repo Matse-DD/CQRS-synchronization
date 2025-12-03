@@ -28,11 +28,11 @@ public class MySqlInsertEvent : Event
                 }
             }
              )})\n" +
-            $"VALUES ({getValuesReduced(PayLoad.GetValuePairs().Values)})";
+            $"VALUES ({GetValuesReduced(PayLoad.GetValuePairs().Values)})";
     }
 
 
-    private string getValuesReduced(IEnumerable<object> incomingValues)
+    private static string GetValuesReduced(IEnumerable<object> incomingValues)
     {
         string result = "";
 
@@ -48,8 +48,7 @@ public class MySqlInsertEvent : Event
                 {
                     result += incomingValue;
                 }
-
-
+                
                 result += ", ";
             }
         }
