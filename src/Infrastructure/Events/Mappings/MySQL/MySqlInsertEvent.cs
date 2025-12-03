@@ -41,8 +41,7 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
                 {
                     result += incomingValue;
                 }
-
-
+                
                 result += ", ";
             }
         }

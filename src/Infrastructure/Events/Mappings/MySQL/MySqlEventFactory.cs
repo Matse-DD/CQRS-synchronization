@@ -5,27 +5,16 @@ namespace Infrastructure.Events.Mappings.MySQL;
 
 public class MySqlEventFactory : IEventFactory
 {
-
     public Event DetermineEvent(string incomingEvent)
     {
+        IntermediateEvent? intermediateEvent = JsonSerializer.Deserialize<IntermediateEvent>(incomingEvent);
 
-        IntermediateEvent intermediateEvent = JsonSerializer.Deserialize<IntermediateEvent>(incomingEvent);
-
-
-        switch (intermediateEvent.EventType)
+        return intermediateEvent?.EventType switch
         {
-            case EventType.INSERT:
-                return new MySqlInsertEvent(intermediateEvent);
-
-             case EventType.UPDATE:
-                return new MySqlUpdateEvent(intermediateEvent);
-
-             case EventType.DELETE:
-                return new MySqlDeleteEvent(intermediateEvent);
-
-        }
-
-        return null; // TODO correcte error handling
+            EventType.INSERT => new MySqlInsertEvent(intermediateEvent),
+            EventType.DELETE => new MySqlDeleteEvent(intermediateEvent),
+            EventType.UPDATE => new MySqlUpdateEvent(intermediateEvent),
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 }
-
