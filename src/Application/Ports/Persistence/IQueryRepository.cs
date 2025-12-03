@@ -4,7 +4,9 @@ using System.Text;
 
 namespace Application.Ports.Persistence
 {
-    internal interface IQueryRepository
+    public interface IQueryRepository
     {
+        public Guid GetLastSuccessfulEventId();
+        public void Execute(string command, Guid eventId);
     }
 }
