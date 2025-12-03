@@ -52,25 +52,22 @@ jobs:
   coverage:
     name: Coverage
     runs-on: ubuntu-latest
-    needs: [testing]
+    needs: [ testing ]
     outputs:
       status: ${{ steps.coverage.outcome }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-  
+
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
           dotnet-quality: 'preview'
-      
+
       - name: Install Dotnet Coverage
         run: dotnet tool install --global dotnet-coverage
-        
-      - name: Install ReportGenerator
-        run: dotnet tool install --global dotnet-reportgenerator-globaltool
-        
+
       - name: Collect Coverage
         id: collect
         continue-on-error: true
@@ -79,16 +76,25 @@ jobs:
             -f cobertura \
             -o coverage.xml \
             --include-files "**/Application.dll"
-  
+
       - name: Enforce 80% Threshold
         id: enforce
-        continue-on-error: true 
+        continue-on-error: true
         run: |
-          reportgenerator \
-            -reports:coverage.xml \
-            -targetdir:coveragereport \
-            -reporttypes:TextSummary \
-            -minimumCoverage:80
+          if [ ! -f coverage.xml ]; then
+            echo "❌ No coverage.xml found! Tests likely failed."
+            exit 1
+          fi
+          COVERAGE_RATE=$(grep -o 'line-rate="[0-9.]*"' coverage.xml | head -1 | grep -o '[0-9.]*')
+          COVERAGE=$(echo "$COVERAGE_RATE * 100" | bc)
+          echo "Current Coverage: $COVERAGE%"
+          if (( $(echo "$COVERAGE < 80.0" | bc -l) )); then
+            echo "❌ Code coverage is below 80%."
+            exit 1
+          else
+            echo "✅ Code coverage meets the threshold."
+          fi
+        shell: bash
   
   build:
     name: Build
