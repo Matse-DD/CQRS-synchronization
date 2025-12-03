@@ -142,9 +142,14 @@ jobs:
           echo "overall=$OVERALL" >> $GITHUB_OUTPUT
           echo "color=$COLOR" >> $GITHUB_OUTPUT
 
-          get_status_text() {
-            if [ "$1" == "success" ]; then echo "✅ Passed";
-            else echo "❌ Failed"; fi
+          get_icon() {
+            if [ "$1" == "success" ]; then echo "✅";
+            else echo "❌"; fi
+          }
+          
+          get_text() {
+             if [ "$1" == "success" ]; then echo "Passed";
+             else echo "Failed"; fi
           }
           
           COV_STATUS="${{ needs.coverage.outputs.status }}"
@@ -153,15 +158,19 @@ jobs:
           if [ -z "$COV_PCT" ]; then COV_PCT="0.00"; fi
 
           if [ "$COV_STATUS" == "success" ]; then
-             COV_MSG="Coverage ($COV_PCT%) - ✅ Passed"
+             COV_MSG="✅ Coverage - Passed ($COV_PCT%)"
           else
-             COV_MSG="Coverage ($COV_PCT% < 80%) - ❌ Failed"
+             COV_MSG="❌ Coverage - Failed ($COV_PCT% < 80%)"
           fi
           
-          echo "format_result=Quality Control - $(get_status_text ${{ needs.quality-control.outputs.status }})" >> $GITHUB_OUTPUT
-          echo "test_result=Testing - $(get_status_text ${{ needs.testing.outputs.status }})" >> $GITHUB_OUTPUT
+          QC="${{ needs.quality-control.outputs.status }}"
+          TEST="${{ needs.testing.outputs.status }}"
+          BUILD="${{ needs.build.outputs.status }}"
+
+          echo "format_result=$(get_icon $QC) Quality Control - $(get_text $QC)" >> $GITHUB_OUTPUT
+          echo "test_result=$(get_icon $TEST) Testing - $(get_text $TEST)" >> $GITHUB_OUTPUT
           echo "coverage_result=$COV_MSG" >> $GITHUB_OUTPUT
-          echo "build_result=Build - $(get_status_text ${{ needs.build.outputs.status }})" >> $GITHUB_OUTPUT
+          echo "build_result=$(get_icon $BUILD) Build - $(get_text $BUILD)" >> $GITHUB_OUTPUT
 
       - name: Get Commit Messages
         id: commits
