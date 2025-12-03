@@ -9,7 +9,7 @@ namespace Application.Contracts.Events
     public class IntermediateEvent
     {
         [JsonPropertyName("event_id")]
-        private Guid EventId { get; init; }
+        public Guid EventId { get; init; }
 
         [JsonPropertyName("occured_at")]
         public DateTime OccuredAt { get; init; }
