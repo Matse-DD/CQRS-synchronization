@@ -46,7 +46,6 @@ jobs:
 
       - name: Run Tests
         id: test
-        continue-on-error: true
         run: |
           dotnet test test/ApplicationTests/ApplicationTests.csproj --configuration Release
 
@@ -71,7 +70,6 @@ jobs:
 
       - name: Enforce Coverage
         id: coverage
-        continue-on-error: true
         run: |
           dotnet-coverage collect "dotnet test test/ApplicationTests/ApplicationTests.csproj --configuration Release" \
             --threshold 80 \
