@@ -21,36 +21,40 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
                 }
             }
              )})\n" +
-            $"VALUES ({getValuesReduced(Properties.Values)})";
+            $"VALUES ({GetValuesReduced(Properties.Values)})";
     }
 
 
-    private string getValuesReduced(IEnumerable<object> incomingValues)
+    private string GetValuesReduced(IEnumerable<object> incomingValues)
     {
-        string result = "";
-
-        foreach (JsonElement incomingValue in incomingValues)
+        return incomingValues.Aggregate("", (currentAccumulation, nextValue) =>
         {
-            if (incomingValue is JsonElement value)
+            string convertedValue = ConvertValue(nextValue);
+            if (string.IsNullOrEmpty(currentAccumulation))
             {
-                if (value.ValueKind == JsonValueKind.String)
-                {
-                    result += $"\"{value}\"";
-                }
-                else
-                {
-                    result += incomingValue;
-                }
+                return convertedValue;
+            }
+            else
+            {
+                return currentAccumulation + ", " + convertedValue;
+            }
+        });
+    }
 
-                result += ", ";
+    private string ConvertValue(object incomingValue)
+    {
+        if (incomingValue is JsonElement value)
+        {
+            if (value.ValueKind == JsonValueKind.String)
+            {
+                return $"\"{value}\"";
+            }
+            else
+            {
+                return value.ToString();
             }
         }
 
-        if (result.Length >= 2)
-        {
-            result = result.Substring(0, result.Length - 2);
-        }
-
-        return result;
+        return "NULL";
     }
 }
