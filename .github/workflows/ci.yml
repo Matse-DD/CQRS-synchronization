@@ -91,7 +91,7 @@ jobs:
       - name: Docker Build
         id: build
         run: |
-          docker build -t cqrs-sync:latest .
+          dotnet publish src/Main/Main.csproj --os linux --arch x64 /t:PublishContainer
 
   discord:
     name: Discord
@@ -130,7 +130,7 @@ jobs:
           echo "format_result=$(get_status_text ${{ needs.quality-control.outputs.status }}) Quality Control" >> $GITHUB_OUTPUT
           echo "test_result=$(get_status_text ${{ needs.testing.outputs.status }}) Testing" >> $GITHUB_OUTPUT
           echo "coverage_result=$(get_status_text ${{ needs.coverage.outputs.status }}) Coverage (80%)" >> $GITHUB_OUTPUT
-          echo "build_result=$(get_status_text ${{ needs.build.outputs.status }}) Container Build" >> $GITHUB_OUTPUT
+          echo "build_result=$(get_status_text ${{ needs.build.outputs.status }}) Build" >> $GITHUB_OUTPUT
 
       - name: Get Commit Messages
         id: commits
