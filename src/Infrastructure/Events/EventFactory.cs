@@ -9,23 +9,16 @@ public class MySqlEventFactory : IEventFactory
 
     public Event DetermineEvent(string incomingEvent)
     {
-        Dictionary<string, object> propertiesEvent = JsonSerializer.Deserialize<Dictionary<string, object>>(incomingEvent);
-        EventType eventType = JsonSerializer.Deserialize<EventType>(propertiesEvent["event_type"].ToString());
+        Dictionary<string, object>? propertiesEvent = JsonSerializer.Deserialize<Dictionary<string, object>>(incomingEvent);
+        EventType eventType = JsonSerializer.Deserialize<EventType>(propertiesEvent?["event_type"].ToString() ?? string.Empty);
 
-        switch (eventType)
+        return eventType switch
         {
-            case EventType.INSERT:
-                return new MySqlInsertEvent(incomingEvent);
-
-            //case EventType.UPDATE:
-            //    return new MySqlUpdateEvent(incomingEvent);
-
-            //case EventType.DELETE:
-            //    return new MySqlDeleteEvent(incomingEvent);
-            
-        }
-
-        return null;
+            EventType.INSERT => new MySqlInsertEvent(incomingEvent),
+            // EventType.DELETE => new MySqlDeleteEvent(incomingEvent);
+            // EventType.UPDATE => new MySqlUpdateEvent(incomingEvent);
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 }
 
