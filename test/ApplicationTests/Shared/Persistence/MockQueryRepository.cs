@@ -14,7 +14,7 @@ namespace ApplicationTests.Shared.Persistence
         {
             string lowerCommand = command.ToLower();
 
-            if(lowerCommand.Contains("update") || lowerCommand.Contains("delete") || lowerCommand.Contains("insert"))
+            if (lowerCommand.Contains("update") || lowerCommand.Contains("delete") || lowerCommand.Contains("insert"))
             {
                 History.Add(command);
                 lastSuccesfulEventId = eventId;
