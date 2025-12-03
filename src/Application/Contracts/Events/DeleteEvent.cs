@@ -4,7 +4,7 @@ namespace Application.Contracts.Events;
 
 public abstract class DeleteEvent : Event
 {
-    public Dictionary<string, object> Condition { get; init; }
+    public Dictionary<string, object>? Condition { get; init; }
 
     public DeleteEvent(IntermediateEvent intermediateEvent) : base(intermediateEvent)
     {
