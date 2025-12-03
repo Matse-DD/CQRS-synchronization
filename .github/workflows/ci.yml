@@ -71,7 +71,6 @@ jobs:
 
       - name: Collect Coverage
         id: collect
-        continue-on-error: true
         run: |
           dotnet-coverage collect "dotnet test test/ApplicationTests/ApplicationTests.csproj --configuration Release" \
             -f cobertura \
@@ -80,7 +79,6 @@ jobs:
 
       - name: Enforce 80% Threshold
         id: enforce
-        continue-on-error: true
         run: |
           if [ ! -f coverage.xml ]; then
             echo "❌ No coverage.xml found! Tests likely failed."
