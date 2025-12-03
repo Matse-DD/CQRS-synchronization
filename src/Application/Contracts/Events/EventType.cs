@@ -1,7 +1,7 @@
 ﻿namespace Application.Contracts.Events;
 
 public enum EventType
-{ 
+{
     INSERT,
     UPDATE,
     DELETE,
