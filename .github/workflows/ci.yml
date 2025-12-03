@@ -31,7 +31,6 @@ jobs:
   testing:
     name: Testing
     runs-on: ubuntu-latest
-    needs: [quality-control]
     outputs:
       status: ${{ steps.test.outcome }}
     steps:
@@ -52,7 +51,6 @@ jobs:
   coverage:
     name: Coverage
     runs-on: ubuntu-latest
-    needs: [ testing ]
     outputs:
       status: ${{ steps.enforce.outcome }}
       percentage: ${{ steps.enforce.outputs.percentage }}
@@ -87,6 +85,8 @@ jobs:
           fi
           
           COVERAGE_RATE=$(grep -o 'line-rate="[0-9.]*"' coverage.xml | head -1 | grep -o '[0-9.]*')
+          if [ -z "$COVERAGE_RATE" ]; then COVERAGE_RATE=0; fi
+
           COVERAGE_PCT=$(awk "BEGIN {printf \"%.2f\", $COVERAGE_RATE * 100}")
           
           echo "Current Coverage: $COVERAGE_PCT%"
@@ -103,7 +103,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [quality-control]
     outputs:
       status: ${{ steps.build.outcome }}
     steps:
@@ -130,14 +129,14 @@ jobs:
         id: status
         run: |
           OVERALL="Passed"
-          COLOR=3066993 # Green
+          COLOR=3066993
           
           if [ "${{ needs.quality-control.outputs.status }}" != "success" ] || \
              [ "${{ needs.testing.outputs.status }}" != "success" ] || \
              [ "${{ needs.coverage.outputs.status }}" != "success" ] || \
              [ "${{ needs.build.outputs.status }}" != "success" ]; then
             OVERALL="Failed"
-            COLOR=15158332 # Red
+            COLOR=15158332
           fi
           
           echo "overall=$OVERALL" >> $GITHUB_OUTPUT
@@ -145,25 +144,24 @@ jobs:
 
           get_status_text() {
             if [ "$1" == "success" ]; then echo "✅ Passed";
-            elif [ "$1" == "failure" ]; then echo "❌ Failed";
-            else echo "⚠️ Skipped/Cancelled"; fi
+            else echo "❌ Failed"; fi
           }
           
           COV_STATUS="${{ needs.coverage.outputs.status }}"
           COV_PCT="${{ needs.coverage.outputs.percentage }}"
           
+          if [ -z "$COV_PCT" ]; then COV_PCT="0.00"; fi
+
           if [ "$COV_STATUS" == "success" ]; then
-             COV_MSG="✅ Coverage ($COV_PCT%) - Passed"
-          elif [ "$COV_STATUS" == "failure" ]; then
-             COV_MSG="❌ Coverage ($COV_PCT% < 80%) - Failed"
+             COV_MSG="Coverage ($COV_PCT%) - ✅ Passed"
           else
-             COV_MSG="⚠️ Coverage - Skipped"
+             COV_MSG="Coverage ($COV_PCT% < 80%) - ❌ Failed"
           fi
           
-          echo "format_result=$(get_status_text ${{ needs.quality-control.outputs.status }}) Quality Control" >> $GITHUB_OUTPUT
-          echo "test_result=$(get_status_text ${{ needs.testing.outputs.status }}) Testing" >> $GITHUB_OUTPUT
+          echo "format_result=Quality Control - $(get_status_text ${{ needs.quality-control.outputs.status }})" >> $GITHUB_OUTPUT
+          echo "test_result=Testing - $(get_status_text ${{ needs.testing.outputs.status }})" >> $GITHUB_OUTPUT
           echo "coverage_result=$COV_MSG" >> $GITHUB_OUTPUT
-          echo "build_result=$(get_status_text ${{ needs.build.outputs.status }}) Container Build" >> $GITHUB_OUTPUT
+          echo "build_result=Build - $(get_status_text ${{ needs.build.outputs.status }})" >> $GITHUB_OUTPUT
 
       - name: Get Commit Messages
         id: commits
