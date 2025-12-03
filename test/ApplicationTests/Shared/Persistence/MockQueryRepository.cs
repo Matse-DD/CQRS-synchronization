@@ -1,29 +1,25 @@
 ﻿using Application.Ports.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace ApplicationTests.Shared.Persistence
+namespace ApplicationTests.Shared.Persistence;
+
+public class MockQueryRepository : IQueryRepository
 {
-    public class MockQueryRepository : IQueryRepository
+    public ICollection<string> History { get; private set; } = [];
+    private Guid _lastSuccesfulEventId;
+
+    public void Execute(string command, Guid eventId)
     {
-        public ICollection<string> History { get; private set; } = [];
-        private Guid lastSuccesfulEventId;
+        string lowerCommand = command.ToLower();
 
-        public void Execute(string command, Guid eventId)
+        if (lowerCommand.Contains("update") || lowerCommand.Contains("delete") || lowerCommand.Contains("insert"))
         {
-            string lowerCommand = command.ToLower();
-
-            if (lowerCommand.Contains("update") || lowerCommand.Contains("delete") || lowerCommand.Contains("insert"))
-            {
-                History.Add(command);
-                lastSuccesfulEventId = eventId;
-            }
+            History.Add(command);
+            _lastSuccesfulEventId = eventId;
         }
+    }
 
-        public Guid GetLastSuccessfulEventId()
-        {
-            return this.lastSuccesfulEventId;
-        }
+    public Guid GetLastSuccessfulEventId()
+    {
+        return this._lastSuccesfulEventId;
     }
 }
