@@ -63,5 +63,4 @@ public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent
             }
         }));
     }
-
 }
