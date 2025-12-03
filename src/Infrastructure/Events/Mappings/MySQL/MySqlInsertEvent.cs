@@ -8,22 +8,24 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
     public override string GetCommand()
     {
         return
-            $"INSERT INTO {AggregateName} ({Properties.Keys.ToList().Aggregate("",
-            (currentAccumulation, nextKey) =>
-            {
-                if (string.IsNullOrEmpty(currentAccumulation))
-                {
-                    return nextKey;
-                }
-                else
-                {
-                    return currentAccumulation + ", " + nextKey;
-                }
-            }
-             )})\n" +
+            $"INSERT INTO {AggregateName} ({GetKeysReduced(Properties.Keys)})\n" +
             $"VALUES ({GetValuesReduced(Properties.Values)})";
     }
 
+    private string GetKeysReduced(IEnumerable<string> keys)
+    {
+        return keys.ToList().Aggregate("", (currentAccumulation, nextKey) =>
+        {
+            if (string.IsNullOrEmpty(currentAccumulation))
+            {
+                return nextKey;
+            }
+            else
+            {
+                return currentAccumulation + ", " + nextKey;
+            }
+        });
+    }
 
     private string GetValuesReduced(IEnumerable<object> incomingValues)
     {
