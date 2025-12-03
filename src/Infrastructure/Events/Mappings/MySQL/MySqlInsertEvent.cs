@@ -3,19 +3,12 @@ using System.Text.Json;
 
 namespace Infrastructure.Events.Mappings.MySQL;
 
-public class MySqlInsertEvent : Event
+public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent(intermediateEvent)
 {
-    public MySqlInsertEvent(string incomingEvent) : base(incomingEvent)
-    {
-        Dictionary<string, object> propertiesEvent = JsonSerializer.Deserialize<Dictionary<string, object>>(incomingEvent);
-        Dictionary<string, object> insertPayload = JsonSerializer.Deserialize<Dictionary<string, object>>(propertiesEvent["payload"].ToString());
-        PayLoad = new InsertPayload(insertPayload);
-    }
-
     public override string GetCommand()
     {
         return
-            $"INSERT INTO {AggregateName} ({PayLoad.GetValuePairs().Keys.ToList().Aggregate("",
+            $"INSERT INTO {AggregateName} ({Properties.Keys.ToList().Aggregate("",
             (currentAccumulation, nextKey) =>
             {
                 if (string.IsNullOrEmpty(currentAccumulation))
@@ -28,7 +21,7 @@ public class MySqlInsertEvent : Event
                 }
             }
              )})\n" +
-            $"VALUES ({getValuesReduced(PayLoad.GetValuePairs().Values)})";
+            $"VALUES ({getValuesReduced(Properties.Values)})";
     }
 
 
