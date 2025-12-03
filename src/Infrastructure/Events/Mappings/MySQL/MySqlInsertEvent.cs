@@ -8,16 +8,16 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
     public override string GetCommand()
     {
         return
-            $"INSERT INTO {AggregateName} ({GetKeysReduced(Properties.Keys)})\n" +
-            $"VALUES ({GetValuesReduced(Properties.Values)})";
+            $"INSERT INTO {AggregateName} ({MapColumns(Properties.Keys)})\n" +
+            $"VALUES ({MapValuesClause(Properties.Values)})";
     }
 
-    private string GetKeysReduced(IEnumerable<string> keys)
+    private string MapColumns(IEnumerable<string> keys)
     {
         return string.Join(", ", keys);
     }
 
-    private string GetValuesReduced(IEnumerable<object> incomingValues)
+    private string MapValuesClause(IEnumerable<object> incomingValues)
     {
         IEnumerable<string> convertedValues = incomingValues.Select(value => ConvertValue(value));
         return string.Join(", ", convertedValues);
@@ -25,7 +25,6 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
 
     private string ConvertValue(object incomingValue)
     {
-        Console.WriteLine(incomingValue.GetType().Name);
         if (incomingValue is JsonElement value)
         {
             if (value.ValueKind == JsonValueKind.String)
