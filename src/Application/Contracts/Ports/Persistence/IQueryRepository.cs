@@ -1,4 +1,4 @@
-﻿namespace Application.Ports.Persistence;
+﻿namespace Application.Contracts.Ports.Persistence;
 
 public interface IQueryRepository
 {
