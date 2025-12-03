@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Application.Contracts.Ports.Persistence;
+﻿namespace Application.Contracts.Ports.Persistence;
 
 public interface IQueryRepository
 {

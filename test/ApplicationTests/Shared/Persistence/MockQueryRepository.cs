@@ -1,7 +1,4 @@
 ﻿using Application.Contracts.Ports.Persistence;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ApplicationTests.Shared.Persistence;
 
