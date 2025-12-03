@@ -2,6 +2,31 @@
 
 namespace Infrastructure.Events.Mappings.MySQL;
 
+/*
+ * // UPDATE 
+{
+  ""event_id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
+  ""occured_at"": ""2025-11-29T17:15:00Z"",
+  ""aggregate_name"": ""Product"",
+  ""status"": ""PENDING"",
+  ""type_event"": ""UPDATE"",
+  ""payload"": {
+    ""condition"": {
+        ""amount_sold"": "">5"",
+        ""price"": "">10""
+    },
+    ""change"": {
+        ""price"": ""price * 1.10"",
+        ""amount_sold"":""amount_sold + 1""
+    }
+  }
+}
+
+// MYSQL UPDATE
+UPDATE table_name
+SET column1 = value1, column2 = value2, ...
+WHERE condition; 
+*/
 public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent(intermediateEvent)
 {
     public override string GetCommand()
