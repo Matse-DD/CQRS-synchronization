@@ -21,17 +21,17 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-          include-prerelease: true
+          dotnet-quality: 'preview'
 
       - name: Format Check
         id: format
-        continue-on-error: true
         run: |
-          dotnet format ./src --verify-no-changes --verbosity diagnostic
+          dotnet format CQRS-Synchronisation.sln --verify-no-changes --verbosity diagnostic
 
   testing:
     name: Testing
     runs-on: ubuntu-latest
+    needs: [quality-control]
     outputs:
       status: ${{ steps.test.outcome }}
     steps:
@@ -42,7 +42,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-          include-prerelease: true
+          dotnet-quality: 'preview'
 
       - name: Run Tests
         id: test
@@ -53,6 +53,7 @@ jobs:
   coverage:
     name: Coverage
     runs-on: ubuntu-latest
+    needs: [testing]
     outputs:
       status: ${{ steps.coverage.outcome }}
     steps:
@@ -63,7 +64,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-          include-prerelease: true
+          dotnet-quality: 'preview'
 
       - name: Install Coverage Tool
         run: dotnet tool install --global dotnet-coverage
@@ -80,6 +81,7 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    needs: [quality-control]
     outputs:
       status: ${{ steps.build.outcome }}
     steps:
@@ -88,7 +90,6 @@ jobs:
 
       - name: Docker Build
         id: build
-        continue-on-error: true
         run: |
           docker build -t cqrs-sync:latest .
 
@@ -97,7 +98,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [quality-control, testing, coverage, build]
     if: always()
-    steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -108,7 +108,7 @@ jobs:
         run: |
           OVERALL="Passed"
           COLOR=3066993 # Green
-
+          
           if [ "${{ needs.quality-control.outputs.status }}" != "success" ] || \
              [ "${{ needs.testing.outputs.status }}" != "success" ] || \
              [ "${{ needs.coverage.outputs.status }}" != "success" ] || \
@@ -120,29 +120,16 @@ jobs:
           echo "overall=$OVERALL" >> $GITHUB_OUTPUT
           echo "color=$COLOR" >> $GITHUB_OUTPUT
 
-          if [ "${{ needs.quality-control.outputs.status }}" == "success" ]; then
-            echo "format_result=✅ Quality Control - Passed" >> $GITHUB_OUTPUT
-          else
-            echo "format_result=❌ Quality Control - Failed" >> $GITHUB_OUTPUT
-          fi
-          
-          if [ "${{ needs.testing.outputs.status }}" == "success" ]; then
-            echo "test_result=✅ Testing - Passed" >> $GITHUB_OUTPUT
-          else
-            echo "test_result=❌ Testing - Failed" >> $GITHUB_OUTPUT
-          fi
+          get_status_text() {
+            if [ "$1" == "success" ]; then echo "✅ Passed";
+            elif [ "$1" == "failure" ]; then echo "❌ Failed";
+            else echo "⚠️ Skipped/Cancelled"; fi
+          }
 
-          if [ "${{ needs.coverage.outputs.status }}" == "success" ]; then
-            echo "coverage_result=✅ Coverage (80%) - Passed" >> $GITHUB_OUTPUT
-          else
-            echo "coverage_result=❌ Coverage (80%) - Failed" >> $GITHUB_OUTPUT
-          fi
-          
-          if [ "${{ needs.build.outputs.status }}" == "success" ]; then
-            echo "build_result=✅ Container Build - Passed" >> $GITHUB_OUTPUT
-          else
-            echo "build_result=❌ Container Build - Failed" >> $GITHUB_OUTPUT
-          fi
+          echo "format_result=$(get_status_text ${{ needs.quality-control.outputs.status }}) Quality Control" >> $GITHUB_OUTPUT
+          echo "test_result=$(get_status_text ${{ needs.testing.outputs.status }}) Testing" >> $GITHUB_OUTPUT
+          echo "coverage_result=$(get_status_text ${{ needs.coverage.outputs.status }}) Coverage (80%)" >> $GITHUB_OUTPUT
+          echo "build_result=$(get_status_text ${{ needs.build.outputs.status }}) Container Build" >> $GITHUB_OUTPUT
 
       - name: Get Commit Messages
         id: commits
@@ -183,7 +170,7 @@ jobs:
             ${{ steps.status.outputs.build_result }}
           embed-footer-text: Triggered by ${{ github.actor }} • ${{ steps.timestamp.outputs.time }}
           embed-color: ${{ steps.status.outputs.color }}
-
-      - name: Fail Workflow if Pipeline Failed
+          
+      - name: Fail Workflow
         if: steps.status.outputs.overall == 'Failed'
         run: exit 1
