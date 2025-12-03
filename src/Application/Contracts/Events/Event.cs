@@ -1,8 +1,4 @@
-﻿using Application.Contracts.Events.Payloads;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
-namespace Application.Contracts.Events;
+﻿namespace Application.Contracts.Events;
 
 public abstract class Event(IntermediateEvent intermediateEvent)
 {
