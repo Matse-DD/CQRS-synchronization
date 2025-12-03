@@ -17,15 +17,15 @@ public class MySqlEventFactory : IEventFactory
             case EventType.INSERT:
                 return new MySqlInsertEvent(intermediateEvent);
 
-             //case EventType.UPDATE:
-             //    return new MySqlUpdateEvent(intermediateEvent);
+             case EventType.UPDATE:
+                return new MySqlUpdateEvent(intermediateEvent);
 
-             //case EventType.DELETE:
-             //    return new MySqlDeleteEvent(intermediateEvent);
+             case EventType.DELETE:
+                return new MySqlDeleteEvent(intermediateEvent);
 
         }
 
-        return null;
+        return null; // TODO correcte error handling
     }
 }
 
