@@ -31,8 +31,37 @@ public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent
 {
     public override string GetCommand()
     {
-
-        Console.WriteLine("impletent the update creator");
-        return "update command";
+        return $"UPDATE {AggregateName}\n" +
+               $"SET {MapSetClause(Change)}\n" +
+               $"WHERE {MapWhereClause(Condition)}";
     }
+
+    private string MapSetClause(Dictionary<string, string> change)
+    {
+        return string.Join(", ", change.Select(changePair=>
+        {
+            return $"{changePair.Key} = {changePair.Value}";
+        }));
+    }
+
+    private string MapWhereClause(Dictionary<string, string> condition)
+    {
+        if (condition == null || !condition.Any()) return "True";
+
+        return string.Join(" AND ", Condition.Select(conditionPair =>
+        {
+            string key = conditionPair.Key;
+            string value = conditionPair.Value.Trim();
+
+            if (value.StartsWith(">=") || value.StartsWith("<=") || value.StartsWith(">") || value.StartsWith("<") || value.StartsWith("="))
+            {
+                return $"{key} {value}";
+            }
+            else
+            {
+                return $"{key} = {value}";
+            }
+        }));
+    }
+
 }
