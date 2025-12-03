@@ -38,7 +38,7 @@ public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent
 
     private string MapSetClause(IDictionary<string, string> change)
     {
-        return string.Join(", ", change.Select(changePair=>
+        return string.Join(", ", change.Select(changePair =>
         {
             return $"{changePair.Key} = {changePair.Value}";
         }));
