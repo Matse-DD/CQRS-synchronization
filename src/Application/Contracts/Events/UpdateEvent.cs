@@ -9,9 +9,9 @@ public abstract class UpdateEvent : Event
 
     public UpdateEvent(IntermediateEvent intermediateEvent) : base(intermediateEvent)
     {
-       JsonElement conditionElement = intermediateEvent.Payload.GetProperty("condition");
-       JsonElement changeElement = intermediateEvent.Payload.GetProperty("change");
-       Condition = conditionElement.Deserialize<Dictionary<string, object>>();
-       Change = changeElement.Deserialize<Dictionary<string, object>>();
+        JsonElement conditionElement = intermediateEvent.Payload.GetProperty("condition");
+        JsonElement changeElement = intermediateEvent.Payload.GetProperty("change");
+        Condition = conditionElement.Deserialize<Dictionary<string, object>>();
+        Change = changeElement.Deserialize<Dictionary<string, object>>();
     }
 }
