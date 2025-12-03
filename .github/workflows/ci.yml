@@ -52,9 +52,10 @@ jobs:
   coverage:
     name: Coverage
     runs-on: ubuntu-latest
-    needs: [testing]
+    needs: [ testing ]
     outputs:
-      status: ${{ steps.coverage.outcome }}
+      status: ${{ steps.enforce.outcome }}
+      percentage: ${{ steps.enforce.outputs.percentage }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -65,17 +66,40 @@ jobs:
           dotnet-version: '10.0.x'
           dotnet-quality: 'preview'
 
-      - name: Install Coverage Tool
+      - name: Install Dotnet Coverage
         run: dotnet tool install --global dotnet-coverage
 
-      - name: Enforce Coverage
-        id: coverage
+      - name: Collect Coverage
+        id: collect
         run: |
           dotnet-coverage collect "dotnet test test/ApplicationTests/ApplicationTests.csproj --configuration Release" \
-            --threshold 80 \
-            --threshold-type line \
+            -f cobertura \
+            -o coverage.xml \
             --include-files "**/Application.dll"
 
+      - name: Enforce 80% Threshold
+        id: enforce
+        run: |
+          if [ ! -f coverage.xml ]; then
+            echo "❌ No coverage.xml found! Tests likely failed."
+            echo "percentage=0.00" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          
+          COVERAGE_RATE=$(grep -o 'line-rate="[0-9.]*"' coverage.xml | head -1 | grep -o '[0-9.]*')
+          COVERAGE_PCT=$(awk "BEGIN {printf \"%.2f\", $COVERAGE_RATE * 100}")
+          
+          echo "Current Coverage: $COVERAGE_PCT%"
+          echo "percentage=$COVERAGE_PCT" >> $GITHUB_OUTPUT
+
+          if (( $(echo "$COVERAGE_PCT < 80.00" | bc -l) )); then
+            echo "❌ Code coverage is below 80%."
+            exit 1
+          else
+            echo "✅ Code coverage meets the threshold."
+          fi
+        shell: bash
+  
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -125,9 +149,20 @@ jobs:
             else echo "⚠️ Skipped/Cancelled"; fi
           }
           
+          COV_STATUS="${{ needs.coverage.outputs.status }}"
+          COV_PCT="${{ needs.coverage.outputs.percentage }}"
+          
+          if [ "$COV_STATUS" == "success" ]; then
+             COV_MSG="✅ Coverage ($COV_PCT%) - Passed"
+          elif [ "$COV_STATUS" == "failure" ]; then
+             COV_MSG="❌ Coverage ($COV_PCT% < 80%) - Failed"
+          else
+             COV_MSG="⚠️ Coverage - Skipped"
+          fi
+          
           echo "format_result=$(get_status_text ${{ needs.quality-control.outputs.status }}) Quality Control" >> $GITHUB_OUTPUT
           echo "test_result=$(get_status_text ${{ needs.testing.outputs.status }}) Testing" >> $GITHUB_OUTPUT
-          echo "coverage_result=$(get_status_text ${{ needs.coverage.outputs.status }}) Coverage (80%)" >> $GITHUB_OUTPUT
+          echo "coverage_result=$COV_MSG" >> $GITHUB_OUTPUT
           echo "build_result=$(get_status_text ${{ needs.build.outputs.status }}) Container Build" >> $GITHUB_OUTPUT
 
       - name: Get Commit Messages
