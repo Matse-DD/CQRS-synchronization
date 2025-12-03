@@ -94,7 +94,7 @@ jobs:
   discord:
     name: Discord
     runs-on: ubuntu-latest
-    needs: [quality-control, testing, coverage, build]
+    needs: [ quality-control, testing, coverage, build ]
     if: always()
     steps:
       - name: Checkout code
@@ -124,11 +124,11 @@ jobs:
             elif [ "$1" == "failure" ]; then echo "❌ Failed";
             else echo "⚠️ Skipped/Cancelled"; fi
           }
-
+          
           echo "format_result=$(get_status_text ${{ needs.quality-control.outputs.status }}) Quality Control" >> $GITHUB_OUTPUT
           echo "test_result=$(get_status_text ${{ needs.testing.outputs.status }}) Testing" >> $GITHUB_OUTPUT
           echo "coverage_result=$(get_status_text ${{ needs.coverage.outputs.status }}) Coverage (80%)" >> $GITHUB_OUTPUT
-          echo "build_result=$(get_status_text ${{ needs.build.outputs.status }}) Build" >> $GITHUB_OUTPUT
+          echo "build_result=$(get_status_text ${{ needs.build.outputs.status }}) Container Build" >> $GITHUB_OUTPUT
 
       - name: Get Commit Messages
         id: commits
@@ -169,7 +169,3 @@ jobs:
             ${{ steps.status.outputs.build_result }}
           embed-footer-text: Triggered by ${{ github.actor }} • ${{ steps.timestamp.outputs.time }}
           embed-color: ${{ steps.status.outputs.color }}
-      
-      - name: Fail Workflow
-        if: steps.status.outputs.overall == 'Failed'
-        run: exit 1
