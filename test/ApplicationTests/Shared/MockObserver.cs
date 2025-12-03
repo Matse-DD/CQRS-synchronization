@@ -5,7 +5,7 @@ namespace ApplicationTests.Shared;
 
 public class MockObserver(IEnumerable<Event>? events) : IObserver
 {
-    private List<Event> _events = events.ToList() ?? [];
+    private List<Event> _events = events?.ToList() ?? [];
     
     public Task StartListening(Action<Event> callback)
     {
