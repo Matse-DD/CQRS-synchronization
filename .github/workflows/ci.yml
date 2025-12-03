@@ -71,11 +71,8 @@ jobs:
       - name: Enforce Coverage
         id: coverage
         run: |
-          dotnet-coverage collect "dotnet test test/ApplicationTests/ApplicationTests.csproj --configuration Release" \
-            --threshold 80 \
-            --threshold-type line \
-            --include-files "**/Application.dll"
-
+          dotnet-coverage collect --threshold 80 --threshold-type line --include-files "**/Application.dll" -- dotnet test test/ApplicationTests/ApplicationTests.csproj --configuration Release
+  
   build:
     name: Build
     runs-on: ubuntu-latest
