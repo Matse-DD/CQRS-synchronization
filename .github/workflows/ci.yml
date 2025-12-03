@@ -1,1 +1,171 @@
+name: CI/CD
 
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [ Main ]
+  workflow_dispatch:
+
+jobs:
+  quality-control:
+    name: Quality Control
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.format.outcome }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+
+      - name: Format Check
+        id: format
+        run: |
+          dotnet format CQRS-Synchronisation.sln --verify-no-changes --verbosity diagnostic
+
+  testing:
+    name: Testing
+    runs-on: ubuntu-latest
+    needs: [quality-control]
+    outputs:
+      status: ${{ steps.test.outcome }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+
+      - name: Run Tests
+        id: test
+        run: |
+          dotnet test test/ApplicationTests/ApplicationTests.csproj --configuration Release
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    needs: [testing]
+    outputs:
+      status: ${{ steps.coverage.outcome }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+
+      - name: Install Coverage Tool
+        run: dotnet tool install --global dotnet-coverage
+
+      - name: Enforce Coverage
+        id: coverage
+        run: |
+          dotnet-coverage collect "dotnet test test/ApplicationTests/ApplicationTests.csproj --configuration Release" \
+            --threshold 80 \
+            --threshold-type line \
+            --include-files "**/Application.dll"
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [quality-control]
+    outputs:
+      status: ${{ steps.build.outcome }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Docker Build
+        id: build
+        run: |
+          dotnet publish src/Main/Main.csproj --os linux --arch x64 /t:PublishContainer
+
+  discord:
+    name: Discord
+    runs-on: ubuntu-latest
+    needs: [ quality-control, testing, coverage, build ]
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine Pipeline Status
+        id: status
+        run: |
+          OVERALL="Passed"
+          COLOR=3066993 # Green
+          
+          if [ "${{ needs.quality-control.outputs.status }}" != "success" ] || \
+             [ "${{ needs.testing.outputs.status }}" != "success" ] || \
+             [ "${{ needs.coverage.outputs.status }}" != "success" ] || \
+             [ "${{ needs.build.outputs.status }}" != "success" ]; then
+            OVERALL="Failed"
+            COLOR=15158332 # Red
+          fi
+          
+          echo "overall=$OVERALL" >> $GITHUB_OUTPUT
+          echo "color=$COLOR" >> $GITHUB_OUTPUT
+
+          get_status_text() {
+            if [ "$1" == "success" ]; then echo "✅ Passed";
+            elif [ "$1" == "failure" ]; then echo "❌ Failed";
+            else echo "⚠️ Skipped/Cancelled"; fi
+          }
+          
+          echo "format_result=$(get_status_text ${{ needs.quality-control.outputs.status }}) Quality Control" >> $GITHUB_OUTPUT
+          echo "test_result=$(get_status_text ${{ needs.testing.outputs.status }}) Testing" >> $GITHUB_OUTPUT
+          echo "coverage_result=$(get_status_text ${{ needs.coverage.outputs.status }}) Coverage (80%)" >> $GITHUB_OUTPUT
+          echo "build_result=$(get_status_text ${{ needs.build.outputs.status }}) Container Build" >> $GITHUB_OUTPUT
+
+      - name: Get Commit Messages
+        id: commits
+        run: |
+          TOTAL_COMMITS=$(git rev-list --count ${{ github.event.before }}..${{ github.sha }} 2>/dev/null || echo "1")
+          COMMITS=$(git log --format="%h - %s" -n 10 ${{ github.event.before }}..${{ github.sha }} 2>/dev/null || git log --format="%h - %s" -n 10 -1)
+          FORMATTED_COMMITS=$(echo "$COMMITS" | sed 's/^\([^ ]*\) - /`\1` - /')
+          
+          if [ "$TOTAL_COMMITS" -gt 10 ]; then
+            REMAINING=$((TOTAL_COMMITS - 10))
+            FORMATTED_COMMITS="$FORMATTED_COMMITS"$'\n'"and $REMAINING more commit(s)..."
+          fi
+          
+          echo "commits<<EOF" >> $GITHUB_OUTPUT
+          echo "$FORMATTED_COMMITS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Get Timestamp
+        id: timestamp
+        run: echo "time=$(date +'%d/%m/%Y, %H:%M')" >> $GITHUB_OUTPUT
+
+      - name: Send Webhook
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          embed-title: "CI/CD Pipeline: ${{ steps.status.outputs.overall }}"
+          embed-description: |
+            **Repository:** ${{ github.repository }}
+            **Branch:** ${{ github.ref_name }}
+            
+            **Commits:**
+            ${{ steps.commits.outputs.commits }}
+            
+            **Pipeline Results:**
+            ${{ steps.status.outputs.format_result }}
+            ${{ steps.status.outputs.test_result }}
+            ${{ steps.status.outputs.coverage_result }}
+            ${{ steps.status.outputs.build_result }}
+          embed-footer-text: Triggered by ${{ github.actor }} • ${{ steps.timestamp.outputs.time }}
+          embed-color: ${{ steps.status.outputs.color }}
