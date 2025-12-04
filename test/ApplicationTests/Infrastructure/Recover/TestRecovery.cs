@@ -74,7 +74,8 @@ public class TestRecovery
         observer.StartListening(projector.AddEvent);
 
         // Assert
-        Thread.Sleep(400);
+        SleepTillReady(queryRepository);
+
         Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(0).eventId}"));
 
         Guid expectedFirstEventIdObserver = eventFactory.DetermineEvent(seedingObserver.ElementAt(0)).EventId;
@@ -124,7 +125,18 @@ public class TestRecovery
         recovery.Recover();
 
         // Assert
-        Thread.Sleep(400);
+        SleepTillReady(queryRepository);
+
         Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(1).eventId}"));
+    }
+
+    private void SleepTillReady(MockQueryRepository mockQueryRepo)
+    {
+        int count = 0;
+        while (count < 100 && mockQueryRepo.History.Count == 0)
+        {
+            Thread.Sleep(10);
+            count++;
+        }
     }
 }
