@@ -1,4 +1,4 @@
-﻿namespace Application.Contracts.Events;
+﻿namespace Application.Contracts.Events.Enums;
 
 public enum EventType
 {

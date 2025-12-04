@@ -1,5 +1,5 @@
-﻿using Application.Contracts.Events;
-using Application.Contracts.Ports.Persistence;
+﻿using Application.Contracts.Events.EventOptions;
+using Application.Contracts.Persistence;
 
 namespace ApplicationTests.Shared.Persistence;
 
