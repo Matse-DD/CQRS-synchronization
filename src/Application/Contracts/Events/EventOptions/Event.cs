@@ -15,8 +15,7 @@ public abstract class Event(IntermediateEvent intermediateEvent)
 
     public override bool Equals(object? obj)
     {
-        return obj is Event @event &&
-               EventId.Equals(@event.EventId);
+        return obj is Event @event && EventId.Equals(@event.EventId);
     }
 
     public override int GetHashCode()
