@@ -20,7 +20,7 @@ public class MySqlDeleteEvent(IntermediateEvent intermediateEvent) : DeleteEvent
 
             if (value.StartsWith(">=") || value.StartsWith("<=") || value.StartsWith(">") || value.StartsWith("<") || value.StartsWith("="))
             {
-                return $"{key} {value}";
+                return $"{key}{value}";
             }
             else
             {
