@@ -40,27 +40,27 @@ public class TestProjector
 
         ICollection<string> expectedCommands = new List<string>();
 
-        foreach(string eventItem in deleteEvents)
+        foreach (string eventItem in deleteEvents)
         {
             expectedCommands.Add(mockEventFactory.DetermineEvent(eventItem).GetCommand());
         }
 
         // Act
-        foreach(string eventItem in deleteEvents)
+        foreach (string eventItem in deleteEvents)
         {
             projector.AddEvent(eventItem);
         }
 
         // Assert
         int count = 0;
-        while(count < 100 || mockQueryRepo.History.Count == 0)
+        while (count < 100 || mockQueryRepo.History.Count == 0)
         {
             Thread.Sleep(10);
             count++;
         }
         for (int i = 0; i < expectedCommands.Count; i++)
         {
-            Assert.That(mockQueryRepo.History.ElementAt(i), Is.EqualTo(expectedCommands.ElementAt(i)));   
+            Assert.That(mockQueryRepo.History.ElementAt(i), Is.EqualTo(expectedCommands.ElementAt(i)));
         }
     }
 }
