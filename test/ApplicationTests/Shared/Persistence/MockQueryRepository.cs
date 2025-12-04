@@ -13,7 +13,6 @@ public class MockQueryRepository : IQueryRepository
 
         if (lowerCommand.Contains("update") || lowerCommand.Contains("delete") || lowerCommand.Contains("insert"))
         {
-            Console.WriteLine(command);
             History.Add(command);
             lastSuccesfulEventId = eventId;
         }
