@@ -11,7 +11,7 @@ public class Projector
     private readonly IQueryRepository _queryRepository;
     private readonly IEventFactory _eventFactory;
 
-    public bool Locked { private get; set; } = false;
+    public bool Locked { get; set; } = false;
     private ConcurrentQueue<string> _eventQueue = new ConcurrentQueue<string>();
 
     public Projector(ICommandRepository commandRepository, IQueryRepository queryRepository, IEventFactory eventFactory)
