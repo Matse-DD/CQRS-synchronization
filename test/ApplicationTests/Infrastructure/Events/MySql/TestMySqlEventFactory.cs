@@ -37,8 +37,15 @@ public class TestMySqlEventFactory
 
         // Act
         Event determinedEvent = eventFactory.DetermineEvent(insertEventMessage);
+        string mySqlCommand = determinedEvent.GetCommand();
 
         // Assert
         Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlInsertEvent)));
+
+        string expectedMySqlCommand =
+            "INSERT INTO Product (product_id, name, sku, price, stock_level, is_active)\n" +
+            @"VALUES (""038e2f47-c1a0-4b3d-98e1-5f2d0c1b4e9f"", ""Wireless Mechanical Keyboard"", ""KB-WM-001"", 129.99, 50, True)";
+
+        Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
     }
 }
