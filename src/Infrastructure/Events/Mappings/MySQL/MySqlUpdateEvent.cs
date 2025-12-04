@@ -55,7 +55,7 @@ public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent
 
             if (value.StartsWith(">=") || value.StartsWith("<=") || value.StartsWith(">") || value.StartsWith("<") || value.StartsWith("="))
             {
-                return $"{key} {value}";
+                return $"{key}{value}";
             }
             else
             {
