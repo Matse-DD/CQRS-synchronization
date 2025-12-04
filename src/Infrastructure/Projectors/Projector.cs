@@ -1,6 +1,7 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
 using Application.Contracts.Persistence;
+using System.Collections.Concurrent;
 
 namespace Infrastructure.Projectors;
 
@@ -11,7 +12,7 @@ public class Projector
     private readonly IEventFactory _eventFactory;
 
     public bool Locked { private get; set; } = false;
-    private Queue<string> _eventQueue = new Queue<string>();
+    private ConcurrentQueue<string> _eventQueue = new ConcurrentQueue<string>();
 
     public Projector(ICommandRepository commandRepository, IQueryRepository queryRepository, IEventFactory eventFactory)
     {
@@ -27,7 +28,7 @@ public class Projector
         IList<string> eventList = new List<string>();
 
         eventList = [.. batchOfEvents, .. _eventQueue];
-        _eventQueue = new Queue<string>(eventList.Distinct());
+        _eventQueue = new ConcurrentQueue<string>(eventList.Distinct());
     }
 
     public void AddEvent(string incomingEvent)
@@ -54,8 +55,10 @@ public class Projector
 
             else
             {
-                string currentEvent = _eventQueue.Dequeue();
-                ProjectEvent(currentEvent);
+                if (_eventQueue.TryDequeue(out string? currentEvent))
+                {
+                    ProjectEvent(currentEvent);
+                }
             }
         }
     }
