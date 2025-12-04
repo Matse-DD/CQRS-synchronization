@@ -18,9 +18,13 @@ namespace Application.Contracts.Events
         public string AggregateName { get; init; }
 
         [JsonPropertyName("status")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        //[JsonConverter(typeof(Status))]
         public Status Status { get; init; }
 
         [JsonPropertyName("event_type")]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        //[JsonConverter(typeof(EventType))]
         public EventType EventType { get; init; }
 
         [JsonPropertyName("payload")]
