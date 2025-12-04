@@ -1,19 +1,18 @@
-﻿using Application.Contracts.Events.EventOptions;
-using Application.Contracts.Persistence;
+﻿using Application.Contracts.Persistence;
 
 namespace ApplicationTests.Shared.Persistence;
 
 public class MockCommandRepository : ICommandRepository
 {
-    private Dictionary<string, string> _eventOutbox = new();
+    private ICollection<OutboxEvent> _eventOutbox = [];
 
-    public ICollection<string> GetAllEvents()
+    public ICollection<OutboxEvent> GetAllEvents()
     {
-        return _eventOutbox.Values;
+        return _eventOutbox;
     }
 
     public void RemoveEvent(Guid eventId)
     {
-        _eventOutbox.Remove(eventId.ToString());
+        _eventOutbox = _eventOutbox.Where(item => item.eventId != eventId.ToString()).ToList();
     }
 }
