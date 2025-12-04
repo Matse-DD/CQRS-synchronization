@@ -5,7 +5,7 @@ namespace Application.Contracts.Events.EventOptions;
 
 public abstract class Event(IntermediateEvent intermediateEvent)
 {
-    private Guid EventId { get; init; } = intermediateEvent.EventId;
+    public Guid EventId { get; init; } = intermediateEvent.EventId;
     public DateTime OccuredAt { get; init; } = intermediateEvent.OccuredAt;
     public string AggregateName { get; init; } = intermediateEvent.AggregateName;
     public Status Status { get; init; } = intermediateEvent.Status;
