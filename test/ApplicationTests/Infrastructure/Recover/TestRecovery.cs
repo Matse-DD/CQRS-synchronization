@@ -74,10 +74,57 @@ public class TestRecovery
         observer.StartListening(projector.AddEvent);
 
         // Assert
-        Thread.Sleep(250);
+        Thread.Sleep(400);
         Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(0).eventId}"));
 
         Guid expectedFirstEventIdObserver = eventFactory.DetermineEvent(seedingObserver.ElementAt(0)).EventId;
         Assert.That(queryRepository.History.ElementAt(15), Is.EqualTo($"delete {expectedFirstEventIdObserver}"));
+    }
+
+
+    [Test]
+    public void Recover_Should_Be_Able_To_Skip_LastSuccessEventId()
+    {
+        // Arrange
+        ICollection<OutboxEvent> seedingOutbox = [];
+
+        for (int i = 0; i < 5; i++)
+        {
+            Guid guid = Guid.NewGuid();
+            seedingOutbox.Add(
+                new OutboxEvent(guid.ToString(),
+                $@"
+                    {{
+                        ""event_id"": ""{guid}"",
+                        ""occured_at"": ""2025-11-29T17:15:00Z"",
+                        ""aggregate_name"": ""Product"",
+                        ""status"": ""PENDING"",
+                        ""event_type"": ""DELETE"",
+                        ""payload"": {{
+                        ""condition"": {{
+                            ""amount_sold"": "">5"",
+                            ""price"": "">10""
+                            }}
+                        }}
+                    }}
+                ")
+            );
+        }
+
+        MockCommandRepository commandRepository = new MockCommandRepository(seedingOutbox);
+        MockQueryRepository queryRepository = new MockQueryRepository();
+        queryRepository.LastSuccesfulEventId = new Guid(seedingOutbox.ElementAt(0).eventId);
+
+        MockEventFactory eventFactory = new MockEventFactory();
+        Projector projector = new Projector(commandRepository, queryRepository, eventFactory);
+
+        Recovery recovery = new Recovery(commandRepository, queryRepository, projector);
+
+        // Act
+        recovery.Recover();
+
+        // Assert
+        Thread.Sleep(400);
+        Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(1).eventId}"));
     }
 }
