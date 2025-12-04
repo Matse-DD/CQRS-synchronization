@@ -5,9 +5,9 @@ namespace ApplicationTests.Shared.Persistence;
 
 public class MockCommandRepository : ICommandRepository
 {
-    private Dictionary<string, Event> _eventOutbox = new();
+    private Dictionary<string, string> _eventOutbox = new();
 
-    public ICollection<Event> GetAllEvents()
+    public ICollection<string> GetAllEvents()
     {
         return _eventOutbox.Values;
     }

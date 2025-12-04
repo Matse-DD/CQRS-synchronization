@@ -2,7 +2,7 @@
 using Application.Contracts.Events.Factory;
 using Application.Contracts.Persistence;
 
-namespace Infrastructure.Projector;
+namespace Infrastructure.Projectors;
 
 public class Projector
 {
@@ -10,7 +10,7 @@ public class Projector
     private readonly IQueryRepository _queryRepository;
     private readonly IEventFactory _eventFactory;
 
-    public bool Locked { private get; set; }
+    public bool Locked { private get; set; } = false;
     private Queue<string> _eventQueue = new Queue<string>();
 
     public Projector(ICommandRepository commandRepository, IQueryRepository queryRepository, IEventFactory eventFactory)
@@ -32,7 +32,7 @@ public class Projector
 
     public void AddEvent(string incomingEvent)
     {
-        _eventQueue.Append(incomingEvent);
+        _eventQueue.Enqueue(incomingEvent);
     }
 
     public void ProjectEvent(string eventToProject)
@@ -46,7 +46,7 @@ public class Projector
         _commandRepository.RemoveEvent(eventId);
     }
 
-    public async void ProcessEvents()
+    private async void ProcessEvents()
     {
         while (true)
         {
