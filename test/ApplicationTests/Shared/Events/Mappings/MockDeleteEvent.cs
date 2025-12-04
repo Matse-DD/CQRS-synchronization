@@ -3,7 +3,7 @@ using Application.Contracts.Events.Factory;
 
 namespace ApplicationTests.Shared.Events.Mappings;
 
-public class MockDeleteEvent(IntermediateEvent intermediateEvent) : InsertEvent(intermediateEvent)
+public class MockDeleteEvent(IntermediateEvent intermediateEvent) : DeleteEvent(intermediateEvent)
 {
     public override string GetCommand()
     {
