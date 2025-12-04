@@ -4,38 +4,59 @@ using Application.Contracts.Persistence;
 
 namespace Infrastructure.Projector;
 
-public class Projector(ICommandRepository commandRepository, IQueryRepository queryRepository, IEventFactory eventFactory)
+public class Projector
 {
-    public bool Locked { private get; set; }
-    private ICollection<string> _eventQueue = new List<string>();
+    private readonly ICommandRepository _commandRepository;
+    private readonly IQueryRepository _queryRepository;
+    private readonly IEventFactory _eventFactory;
 
+    public bool Locked { private get; set; }
+    private Queue<string> _eventQueue = new Queue<string>();
+
+    public Projector(ICommandRepository commandRepository, IQueryRepository queryRepository, IEventFactory eventFactory)
+    {
+        _commandRepository = commandRepository;
+        _queryRepository = queryRepository;
+        _eventFactory = eventFactory;
+
+        ProcessEvents();
+    }
 
     public void AddEventsToFront(IEnumerable<string> batchOfEvents)
     {
-        _eventQueue = [.. batchOfEvents, .. _eventQueue];
-        _eventQueue = _eventQueue.Distinct().ToList();
+        IList<string> eventList = new List<string>();
+
+        eventList = [.. batchOfEvents, .. _eventQueue];
+        _eventQueue = new Queue<string>(eventList.Distinct());
     }
 
     public void AddEvent(string incomingEvent)
     {
-        _eventQueue.Add(incomingEvent);
+        _eventQueue.Append(incomingEvent);
     }
 
     public void ProjectEvent(string eventToProject)
     {
-        Event convertedEvent = eventFactory.DetermineEvent(eventToProject);
+        Event convertedEvent = _eventFactory.DetermineEvent(eventToProject);
 
         string commandForEvent = convertedEvent.GetCommand();
         Guid eventId = convertedEvent.EventId;
 
-        queryRepository.Execute(commandForEvent, eventId);
-        commandRepository.RemoveEvent(eventId);
+        _queryRepository.Execute(commandForEvent, eventId);
+        _commandRepository.RemoveEvent(eventId);
     }
 
     public async void ProcessEvents()
     {
-        if (Locked || ) return;
+        while (true)
+        {
+            if (Locked || _eventQueue.Count == 0) await Task.Delay(250);
 
-
+            else
+            {
+                string currentEvent = _eventQueue.Dequeue();
+                ProjectEvent(currentEvent);
+            }
+        }
     }
 }
