@@ -58,6 +58,7 @@ public class TestProjector
             Thread.Sleep(10);
             count++;
         }
+
         for (int i = 0; i < expectedCommands.Count; i++)
         {
             Assert.That(mockQueryRepo.History.ElementAt(i), Is.EqualTo(expectedCommands.ElementAt(i)));
