@@ -53,7 +53,7 @@ public class TestProjector
 
         // Assert
         int count = 0;
-        while (count < 100 || mockQueryRepo.History.Count == 0)
+        while (count < 100 && mockQueryRepo.History.Count == 0)
         {
             Thread.Sleep(10);
             count++;
