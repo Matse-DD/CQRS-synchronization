@@ -2,7 +2,6 @@
 using Application.Contracts.Events.Enums;
 using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
-using Infrastructure.Events.Mappings.MySQL;
 using System.Text.Json;
 
 namespace ApplicationTests.Shared.Events.Mappings;
