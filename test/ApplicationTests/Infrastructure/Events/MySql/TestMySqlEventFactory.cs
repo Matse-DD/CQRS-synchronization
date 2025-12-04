@@ -48,4 +48,38 @@ public class TestMySqlEventFactory
 
         Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
     }
+
+    [Test]
+    public void MySqlEventFactory_Gives_MySqlDeleteEvent_Back_When_Given_A_Event_Of_EventType_Delete()
+    {
+        // Arrange
+        string deleteEventMessage = @"
+        {
+          ""event_id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
+          ""occured_at"": ""2025-11-29T17:15:00Z"",
+          ""aggregate_name"": ""Product"",
+          ""status"": ""PENDING"",
+          ""event_type"": ""DELETE"",
+          ""payload"": {
+            ""condition"": {
+                ""amount_sold"": "">5"",
+                ""price"": "">10""
+            }
+          }
+        }";
+
+        MySqlEventFactory eventFactory = new MySqlEventFactory();
+
+        // Act
+        Event determinedEvent = eventFactory.DetermineEvent(deleteEventMessage);
+        string mySqlCommand = determinedEvent.GetCommand();
+
+        // Assert
+        Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlDeleteEvent)));
+
+        string expectedMySqlCommand =
+            "DELETE FROM Product WHERE amount_sold>5 AND price>10";
+
+        Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
+    }
 }
