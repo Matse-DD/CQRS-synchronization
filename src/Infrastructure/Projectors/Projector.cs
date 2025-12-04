@@ -25,9 +25,7 @@ public class Projector
 
     public void AddEventsToFront(IEnumerable<string> batchOfEvents)
     {
-        IList<string> eventList = new List<string>();
-
-        eventList = [.. batchOfEvents, .. _eventQueue];
+        IList<string> eventList = [.. batchOfEvents, .. _eventQueue];
         _eventQueue = new ConcurrentQueue<string>(eventList.Distinct());
     }
 
