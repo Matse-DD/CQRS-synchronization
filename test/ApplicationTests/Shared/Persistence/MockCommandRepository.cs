@@ -2,9 +2,9 @@
 
 namespace ApplicationTests.Shared.Persistence;
 
-public class MockCommandRepository : ICommandRepository
+public class MockCommandRepository(ICollection<OutboxEvent> seededEvents) : ICommandRepository
 {
-    private ICollection<OutboxEvent> _eventOutbox = [];
+    private ICollection<OutboxEvent> _eventOutbox = seededEvents;
 
     public ICollection<OutboxEvent> GetAllEvents()
     {
