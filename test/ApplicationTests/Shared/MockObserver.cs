@@ -1,6 +1,5 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Observer;
-using Application.Contracts.Persistence;
 
 namespace ApplicationTests.Shared;
 
