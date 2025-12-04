@@ -1,7 +1,8 @@
-﻿using System.Text.Json;
+﻿using Application.Contracts.Events.Enums;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Application.Contracts.Events;
+namespace Application.Contracts.Events.Factory;
 
 public class IntermediateEvent
 {

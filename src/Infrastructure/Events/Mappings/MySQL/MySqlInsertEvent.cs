@@ -1,4 +1,5 @@
-﻿using Application.Contracts.Events;
+﻿using Application.Contracts.Events.EventOptions;
+using Application.Contracts.Events.Factory;
 using System.Text.Json;
 
 namespace Infrastructure.Events.Mappings.MySQL;

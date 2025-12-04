@@ -1,6 +1,7 @@
-﻿using System.Text.Json;
+﻿using Application.Contracts.Events.Factory;
+using System.Text.Json;
 
-namespace Application.Contracts.Events;
+namespace Application.Contracts.Events.EventOptions;
 
 public abstract class InsertEvent : Event
 {

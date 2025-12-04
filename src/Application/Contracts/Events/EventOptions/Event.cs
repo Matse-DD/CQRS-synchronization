@@ -1,4 +1,7 @@
-﻿namespace Application.Contracts.Events;
+﻿using Application.Contracts.Events.Enums;
+using Application.Contracts.Events.Factory;
+
+namespace Application.Contracts.Events.EventOptions;
 
 public abstract class Event(IntermediateEvent intermediateEvent)
 {

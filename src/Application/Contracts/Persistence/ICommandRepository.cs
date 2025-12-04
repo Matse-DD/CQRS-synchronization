@@ -1,6 +1,6 @@
-﻿using Application.Contracts.Events;
+﻿using Application.Contracts.Events.EventOptions;
 
-namespace Application.Contracts.Ports.Persistence;
+namespace Application.Contracts.Persistence;
 
 public interface ICommandRepository
 {
