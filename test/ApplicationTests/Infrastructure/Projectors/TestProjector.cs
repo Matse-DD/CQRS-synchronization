@@ -10,7 +10,7 @@ public class TestProjector
     public void Test_Incoming_Events_Are_Being_Processed()
     {
         // Arrange
-        MockCommandRepository mockCommandRepo = new MockCommandRepository();
+        MockCommandRepository mockCommandRepo = new MockCommandRepository([]);
         MockQueryRepository mockQueryRepo = new MockQueryRepository();
         MockEventFactory mockEventFactory = new MockEventFactory();
 
@@ -55,7 +55,7 @@ public class TestProjector
         int count = 0;
         while (count < 100 && mockQueryRepo.History.Count == 0)
         {
-            Task.Delay(10);
+            Thread.Sleep(10);
             count++;
         }
 
