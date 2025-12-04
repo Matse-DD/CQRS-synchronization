@@ -1,4 +1,4 @@
-﻿using Application.Contracts.Ports.Persistence;
+﻿using Application.Contracts.Persistence;
 
 namespace ApplicationTests.Shared.Persistence;
 

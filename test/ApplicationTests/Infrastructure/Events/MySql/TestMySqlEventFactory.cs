@@ -1,4 +1,4 @@
-﻿using Application.Contracts.Events;
+﻿using Application.Contracts.Events.EventOptions;
 using Infrastructure.Events.Mappings.MySQL;
 using System.Xml.Linq;
 

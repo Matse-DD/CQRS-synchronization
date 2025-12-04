@@ -1,5 +1,5 @@
-﻿using Application.Contracts.Events;
-using Application.Contracts.Ports;
+﻿using Application.Contracts.Events.EventOptions;
+using Application.Contracts.Observer;
 
 namespace ApplicationTests.Shared;
 
