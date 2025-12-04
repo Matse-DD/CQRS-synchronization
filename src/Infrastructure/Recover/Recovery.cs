@@ -13,7 +13,7 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         Guid lastSuccessfulEventId = queryRepository.GetLastSuccessfulEventId();
 
         IList<string> pureEvents = [];
-        outboxEvents = outboxEvents.ToList().Where(entry => !entry.eventId.Equals(lastSuccessfulEventId));
+        outboxEvents = outboxEvents.ToList().Where(entry => !entry.eventId.Equals(lastSuccessfulEventId.ToString()));
         outboxEvents.ToList().ForEach(entry => pureEvents.Add(entry.eventItem));
 
         projector.AddEventsToFront(pureEvents);
