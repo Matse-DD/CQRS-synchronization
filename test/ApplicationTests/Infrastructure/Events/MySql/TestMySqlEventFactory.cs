@@ -82,4 +82,44 @@ public class TestMySqlEventFactory
 
         Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
     }
+
+    [Test]
+    public void MySqlEventFactory_Gives_MySqlUpdateEvent_Back_When_Given_A_Event_Of_EventType_Update()
+    {
+        // Arrange
+        string updateEventMessage = @"
+        {
+            ""event_id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
+            ""occured_at"": ""2025-11-29T17:15:00Z"",
+            ""aggregate_name"": ""Product"",
+            ""status"": ""PENDING"",
+            ""event_type"": ""UPDATE"",
+            ""payload"": {
+                ""condition"": {
+                    ""amount_sold"": "">5"",
+                    ""price"": "">10""
+                },
+                ""change"": {
+                    ""price"": ""price * 1.10"",
+                    ""amount_sold"":""amount_sold + 1""
+                }
+            }
+        }";
+
+        MySqlEventFactory eventFactory = new MySqlEventFactory();
+
+        // Act
+        Event determinedEvent = eventFactory.DetermineEvent(updateEventMessage);
+        string mySqlCommand = determinedEvent.GetCommand();
+
+        // Assert
+        Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlUpdateEvent)));
+
+        string expectedMySqlCommand =
+            "UPDATE Product\n" +
+            "SET price = price * 1.10, amount_sold = amount_sold + 1\n" +
+            "WHERE amount_sold>5 AND price>10";
+
+        Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
+    }
 }
