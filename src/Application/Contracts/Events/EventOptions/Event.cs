@@ -12,4 +12,15 @@ public abstract class Event(IntermediateEvent intermediateEvent)
     public EventType EventType { get; init; } = intermediateEvent.EventType;
 
     public abstract string GetCommand();
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Event @event &&
+               EventId.Equals(@event.EventId);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(EventId);
+    }
 }
