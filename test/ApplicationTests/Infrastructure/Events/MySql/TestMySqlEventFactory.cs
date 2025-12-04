@@ -1,0 +1,44 @@
+﻿using Application.Contracts.Events;
+using Infrastructure.Events.Mappings.MySQL;
+using System.Xml.Linq;
+
+namespace ApplicationTests.Infrastructure.Events.MySql;
+
+public class TestMySqlEventFactory
+{
+    [SetUp]
+    public void SetUp()
+    {
+
+    }
+
+    [Test]
+    public void MySqlEventFactory_Gives_MySqlInsertEvent_Back_When_Given_A_Event_Of_EventType_Insert()
+    {
+        // Arrange
+        string insertEventMessage = @"
+        {
+          ""event_id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
+          ""occured_at"": ""2025-11-29T17:15:00Z"",
+          ""aggregate_name"": ""Product"",
+          ""status"": ""PENDING"",
+          ""event_type"": ""INSERT"",
+          ""payload"": {
+            ""product_id"": ""038e2f47-c1a0-4b3d-98e1-5f2d0c1b4e9f"",
+            ""name"": ""Wireless Mechanical Keyboard"",
+            ""sku"": ""KB-WM-001"",
+            ""price"": 129.99,
+            ""stock_level"": 50,
+            ""is_active"": true
+          }
+        }";
+
+        MySqlEventFactory eventFactory = new MySqlEventFactory();
+
+        // Act
+        Event determinedEvent = eventFactory.DetermineEvent(insertEventMessage);
+
+        // Assert
+        Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlInsertEvent)));
+    }
+}
