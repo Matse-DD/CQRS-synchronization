@@ -13,7 +13,7 @@ public class IntermediateEvent
     public DateTime OccuredAt { get; init; }
 
     [JsonPropertyName("aggregate_name")]
-    public string AggregateName { get; init; }
+    public required string AggregateName { get; init; }
 
     [JsonPropertyName("status")]
     [JsonConverter(typeof(JsonStringEnumConverter))]

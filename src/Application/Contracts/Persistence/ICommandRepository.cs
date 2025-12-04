@@ -4,7 +4,7 @@ namespace Application.Contracts.Persistence;
 
 public interface ICommandRepository
 {
-    public ICollection<Event> GetAllEvents();
+    public ICollection<string> GetAllEvents();
     public void RemoveEvent(Guid eventId);
 
 }
