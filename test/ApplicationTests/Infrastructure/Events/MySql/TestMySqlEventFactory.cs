@@ -1,17 +1,10 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Infrastructure.Events.Mappings.MySQL;
-using System.Xml.Linq;
 
 namespace ApplicationTests.Infrastructure.Events.MySql;
 
 public class TestMySqlEventFactory
 {
-    [SetUp]
-    public void SetUp()
-    {
-
-    }
-
     [Test]
     public void MySqlEventFactory_Gives_MySqlInsertEvent_Back_When_Given_A_Event_Of_EventType_Insert()
     {
