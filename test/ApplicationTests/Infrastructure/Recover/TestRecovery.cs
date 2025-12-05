@@ -70,8 +70,9 @@ public class TestRecovery
         MockObserver observer = new MockObserver(seedingObserver);
 
         // Act
-        recovery.Recover();
+        projector.Lock();
         observer.StartListening(projector.AddEvent);
+        recovery.Recover();
 
         // Assert
         SleepTillReady(queryRepository);
