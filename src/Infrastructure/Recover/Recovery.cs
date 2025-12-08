@@ -5,7 +5,7 @@ namespace Infrastructure.Recover;
 
 public class Recovery(ICommandRepository commandRepository, IQueryRepository queryRepository, Projector projector)
 {
-    public void Recover()
+    public async void Recover()
     {
         projector.Lock();
 
