@@ -115,7 +115,7 @@ public class TestRecovery
 
         MockCommandRepository commandRepository = new MockCommandRepository(seedingOutbox);
         MockQueryRepository queryRepository = new MockQueryRepository();
-        queryRepository.LastSuccesfulEventId = new Guid(seedingOutbox.ElementAt(0).eventId);
+        queryRepository.LastSuccessfulEventId = new Guid(seedingOutbox.ElementAt(0).eventId);
 
         MockEventFactory eventFactory = new MockEventFactory();
         Projector projector = new Projector(commandRepository, queryRepository, eventFactory);
