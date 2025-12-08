@@ -11,7 +11,7 @@ public class Projector
     private readonly IQueryRepository _queryRepository;
     private readonly IEventFactory _eventFactory;
 
-    public bool Locked { get; set; } = false;
+    public bool locked = false;
     private ConcurrentQueue<string> _eventQueue = new ConcurrentQueue<string>();
 
     public Projector(ICommandRepository commandRepository, IQueryRepository queryRepository, IEventFactory eventFactory)
@@ -41,6 +41,7 @@ public class Projector
         string commandForEvent = convertedEvent.GetCommand();
         Guid eventId = convertedEvent.EventId;
 
+        _commandRepository.MarkEventAsInProgress(eventId);
         _queryRepository.Execute(commandForEvent, eventId);
         _commandRepository.RemoveEvent(eventId);
     }
@@ -49,7 +50,7 @@ public class Projector
     {
         while (true)
         {
-            if (Locked || _eventQueue.Count == 0) await Task.Delay(250);
+            if (locked || _eventQueue.Count == 0) await Task.Delay(250);
 
             else
             {
@@ -59,5 +60,15 @@ public class Projector
                 }
             }
         }
+    }
+
+    public void Lock()
+    {
+        locked = true;
+    }
+
+    public void Unlock()
+    {
+        locked = false;
     }
 }

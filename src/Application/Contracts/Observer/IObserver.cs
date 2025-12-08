@@ -1,8 +1,6 @@
-﻿using Application.Contracts.Events.EventOptions;
-
-namespace Application.Contracts.Observer;
+﻿namespace Application.Contracts.Observer;
 
 public interface IObserver
 {
-    Task StartListening(Action<Event> callback);
+    Task StartListening(Action<string> callback);
 }

@@ -5,7 +5,7 @@ namespace ApplicationTests.Shared.Persistence;
 public class MockQueryRepository : IQueryRepository
 {
     public ICollection<string> History { get; private set; } = [];
-    private Guid lastSuccesfulEventId;
+    public Guid LastSuccessfulEventId { get; set; }
 
     public void Execute(string command, Guid eventId)
     {
@@ -14,12 +14,12 @@ public class MockQueryRepository : IQueryRepository
         if (lowerCommand.Contains("update") || lowerCommand.Contains("delete") || lowerCommand.Contains("insert"))
         {
             History.Add(command);
-            lastSuccesfulEventId = eventId;
+            LastSuccessfulEventId = eventId;
         }
     }
 
     public Guid GetLastSuccessfulEventId()
     {
-        return this.lastSuccesfulEventId;
+        return this.LastSuccessfulEventId;
     }
 }
