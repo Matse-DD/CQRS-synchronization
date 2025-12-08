@@ -29,7 +29,7 @@ public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent
             string key = conditionPair.Key;
             string value = conditionPair.Value.Trim();
 
-            if (value.StartsWith(">=") || value.StartsWith("<=") || value.StartsWith(">") || value.StartsWith("<") || value.StartsWith("="))
+            if (value.StartsWith(">=") || value.StartsWith("<=") || value.StartsWith('>') || value.StartsWith('<') || value.StartsWith('='))
             {
                 return $"{key}{value}";
             }
