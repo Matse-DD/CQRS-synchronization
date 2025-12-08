@@ -41,6 +41,7 @@ public class Projector
         string commandForEvent = convertedEvent.GetCommand();
         Guid eventId = convertedEvent.EventId;
 
+        _commandRepository.MarkEventAsInProgress(eventId);
         _queryRepository.Execute(commandForEvent, eventId);
         _commandRepository.RemoveEvent(eventId);
     }
