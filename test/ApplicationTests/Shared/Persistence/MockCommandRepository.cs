@@ -13,7 +13,8 @@ public class MockCommandRepository(ICollection<OutboxEvent> seededEvents) : ICom
 
     public void MarkEventAsInProgress(Guid eventId)
     {
-        for(int i = 0; i < _eventOutbox.Count; i++) {
+        for (int i = 0; i < _eventOutbox.Count; i++)
+        {
             OutboxEvent eventEntry = _eventOutbox.ElementAt(i);
             if (eventEntry.eventId == eventId.ToString())
             {
