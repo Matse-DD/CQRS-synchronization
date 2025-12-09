@@ -25,8 +25,8 @@ public class ProjectorIntegration
         IEventFactory eventFactory = new MySqlEventFactory();
 
         Projector projector = new Projector(commandRepo, queryRepo, eventFactory);
-        
-        
+
+
         // start listing for changes
         MongoDbObserver observer = new MongoDbObserver(_connectionStringCommandRepoMongo);
         observer.StartListening(projector.ProjectEvent);

@@ -22,10 +22,10 @@ public class MongoDbCommandRepository : ICommandRepository
     {
         ICollection<BsonDocument> events = await _collection.Find(_ => true).ToListAsync();
         ICollection<OutboxEvent> outboxEvents = events.Select(
-            d => new OutboxEvent(d.GetValue("event_id").AsString ?? string.Empty, 
+            d => new OutboxEvent(d.GetValue("event_id").AsString ?? string.Empty,
             d.ToJson() ?? string.Empty)
         ).ToList();
-        
+
         return outboxEvents;
     }
 
@@ -34,7 +34,7 @@ public class MongoDbCommandRepository : ICommandRepository
         FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Eq(
             d => d.GetValue("event_id"), BsonDocument.Parse(eventId.ToString())
         );
-        
+
         DeleteResult result = await _collection.DeleteOneAsync(filter);
         return result.IsAcknowledged && result.DeletedCount > 0;
     }
