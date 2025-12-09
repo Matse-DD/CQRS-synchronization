@@ -5,7 +5,7 @@ using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI;
 using System.Data.Common;
 
-namespace Infrastructure.Persistence;
+namespace Infrastructure.Persistence.QueryRepository;
 
 public class MySqlRepository : IQueryRepository
 {
@@ -24,6 +24,7 @@ public class MySqlRepository : IQueryRepository
         MySqlCommand cmdDataUpdate = new MySqlCommand(command, _connection);
 
         MySqlTransaction transaction = _connection.BeginTransaction();
+
         try
         {
             await cmdLastEventId.ExecuteNonQueryAsync();
@@ -35,7 +36,6 @@ public class MySqlRepository : IQueryRepository
         {
             transaction.Rollback();
         }
-
     }
 
     public async Task<Guid> GetLastSuccessfulEventId()

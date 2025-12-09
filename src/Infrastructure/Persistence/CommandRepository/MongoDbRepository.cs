@@ -3,7 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Persistence;
+namespace Infrastructure.Persistence.CommandRepository;
 
 public class MongoDbRepository : ICommandRepository
 {
