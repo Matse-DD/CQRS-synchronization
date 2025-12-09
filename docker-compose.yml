@@ -1,0 +1,42 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: cqrs-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    healthcheck:
+      test: |
+        test $$(mongosh --quiet --eval "try { rs.initiate({_id:'rs0',members:[{_id:0,host:'mongo:27017'}]}) } catch(e) { rs.status().ok }") -eq 1
+      interval: 10s
+      start_period: 5s
+
+  mysql:
+    image: mysql:latest
+    container_name: cqrs-mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_DATABASE: cqrs_read
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  app:
+    image: cqrs-sync:latest
+    container_name: cqrs-app
+    depends_on:
+      mongo:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    environment:
+      ConnectionStrings__Mongo: "mongodb://mongo:27017/?replicaSet=rs0"
+      ConnectionStrings__MySQL: "Server=mysql;Database=cqrs_read;User=root;Password=;"
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "8081:8080"
