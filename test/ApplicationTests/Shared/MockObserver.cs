@@ -7,9 +7,8 @@ public class MockObserver(IEnumerable<string>? events) : IObserver
 {
     private readonly List<string> _events = events?.ToList() ?? [];
 
-    public Task StartListening(Action<string> callback)
+    public async void StartListening(Action<string> callback)
     {
         _events.ForEach(callback);
-        return Task.CompletedTask;
     }
 }
