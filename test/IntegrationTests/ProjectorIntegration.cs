@@ -12,8 +12,9 @@ namespace IntegrationTests;
 
 public class ProjectorIntegration
 {
-    private readonly string _connectionStringQueryRepoMySql = "Server=mysql;Database=cqrs_read;User=root;Password=;";
+    private readonly string _connectionStringQueryRepoMySql = "Server=mysql;Port=13306;Database=cqrs_read;User=root;Password=;";
     private readonly string _connectionStringCommandRepoMongo = "mongodb://mongo:27017/?replicaSet=rs0";
+
 
     [Test]
     public void Projector_Should_Project()

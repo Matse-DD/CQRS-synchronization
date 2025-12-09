@@ -17,7 +17,7 @@ services:
     container_name: cqrs-mysql
     restart: always
     ports:
-      - "3306:3306"
+      - "13306:3306"
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
       MYSQL_DATABASE: cqrs_read
@@ -25,18 +25,4 @@ services:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       timeout: 20s
       retries: 10
-
-  app:
-    image: cqrs-sync:latest
-    container_name: cqrs-app
-    depends_on:
-      mongo:
-        condition: service_healthy
-      mysql:
-        condition: service_healthy
-    environment:
-      ConnectionStrings__Mongo: "mongodb://mongo:27017/?replicaSet=rs0"
-      ConnectionStrings__MySQL: "Server=mysql;Database=cqrs_read;User=root;Password=;"
-      ASPNETCORE_ENVIRONMENT: Development
-    ports:
-      - "8081:8080"
+      
