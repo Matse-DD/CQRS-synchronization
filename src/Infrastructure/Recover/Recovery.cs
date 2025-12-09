@@ -12,10 +12,10 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         StartRecovering();
     }
 
-    public async void StartRecovering()
+    private async void StartRecovering()
     {
-        IEnumerable<OutboxEvent> outboxEvents = commandRepository.GetAllEvents();
-        Guid lastSuccessfulEventId = queryRepository.GetLastSuccessfulEventId();
+        IEnumerable<OutboxEvent> outboxEvents = await commandRepository.GetAllEvents();
+        Guid lastSuccessfulEventId = await queryRepository.GetLastSuccessfulEventId();
 
         IList<string> pureEvents = [];
         outboxEvents = outboxEvents.ToList().Where(entry => !entry.eventId.Equals(lastSuccessfulEventId.ToString()));

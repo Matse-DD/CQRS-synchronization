@@ -7,11 +7,11 @@ using System.Data.Common;
 
 namespace Infrastructure.Persistence.QueryRepository;
 
-public class MySqlRepository : IQueryRepository
+public class MySqlQueryRepository : IQueryRepository
 {
     private readonly MySqlConnection _connection;
 
-    public MySqlRepository(string connectionString)
+    public MySqlQueryRepository(string connectionString)
     {
         _connection = new MySqlConnection(connectionString);
     }

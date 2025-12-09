@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.CommandRepository;
 
-public class MongoDbRepository : ICommandRepository
+public class MongoDbCommandRepository : ICommandRepository
 {
     private readonly MongoClient _client;
     private readonly IMongoDatabase _database;
     private readonly IMongoCollection<BsonDocument> _collection;
 
-    public MongoDbRepository(string connectionString)
+    public MongoDbCommandRepository(string connectionString)
     {
         _client = new MongoClient(connectionString);
         _database = _client.GetDatabase("DB");
