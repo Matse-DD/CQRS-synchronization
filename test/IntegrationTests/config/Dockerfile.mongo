@@ -1,0 +1,10 @@
+FROM mongo:latest
+
+COPY ./mongoDbSeed.js /docker-entrypoint-initdb.d/
+
+EXPOSE 27017
+
+CMD ["mongod", "--replSet", "rs0", "--bind_ip_all"]
+
+HEALTHCHECK --interval=10s --start-period=5s CMD \
+  test "$$(mongosh --quiet --eval \"try { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) } catch(e) { rs.status().ok }\")" -eq 1

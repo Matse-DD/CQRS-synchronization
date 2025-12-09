@@ -2,6 +2,7 @@
 using Application.Contracts.Events.Factory;
 using Application.Contracts.Persistence;
 using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Containers;
 using Infrastructure.Events.Mappings.MySQL;
 using Infrastructure.Observer;
 using Infrastructure.Persistence.CommandRepository;
@@ -17,15 +18,24 @@ public class ProjectorIntegration
     private readonly string _connectionStringCommandRepoMongo = "mongodb://mongo:27017/?replicaSet=rs0";
     
     [OneTimeSetUp]
-    public void Set_DatabasesUp()
+    public async void Set_DatabasesUp()
     {
-        // Create a new instance of a container.
-        var container = new ContainerBuilder()
-            .WithCommand()
-          // Wait until the HTTP endpoint of the container is available.
-          .WithWaitStrategy(Wait.ForUnixContainer().UntilHttpRequestIsSucceeded(r => r.ForPort(8080)))
-          // Build the container configuration.
-          .Build();
+        IContainer mongoDbContainer = new ContainerBuilder()
+            .WithImage("cqrs-mongo:latest")
+            .WithPortBinding(27017, true)
+            .Build();
+
+        IContainer mysqlDbContainer = new ContainerBuilder()
+            .WithImage("cqrs-mysql:latest")
+            .WithPortBinding(13306, true)
+            .Build();
+
+
+        await mongoDbContainer.StartAsync()
+            .ConfigureAwait(false);
+
+        await mysqlDbContainer.StartAsync()
+            .ConfigureAwait(false);
 
     }
 
