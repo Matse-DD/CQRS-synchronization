@@ -2,6 +2,6 @@
 
 public interface IQueryRepository
 {
-    public Guid GetLastSuccessfulEventId();
+    public Task<Guid> GetLastSuccessfulEventId();
     public void Execute(string command, Guid eventId);
 }

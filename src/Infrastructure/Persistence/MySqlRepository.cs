@@ -1,7 +1,9 @@
 ﻿using Application.Contracts.Persistence;
+using Microsoft.Extensions.Logging;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 using MySqlX.XDevAPI;
+using System.Data.Common;
 
 namespace Infrastructure.Persistence;
 
@@ -14,23 +16,35 @@ public class MySqlRepository : IQueryRepository
         _connection = new MySqlConnection(connectionString);
     }
 
-    public void Execute(string command, Guid eventId)
+    public async void Execute(string command, Guid eventId)
     {
-        string commandLastEventId = $"UPDATE last_event_id SET last_event_id = {eventId} FROM last_info";
+        string commandLastEventId = $"UPDATE last_info SET last_event_id = {eventId}";
 
         MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, _connection);
         MySqlCommand cmdDataUpdate = new MySqlCommand(command, _connection);
 
         MySqlTransaction transaction = _connection.BeginTransaction();
+        try
+        {
+            await cmdLastEventId.ExecuteNonQueryAsync();
+            await cmdDataUpdate.ExecuteNonQueryAsync();
 
-        cmdLastEventId.ExecuteReader();
-        cmdDataUpdate.ExecuteReader();
+            transaction.Commit();
+        }
+        catch (DbException)
+        {
+            transaction.Rollback();
+        }
 
-        transaction.Commit();
     }
 
-    public Guid GetLastSuccessfulEventId()
+    public async Task<Guid> GetLastSuccessfulEventId()
     {
-        throw new NotImplementedException();
+        string queryLastEventId = $"SELECT last_event_id FROM last_info";
+
+        MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, _connection);
+        DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync();
+
+        return result.GetGuid(result.GetOrdinal("last_event_id"));
     }
 }
