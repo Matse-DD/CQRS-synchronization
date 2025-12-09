@@ -14,8 +14,8 @@ public class MongoDbObserver : IObserver
     public MongoDbObserver(string connectionString)
     {
         _client = new MongoClient(connectionString);
-        _database = _client.GetDatabase("DB");
-        _collection = _database.GetCollection<BsonDocument>("outbox")!;
+        _database = _client.GetDatabase("users");
+        _collection = _database.GetCollection<BsonDocument>("events")!;
     }
 
     public async void StartListening(Action<string> callback)
