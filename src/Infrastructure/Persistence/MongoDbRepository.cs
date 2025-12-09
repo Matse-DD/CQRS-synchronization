@@ -1,5 +1,41 @@
-﻿namespace Infrastructure.Persistence;
+﻿using Application.Contracts.Persistence;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using System.Threading.Tasks;
 
-public class MongoDbRepository
+namespace Infrastructure.Persistence;
+
+public class MongoDbRepository : ICommandRepository
 {
+    private readonly MongoClient _client;
+    private readonly IMongoDatabase _database;
+    private readonly IMongoCollection<BsonDocument> _collection;
+
+    public MongoDbRepository(string connectionString)
+    {
+        _client = new MongoClient(connectionString);
+        _database = _client.GetDatabase("DB");
+        _collection = _database.GetCollection<BsonDocument>("outbox")!;
+    }
+
+    public async Task<ICollection<OutboxEvent>> GetAllEvents()
+    {
+        ICollection<BsonDocument> events = await _collection.Find(_ => true).ToListAsync();
+        ICollection<OutboxEvent> outboxEvents = events.Select(
+            d => new OutboxEvent(d.GetValue("event_id").AsString ?? string.Empty, 
+            d.ToJson() ?? string.Empty)
+        ).ToList();
+        
+        return outboxEvents;
+    }
+
+    public async Task<bool> RemoveEvent(Guid eventId)
+    {
+        FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Eq(
+            d => d.GetValue("event_id"), BsonDocument.Parse(eventId.ToString())
+        );
+        
+        DeleteResult result = await _collection.DeleteOneAsync(filter);
+        return result.IsAcknowledged && result.DeletedCount > 0;
+    }
 }
