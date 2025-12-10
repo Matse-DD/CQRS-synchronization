@@ -1,7 +1,6 @@
 ﻿using Application.Contracts.Persistence;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.CommandRepository;
 
@@ -14,16 +13,21 @@ public class MongoDbCommandRepository : ICommandRepository
     public MongoDbCommandRepository(string connectionString)
     {
         _client = new MongoClient(connectionString);
-        _database = _client.GetDatabase("users"); //cqrs_command
+        _database = _client.GetDatabase("users");
         _collection = _database.GetCollection<BsonDocument>("events")!;
     }
 
     public async Task<ICollection<OutboxEvent>> GetAllEvents()
     {
-        ICollection<BsonDocument> events = await _collection.Find(_ => true).ToListAsync();
+        SortDefinition<BsonDocument>? sort = Builders<BsonDocument>.Sort.Ascending("_id");
+        ICollection<BsonDocument> events = await _collection
+            .Find(_ => true)
+            .Sort(sort)
+            .ToListAsync();
+
         ICollection<OutboxEvent> outboxEvents = events.Select(
             d => new OutboxEvent(d.GetValue("event_id").AsString ?? string.Empty,
-            d.ToJson() ?? string.Empty)
+                d.ToJson() ?? string.Empty)
         ).ToList();
 
         return outboxEvents;
