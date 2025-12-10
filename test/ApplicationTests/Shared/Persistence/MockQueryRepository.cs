@@ -6,16 +6,15 @@ public class MockQueryRepository : IQueryRepository
 {
     public ICollection<string> History { get; private set; } = [];
     public Guid LastSuccessfulEventId { get; set; }
-
-    public void Execute(string command, Guid eventId)
+    
+    public Task Execute(string command, Guid eventId)
     {
         string lowerCommand = command.ToLower();
 
-        if (lowerCommand.Contains("update") || lowerCommand.Contains("delete") || lowerCommand.Contains("insert"))
-        {
-            History.Add(command);
-            LastSuccessfulEventId = eventId;
-        }
+        if (!lowerCommand.Contains("update") && !lowerCommand.Contains("delete") && !lowerCommand.Contains("insert")) return Task.CompletedTask;
+        History.Add(command);
+        LastSuccessfulEventId = eventId;
+        return Task.CompletedTask;
     }
 
     public Task<Guid> GetLastSuccessfulEventId()
