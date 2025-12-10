@@ -2,7 +2,10 @@
 
 public enum EventType
 {
-    Insert,
-    Update,
-    Delete,
+    INSERT,
+    UPDATE,
+    DELETE,
+    CREATE_TABLE,
+    DROP_TABLE,
+    UPDATE_TABLE
 }

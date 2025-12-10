@@ -13,9 +13,9 @@ public class MySqlEventFactory : IEventFactory
 
         return intermediateEvent?.EventType switch
         {
-            EventType.Insert => new MySqlInsertEvent(intermediateEvent),
-            EventType.Delete => new MySqlDeleteEvent(intermediateEvent),
-            EventType.Update => new MySqlUpdateEvent(intermediateEvent),
+            EventType.INSERT => new MySqlInsertEvent(intermediateEvent),
+            EventType.DELETE => new MySqlDeleteEvent(intermediateEvent),
+            EventType.UPDATE => new MySqlUpdateEvent(intermediateEvent),
             _ => throw new ArgumentOutOfRangeException()
         };
     }

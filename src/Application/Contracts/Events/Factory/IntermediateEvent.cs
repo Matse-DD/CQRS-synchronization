@@ -15,6 +15,10 @@ public class IntermediateEvent
     [JsonPropertyName("aggregate_name")]
     public required string AggregateName { get; init; }
 
+    [JsonPropertyName("status")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public Status Status { get; init; }
+
     [JsonPropertyName("event_type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public EventType EventType { get; init; }
