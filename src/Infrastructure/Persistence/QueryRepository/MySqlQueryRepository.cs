@@ -6,33 +6,47 @@ namespace Infrastructure.Persistence.QueryRepository;
 
 public class MySqlQueryRepository : IQueryRepository
 {
-    private readonly MySqlConnection _connection;
+    private readonly string _connectionString;
 
     public MySqlQueryRepository(string connectionString)
     {
-        _connection = new MySqlConnection(connectionString);
-        _connection.Open();
+        _connectionString = connectionString;
     }
 
     public async void Execute(string command, Guid eventId)
     {
-        string commandLastEventId = $"UPDATE last_info SET last_event_id = {eventId}";
+        using MySqlConnection connection = new MySqlConnection(_connectionString);
+        
+        await connection.OpenAsync();
 
-        MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, _connection);
-        MySqlCommand cmdDataUpdate = new MySqlCommand(command, _connection);
+        string commandLastEventId = $@"UPDATE last_info SET last_event_id = ""{eventId}""";
+        Console.WriteLine(commandLastEventId);
 
-        MySqlTransaction transaction = _connection.BeginTransaction();
+        //MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, _connection);
+        //MySqlCommand cmdDataUpdate = new MySqlCommand(command, _connection);
+
+        using MySqlTransaction transaction = connection.BeginTransaction();
 
         try
         {
-            await cmdLastEventId.ExecuteNonQueryAsync();
-            await cmdDataUpdate.ExecuteNonQueryAsync();
+            // 2. Initialize Commands and associate them with the Connection and Transaction
+            using MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, connection, transaction);
+            using MySqlCommand cmdDataUpdate = new MySqlCommand(command, connection, transaction);
+
+            Console.WriteLine("begin update");
+            
+            int amountChangedLasteEventId = await cmdLastEventId.ExecuteNonQueryAsync();
+            int amountChangedUpdate = await cmdDataUpdate.ExecuteNonQueryAsync();
 
             transaction.Commit();
         }
-        catch (DbException)
+        catch (DbException ex)
         {
+            Console.WriteLine("something went back rolling back");
+            Console.WriteLine(ex.ToString());
             transaction.Rollback();
+
+            throw new Exception(ex.Message);
         }
     }
 
@@ -40,14 +54,22 @@ public class MySqlQueryRepository : IQueryRepository
     {
         string queryLastEventId = $"SELECT last_event_id FROM last_info";
 
-        MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, _connection);
-        DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync();
+        using MySqlConnection connection = new MySqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, connection);
+        using DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync();
 
         if (!await result.ReadAsync())
         {
             return Guid.Empty;
         }
 
-        return result.GetGuid(result.GetOrdinal("last_event_id"));
+        int lastEventId = result.GetOrdinal("last_event_id");
+        if (lastEventId == 0)
+        {
+            return Guid.Empty;
+        }
+        return result.GetGuid(lastEventId);
     }
 }
