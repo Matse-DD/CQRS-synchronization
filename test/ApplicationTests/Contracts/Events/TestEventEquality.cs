@@ -43,7 +43,7 @@ public class TestEventEquality
         using (Assert.EnterMultipleScope())
         {
             // Assert
-            Assert.That(event1, Is.Not.EqualTo(null));
+            Assert.That(event1, Is.Not.Null);
             Assert.That(event1, Is.Not.EqualTo(new object()));
         }
     }
