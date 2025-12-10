@@ -2,6 +2,6 @@
 
 public interface IObserver
 {
-    void StartListening(Action<string> callback);
-    void StopListening();
+    Task StartListening(Action<string> callback, CancellationToken cancellationToken);
+    void StopListening(); // Geen idee of dit nog nodig is als je met token werkt (gemakkelijker)
 }
