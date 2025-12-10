@@ -1,8 +1,5 @@
 ﻿using Application.Contracts.Persistence;
-using Microsoft.Extensions.Logging;
-using MySql.Data;
 using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI;
 using System.Data.Common;
 
 namespace Infrastructure.Persistence.QueryRepository;
