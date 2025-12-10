@@ -8,36 +8,24 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
 {
     public override string GetCommand()
     {
-        return
-            $"INSERT INTO {AggregateName} ({MapColumns(Properties.Keys)})\n" +
-            $"VALUES ({MapValuesClause(Properties.Values)})";
+        return $"INSERT INTO {AggregateName} ({MapColumns(Properties.Keys)})\n" +
+               $"VALUES ({MapValuesClause(Properties.Values)})";
     }
 
-    private string MapColumns(IEnumerable<string> keys)
+    private static string MapColumns(IEnumerable<string> keys)
     {
         return string.Join(", ", keys);
     }
 
-    private string MapValuesClause(IEnumerable<object> incomingValues)
+    private static string MapValuesClause(IEnumerable<object> incomingValues)
     {
-        IEnumerable<string> convertedValues = incomingValues.Select(value => ConvertValue(value));
+        IEnumerable<string> convertedValues = incomingValues.Select(ConvertValue);
         return string.Join(", ", convertedValues);
-    }
 
-    private string ConvertValue(object incomingValue)
-    {
-        if (incomingValue is JsonElement value)
+        static string ConvertValue(object incomingValue)
         {
-            if (value.ValueKind == JsonValueKind.String)
-            {
-                return $"\"{value}\"";
-            }
-            else
-            {
-                return value.ToString();
-            }
+            if (incomingValue is not JsonElement value) return "NULL";
+            return value.ValueKind == JsonValueKind.String ? $"\"{value}\"" : value.ToString();
         }
-
-        return "NULL";
     }
 }

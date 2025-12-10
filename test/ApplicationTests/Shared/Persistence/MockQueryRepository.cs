@@ -7,7 +7,7 @@ public class MockQueryRepository : IQueryRepository
     public ICollection<string> History { get; private set; } = [];
     public Guid LastSuccessfulEventId { get; set; }
 
-    public void Execute(string command, Guid eventId)
+    public Task Execute(string command, Guid eventId)
     {
         string lowerCommand = command.ToLower();
 
@@ -16,10 +16,11 @@ public class MockQueryRepository : IQueryRepository
             History.Add(command);
             LastSuccessfulEventId = eventId;
         }
+        return Task.CompletedTask;
     }
 
     public Task<Guid> GetLastSuccessfulEventId()
     {
-        return Task.FromResult(this.LastSuccessfulEventId);
+        return Task.FromResult(LastSuccessfulEventId);
     }
 }

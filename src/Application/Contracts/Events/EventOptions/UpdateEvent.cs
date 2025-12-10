@@ -5,10 +5,10 @@ namespace Application.Contracts.Events.EventOptions;
 
 public abstract class UpdateEvent : Event
 {
-    public Dictionary<string, string> Condition { get; init; }
-    public Dictionary<string, string> Change { get; init; }
+    protected Dictionary<string, string> Condition { get; init; }
+    protected Dictionary<string, string> Change { get; init; }
 
-    public UpdateEvent(IntermediateEvent intermediateEvent) : base(intermediateEvent)
+    protected UpdateEvent(IntermediateEvent intermediateEvent) : base(intermediateEvent)
     {
         JsonElement conditionElement = intermediateEvent.Payload.GetProperty("condition");
         JsonElement changeElement = intermediateEvent.Payload.GetProperty("change");

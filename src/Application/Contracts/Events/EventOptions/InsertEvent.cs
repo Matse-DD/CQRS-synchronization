@@ -3,11 +3,7 @@ using System.Text.Json;
 
 namespace Application.Contracts.Events.EventOptions;
 
-public abstract class InsertEvent : Event
+public abstract class InsertEvent(IntermediateEvent intermediateEvent) : Event(intermediateEvent)
 {
-    public Dictionary<string, object> Properties { get; init; }
-    public InsertEvent(IntermediateEvent intermediateEvent) : base(intermediateEvent)
-    {
-        Properties = intermediateEvent.Payload.Deserialize<Dictionary<string, object>>()!;
-    }
+    protected Dictionary<string, object> Properties { get; init; } = intermediateEvent.Payload.Deserialize<Dictionary<string, object>>()!;
 }

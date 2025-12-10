@@ -7,18 +7,17 @@ namespace ApplicationTests.Infrastructure.Projectors;
 public class TestProjector
 {
     [Test]
-    public void Test_Incoming_Events_Are_Being_Processed()
+    public async Task Test_Incoming_Events_Are_Being_Processed()
     {
         // Arrange
+        const int expectedEventCount = 15;
         MockCommandRepository mockCommandRepo = new MockCommandRepository([]);
-        MockQueryRepository mockQueryRepo = new MockQueryRepository();
+        SynchronizedQueryRepository syncQueryRepo = new SynchronizedQueryRepository(expectedEventCount);
         MockEventFactory mockEventFactory = new MockEventFactory();
-
-        Projector projector = new Projector(mockCommandRepo, mockQueryRepo, mockEventFactory);
-
+        Projector projector = new Projector(mockCommandRepo, syncQueryRepo, mockEventFactory);
         ICollection<string> deleteEvents = new List<string>();
 
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < expectedEventCount; i++)
         {
             deleteEvents.Add(
                $@"
@@ -38,12 +37,7 @@ public class TestProjector
                 ");
         }
 
-        ICollection<string> expectedCommands = new List<string>();
-
-        foreach (string eventItem in deleteEvents)
-        {
-            expectedCommands.Add(mockEventFactory.DetermineEvent(eventItem).GetCommand());
-        }
+        ICollection<string> expectedCommands = deleteEvents.Select(eventItem => mockEventFactory.DetermineEvent(eventItem).GetCommand()).ToList();
 
         // Act
         foreach (string eventItem in deleteEvents)
@@ -52,16 +46,20 @@ public class TestProjector
         }
 
         // Assert
-        int count = 0;
-        while (count < 500 && mockQueryRepo.History.Count == 0)
+        try
         {
-            Thread.Sleep(10);
-            count++;
+            await syncQueryRepo.WaitForCompletionAsync().WaitAsync(TimeSpan.FromSeconds(5));
         }
+        catch (TimeoutException)
+        {
+            Assert.Fail("Test gefaald door trage event projectie (timeout!!)");
+        }
+
+        Assert.That(syncQueryRepo.History, Has.Count.EqualTo(expectedCommands.Count));
 
         for (int i = 0; i < expectedCommands.Count; i++)
         {
-            Assert.That(mockQueryRepo.History.ElementAt(i), Is.EqualTo(expectedCommands.ElementAt(i)));
+            Assert.That(syncQueryRepo.History.ElementAt(i), Is.EqualTo(expectedCommands.ElementAt(i)));
         }
     }
 }

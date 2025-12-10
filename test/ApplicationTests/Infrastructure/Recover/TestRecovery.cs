@@ -1,5 +1,4 @@
-﻿using Application.Contracts.Events.EventOptions;
-using Application.Contracts.Persistence;
+﻿using Application.Contracts.Persistence;
 using ApplicationTests.Shared;
 using ApplicationTests.Shared.Events.Mappings;
 using ApplicationTests.Shared.Persistence;
@@ -71,7 +70,7 @@ public class TestRecovery
 
         // Act
         projector.Lock();
-        observer.StartListening(projector.AddEvent);
+        observer.StartListening(projector.AddEvent, CancellationToken.None);
         recovery.Recover();
 
         // Assert
@@ -82,7 +81,6 @@ public class TestRecovery
         Guid expectedFirstEventIdObserver = eventFactory.DetermineEvent(seedingObserver.ElementAt(0)).EventId;
         Assert.That(queryRepository.History.ElementAt(15), Is.EqualTo($"delete {expectedFirstEventIdObserver}"));
     }
-
 
     [Test]
     public void Recover_Should_Be_Able_To_Skip_LastSuccessEventId()

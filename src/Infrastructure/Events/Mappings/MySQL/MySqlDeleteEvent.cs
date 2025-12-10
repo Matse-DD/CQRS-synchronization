@@ -7,10 +7,10 @@ public class MySqlDeleteEvent(IntermediateEvent intermediateEvent) : DeleteEvent
 {
     public override string GetCommand()
     {
-        return
-            $"DELETE FROM {AggregateName} WHERE {MapWhereClause(Condition)}";
+        return $"DELETE FROM {AggregateName} WHERE {MapWhereClause(Condition)}";
     }
-    private string MapWhereClause(IDictionary<string, string> condition)
+
+    private static string MapWhereClause(IDictionary<string, string>? condition)
     {
         if (condition == null || !condition.Any()) return "True";
 
@@ -23,10 +23,8 @@ public class MySqlDeleteEvent(IntermediateEvent intermediateEvent) : DeleteEvent
             {
                 return $"{key}{value}";
             }
-            else
-            {
-                return $"{key} = {value}";
-            }
+
+            return $"{key} = {value}";
         }));
     }
 }
