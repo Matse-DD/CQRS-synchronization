@@ -18,8 +18,8 @@ public class MockQueryRepository : IQueryRepository
         }
     }
 
-    public Guid GetLastSuccessfulEventId()
+    public Task<Guid> GetLastSuccessfulEventId()
     {
-        return this.LastSuccessfulEventId;
+        return Task.FromResult(this.LastSuccessfulEventId);
     }
 }

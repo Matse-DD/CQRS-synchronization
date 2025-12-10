@@ -1,0 +1,76 @@
+﻿using Application.Contracts.Persistence;
+using MySql.Data.MySqlClient;
+using System.Data.Common;
+
+namespace Infrastructure.Persistence.QueryRepository;
+
+public class MySqlQueryRepository : IQueryRepository
+{
+    private readonly string _connectionString;
+
+    public MySqlQueryRepository(string connectionString)
+    {
+        _connectionString = connectionString;
+    }
+
+    public async void Execute(string command, Guid eventId)
+    {
+        using MySqlConnection connection = new MySqlConnection(_connectionString);
+
+        await connection.OpenAsync();
+
+        string commandLastEventId = $@"UPDATE last_info SET last_event_id = ""{eventId}""";
+
+        // TODO change this to logger
+        Console.WriteLine(command);
+        Console.WriteLine(commandLastEventId);
+        Console.WriteLine();
+
+        using MySqlTransaction transaction = connection.BeginTransaction();
+
+        try
+        {
+            using MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, connection, transaction);
+            using MySqlCommand cmdDataUpdate = new MySqlCommand(command, connection, transaction);
+
+            int amountChangedLasteEventId = await cmdLastEventId.ExecuteNonQueryAsync();
+            int amountChangedUpdate = await cmdDataUpdate.ExecuteNonQueryAsync();
+
+            transaction.Commit();
+        }
+        catch (DbException ex)
+        {
+            Console.WriteLine("something went wrong rolling back");
+            Console.WriteLine(ex.ToString());
+            transaction.Rollback();
+
+            throw new Exception(ex.Message);
+        }
+    }
+
+    public async Task<Guid> GetLastSuccessfulEventId()
+    {
+        string queryLastEventId = $"SELECT last_event_id FROM last_info";
+
+        using MySqlConnection connection = new MySqlConnection(_connectionString);
+        await connection.OpenAsync();
+
+        MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, connection);
+        using DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync();
+
+        if (!await result.ReadAsync())
+        {
+            Console.WriteLine("result is empty");
+            return Guid.Empty;
+        }
+
+        int columnLastEventId = result.GetOrdinal("last_event_id");
+
+        if (result.IsDBNull(columnLastEventId))
+        {
+            return Guid.Empty;
+        }
+
+        return result.GetGuid(columnLastEventId);
+    }
+}

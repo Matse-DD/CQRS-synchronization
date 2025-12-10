@@ -6,9 +6,9 @@ public class MockCommandRepository(ICollection<OutboxEvent> seededEvents) : ICom
 {
     private ICollection<OutboxEvent> _eventOutbox = seededEvents;
 
-    public ICollection<OutboxEvent> GetAllEvents()
+    public Task<ICollection<OutboxEvent>> GetAllEvents()
     {
-        return _eventOutbox;
+        return Task.FromResult(_eventOutbox);
     }
 
     public void MarkEventAsInProgress(Guid eventId)
@@ -24,8 +24,9 @@ public class MockCommandRepository(ICollection<OutboxEvent> seededEvents) : ICom
         }
     }
 
-    public void RemoveEvent(Guid eventId)
+    public Task<bool> RemoveEvent(Guid eventId)
     {
         _eventOutbox = _eventOutbox.Where(item => item.eventId != eventId.ToString()).ToList();
+        return Task.FromResult(true);
     }
 }

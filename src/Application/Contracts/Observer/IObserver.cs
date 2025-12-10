@@ -2,5 +2,6 @@
 
 public interface IObserver
 {
-    Task StartListening(Action<string> callback);
+    void StartListening(Action<string> callback);
+    void StopListening();
 }
