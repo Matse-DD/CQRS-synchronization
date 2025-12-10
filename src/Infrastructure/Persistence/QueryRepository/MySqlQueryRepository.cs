@@ -12,39 +12,31 @@ public class MySqlQueryRepository : IQueryRepository
     {
         _connectionString = connectionString;
     }
-
-    public async void Execute(string command, Guid eventId)
+    
+    public async Task Execute(string command, Guid eventId)
     {
         using MySqlConnection connection = new MySqlConnection(_connectionString);
-
         await connection.OpenAsync();
 
         string commandLastEventId = $@"UPDATE last_info SET last_event_id = ""{eventId}""";
-
-        // TODO change this to logger
-        Console.WriteLine(command);
-        Console.WriteLine(commandLastEventId);
-        Console.WriteLine();
-
-        using MySqlTransaction transaction = connection.BeginTransaction();
+        
+        using MySqlTransaction transaction = await connection.BeginTransactionAsync();
 
         try
         {
             using MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, connection, transaction);
             using MySqlCommand cmdDataUpdate = new MySqlCommand(command, connection, transaction);
+            
+            await cmdLastEventId.ExecuteNonQueryAsync();
+            await cmdDataUpdate.ExecuteNonQueryAsync();
 
-            int amountChangedLasteEventId = await cmdLastEventId.ExecuteNonQueryAsync();
-            int amountChangedUpdate = await cmdDataUpdate.ExecuteNonQueryAsync();
-
-            transaction.Commit();
+            await transaction.CommitAsync();
         }
-        catch (DbException ex)
+        catch (DbException e)
         {
-            Console.WriteLine("something went wrong rolling back");
-            Console.WriteLine(ex.ToString());
-            transaction.Rollback();
-
-            throw new Exception(ex.Message);
+            Console.WriteLine(e.Message);
+            await transaction.RollbackAsync();
+            throw;
         }
     }
 
@@ -58,19 +50,11 @@ public class MySqlQueryRepository : IQueryRepository
         MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, connection);
         using DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync();
 
-        if (!await result.ReadAsync())
-        {
-            Console.WriteLine("result is empty");
-            return Guid.Empty;
-        }
+        if (!await result.ReadAsync()) return Guid.Empty;
 
         int columnLastEventId = result.GetOrdinal("last_event_id");
-
-        if (result.IsDBNull(columnLastEventId))
-        {
-            return Guid.Empty;
-        }
-
+        if (result.IsDBNull(columnLastEventId)) return Guid.Empty;
+        
         return result.GetGuid(columnLastEventId);
     }
 }
