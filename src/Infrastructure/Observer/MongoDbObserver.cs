@@ -10,6 +10,7 @@ public class MongoDbObserver : IObserver
     private readonly MongoClient _client;
     private readonly IMongoDatabase _database;
     private readonly IMongoCollection<BsonDocument> _collection;
+    private IChangeStreamCursor<ChangeStreamDocument<BsonDocument>> _cursor;
 
     public MongoDbObserver(string connectionString)
     {
@@ -28,11 +29,16 @@ public class MongoDbObserver : IObserver
             FullDocument = ChangeStreamFullDocumentOption.UpdateLookup
         };
 
-        using IChangeStreamCursor<ChangeStreamDocument<BsonDocument>> cursor = _collection.Watch(pipeline, options);
+        _cursor = _collection.Watch(pipeline, options);
 
-        foreach (ChangeStreamDocument<BsonDocument>? change in cursor.ToEnumerable())
+        foreach (ChangeStreamDocument<BsonDocument>? change in _cursor.ToEnumerable())
         {
             callback(change.FullDocument.ToJson());
         }
+    }
+
+    public async void StopListening()
+    {
+        _cursor.Dispose();
     }
 }

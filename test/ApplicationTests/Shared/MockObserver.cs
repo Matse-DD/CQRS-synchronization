@@ -11,4 +11,9 @@ public class MockObserver(IEnumerable<string>? events) : IObserver
     {
         _events.ForEach(callback);
     }
+
+    public void StopListening()
+    {
+
+    }
 }

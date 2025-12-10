@@ -3,4 +3,5 @@
 public interface IObserver
 {
     void StartListening(Action<string> callback);
+    void StopListening();
 }
