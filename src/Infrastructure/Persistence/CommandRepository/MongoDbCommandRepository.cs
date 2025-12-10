@@ -32,7 +32,7 @@ public class MongoDbCommandRepository : ICommandRepository
     public async Task<bool> RemoveEvent(Guid eventId)
     {
         FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Eq(
-            d => d.GetValue("event_id"), BsonDocument.Parse(eventId.ToString())
+            "event_id", eventId.ToString()
         );
 
         DeleteResult result = await _collection.DeleteOneAsync(filter);
