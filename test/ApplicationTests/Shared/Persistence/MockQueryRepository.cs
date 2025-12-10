@@ -21,6 +21,6 @@ public class MockQueryRepository : IQueryRepository
 
     public Task<Guid> GetLastSuccessfulEventId()
     {
-        return Task.FromResult(this.LastSuccessfulEventId);
+        return Task.FromResult(LastSuccessfulEventId);
     }
 }
