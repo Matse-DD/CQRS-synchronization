@@ -53,8 +53,8 @@ public class TestEventEquality
     {
         // Arrange
         string id = Guid.NewGuid().ToString();
-        string payload = "{}";
-        
+        const string payload = "{}";
+
         OutboxEvent ev1 = new OutboxEvent(id, payload);
         OutboxEvent ev2 = new OutboxEvent(id, payload);
         OutboxEvent ev3 = new OutboxEvent("different", payload);
