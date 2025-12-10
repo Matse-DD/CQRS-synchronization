@@ -10,7 +10,7 @@ public class MySqlDeleteEvent(IntermediateEvent intermediateEvent) : DeleteEvent
         return
             $"DELETE FROM {AggregateName} WHERE {MapWhereClause(Condition)}";
     }
-    
+
     private static string MapWhereClause(IDictionary<string, string>? condition)
     {
         if (condition == null || !condition.Any()) return "True";
