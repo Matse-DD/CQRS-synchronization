@@ -12,8 +12,10 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         StartRecovering();
     }
 
-    private async void StartRecovering() {
-        try {
+    private async void StartRecovering()
+    {
+        try
+        {
             IEnumerable<OutboxEvent> outboxEvents = await commandRepository.GetAllEvents();
 
             Guid lastSuccessfulEventId = await queryRepository.GetLastSuccessfulEventId();
@@ -32,7 +34,8 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
 
             projector.Unlock();
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             Console.WriteLine($"error in recovery: ${e.Message}");
         }
     }
