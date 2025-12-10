@@ -17,7 +17,6 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         try
         {
             IEnumerable<OutboxEvent> outboxEvents = await commandRepository.GetAllEvents();
-
             Guid lastSuccessfulEventId = await queryRepository.GetLastSuccessfulEventId();
 
             if (lastSuccessfulEventId != Guid.Empty)
@@ -29,9 +28,7 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
             // mogelijks ook kijken of event done zie mock query repo voor ideen
 
             outboxEvents.ToList().ForEach(entry => pureEvents.Add(entry.eventItem));
-
             projector.AddEventsToFront(pureEvents);
-
             projector.Unlock();
         }
         catch (Exception e)

@@ -4,18 +4,10 @@ using System.Data.Common;
 
 namespace Infrastructure.Persistence.QueryRepository;
 
-public class MySqlQueryRepository : IQueryRepository
-{
-    private readonly string _connectionString;
-
-    public MySqlQueryRepository(string connectionString)
-    {
-        _connectionString = connectionString;
-    }
-
+public class MySqlQueryRepository(string connectionString) : IQueryRepository {
     public async Task Execute(string command, Guid eventId)
     {
-        using MySqlConnection connection = new MySqlConnection(_connectionString);
+        using MySqlConnection connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
         string commandLastEventId = $@"UPDATE last_info SET last_event_id = ""{eventId}""";
@@ -48,9 +40,9 @@ public class MySqlQueryRepository : IQueryRepository
 
     public async Task<Guid> GetLastSuccessfulEventId()
     {
-        const string queryLastEventId = $"SELECT last_event_id FROM last_info";
+        const string queryLastEventId = "SELECT last_event_id FROM last_info";
 
-        using MySqlConnection connection = new MySqlConnection(_connectionString);
+        using MySqlConnection connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
         MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, connection);
