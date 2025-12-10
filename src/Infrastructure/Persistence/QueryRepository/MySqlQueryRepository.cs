@@ -43,7 +43,10 @@ public class MySqlQueryRepository : IQueryRepository
         MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, _connection);
         DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync();
 
-        await result.ReadAsync();
+        if (!await result.ReadAsync())
+        {
+            return Guid.Empty;
+        }
 
         return result.GetGuid(result.GetOrdinal("last_event_id"));
     }

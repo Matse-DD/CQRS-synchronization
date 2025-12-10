@@ -15,10 +15,15 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
     private async void StartRecovering()
     {
         IEnumerable<OutboxEvent> outboxEvents = await commandRepository.GetAllEvents();
+
         Guid lastSuccessfulEventId = await queryRepository.GetLastSuccessfulEventId();
+        
+        if(lastSuccessfulEventId != Guid.Empty)
+        {
+            outboxEvents = outboxEvents.ToList().Where(entry => !entry.eventId.Equals(lastSuccessfulEventId.ToString()));
+        }
 
         IList<string> pureEvents = [];
-        outboxEvents = outboxEvents.ToList().Where(entry => !entry.eventId.Equals(lastSuccessfulEventId.ToString()));
         // mogelijks ook kijken of event done zie mock query repo voor ideen
 
         outboxEvents.ToList().ForEach(entry => pureEvents.Add(entry.eventItem));
