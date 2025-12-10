@@ -31,10 +31,10 @@ public class TestMySqlQueryRepository
     public async Task SetUp()
     {
         _repository = new MySqlQueryRepository(ConnectionStringQueryRepoMySql);
-        
+
         await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
         await connection.OpenAsync();
-        
+
         await using MySqlCommand cmd = new MySqlCommand("UPDATE last_info SET last_event_id = NULL WHERE id = 1; TRUNCATE TABLE TestTable;", connection);
         await cmd.ExecuteNonQueryAsync();
     }
@@ -66,7 +66,7 @@ public class TestMySqlQueryRepository
         await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
         await connection.OpenAsync();
         await using MySqlCommand verifyCmd = new MySqlCommand("SELECT count(*) FROM TestTable WHERE name = 'IntegrationTest'", connection);
-        long count = (long) (await verifyCmd.ExecuteScalarAsync())!;
+        long count = (long)(await verifyCmd.ExecuteScalarAsync())!;
         Assert.That(count, Is.EqualTo(1));
     }
 

@@ -46,7 +46,7 @@ public class TestMongoDbCommandRepository
                 ""payload"": {{ ""index"": {i} }}
             }}"));
         }
-        
+
         await _collection.InsertManyAsync(events);
 
         // Act
@@ -54,16 +54,16 @@ public class TestMongoDbCommandRepository
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(3));
-        Assert.That(result.First().eventItem, Does.Contain("\"index\" : 0")); 
+        Assert.That(result.First().eventItem, Does.Contain("\"index\" : 0"));
     }
-    
+
     [Test]
     public async Task GetAllEvents_Should_Return_Events_Sorted_By_OccuredAt_When_Inserted_Sequentially()
     {
         // Arrange
         DateTime baseTime = DateTime.UtcNow;
         List<BsonDocument> events = new List<BsonDocument>();
-        
+
         for (int i = 0; i < 3; i++)
         {
             DateTime time = baseTime.AddSeconds(i);
@@ -77,7 +77,7 @@ public class TestMongoDbCommandRepository
                 ""payload"": {{ ""sequence"": {i} }}
             }}"));
         }
-        
+
         await _collection.InsertManyAsync(events);
 
         // Act
@@ -85,13 +85,13 @@ public class TestMongoDbCommandRepository
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(3));
-        
-        List<DateTime> loadedDates = result.Select(e => 
+
+        List<DateTime> loadedDates = result.Select(e =>
         {
             BsonDocument? doc = BsonDocument.Parse(e.eventItem);
             return DateTime.Parse(doc["occured_at"].AsString);
         }).ToList();
-        
+
         Assert.That(loadedDates, Is.Ordered.Ascending);
     }
 
@@ -109,7 +109,7 @@ public class TestMongoDbCommandRepository
                 ""event_type"": ""INSERT"",
                 ""payload"": {{}}
             }}");
-        
+
         await _collection.InsertOneAsync(doc);
 
         // Act
