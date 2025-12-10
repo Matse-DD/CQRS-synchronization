@@ -43,6 +43,7 @@ public class Projector
         try 
         {
             Event convertedEvent = _eventFactory.DetermineEvent(eventToProject);
+            
             string commandForEvent = convertedEvent.GetCommand();
             Guid eventId = convertedEvent.EventId;
             
@@ -51,7 +52,7 @@ public class Projector
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error projecting event: {ex.Message}");
+            Console.WriteLine($"error met de projector: {ex.Message}");
         }
     }
 

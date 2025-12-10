@@ -19,6 +19,11 @@ public class MySqlQueryRepository : IQueryRepository
         await connection.OpenAsync();
 
         string commandLastEventId = $@"UPDATE last_info SET last_event_id = ""{eventId}""";
+
+        // TODO change this to logger
+        Console.WriteLine(command);
+        Console.WriteLine(commandLastEventId);
+        Console.WriteLine();
         
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
 
@@ -32,9 +37,10 @@ public class MySqlQueryRepository : IQueryRepository
 
             await transaction.CommitAsync();
         }
-        catch (DbException e)
+        catch (DbException ex)
         {
-            Console.WriteLine(e.Message);
+            Console.WriteLine("something went wrong rolling back");
+            Console.WriteLine(ex.ToString());
             await transaction.RollbackAsync();
             throw;
         }
@@ -49,8 +55,12 @@ public class MySqlQueryRepository : IQueryRepository
 
         MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, connection);
         using DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync();
-
-        if (!await result.ReadAsync()) return Guid.Empty;
+        
+        if (!await result.ReadAsync())
+        {
+            Console.WriteLine("result is empty");
+            return Guid.Empty;
+        }
 
         int columnLastEventId = result.GetOrdinal("last_event_id");
         if (result.IsDBNull(columnLastEventId)) return Guid.Empty;

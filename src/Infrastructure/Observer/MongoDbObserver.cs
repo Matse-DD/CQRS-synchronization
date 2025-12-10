@@ -20,7 +20,7 @@ public class MongoDbObserver : IObserver
         PipelineDefinition<ChangeStreamDocument<BsonDocument>, ChangeStreamDocument<BsonDocument>>? pipeline = new EmptyPipelineDefinition<ChangeStreamDocument<BsonDocument>>()
             .Match("{operationType: { $in: ['insert'] }}");
 
-        ChangeStreamOptions options = new();
+        ChangeStreamOptions options = new ChangeStreamOptions();
         options.FullDocument = ChangeStreamFullDocumentOption.UpdateLookup;
         using IChangeStreamCursor<ChangeStreamDocument<BsonDocument>>? cursor = await _collection.WatchAsync(pipeline, options, cancellationToken);
 
