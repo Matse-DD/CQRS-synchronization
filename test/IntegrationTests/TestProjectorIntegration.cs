@@ -24,12 +24,7 @@ public class TestProjectorIntegration
         await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringToStartRepoMySql);
         await connectionMySql.OpenAsync();
 
-        string queryToStart = 
-            "CREATE DATABASE IF NOT EXISTS cqrs_read; " +
-            "USE cqrs_read; " +
-            "CREATE TABLE IF NOT EXISTS Products (product_id CHAR(36) PRIMARY KEY, name VARCHAR(255) NOT NULL, sku VARCHAR(100) NOT NULL, price DECIMAL(10,2) NOT NULL, stock_level INT NOT NULL, is_active BOOLEAN NOT NULL);" +
-            "CREATE TABLE IF NOT EXISTS last_info (id INT AUTO_INCREMENT PRIMARY KEY, last_event_id CHAR(36));" +
-            "INSERT IGNORE INTO last_info (id, last_event_id) VALUES (1, NULL);"; // Insert IGNORE to prevent duplicates on rerun
+        string queryToStart = "CREATE DATABASE IF NOT EXISTS cqrs_read; USE cqrs_read; CREATE TABLE IF NOT EXISTS Products (product_id CHAR(36) PRIMARY KEY, name VARCHAR(255) NOT NULL, sku VARCHAR(100) NOT NULL, price DECIMAL(10,2) NOT NULL, stock_level INT NOT NULL, is_active BOOLEAN NOT NULL);CREATE TABLE IF NOT EXISTS last_info (id INT AUTO_INCREMENT PRIMARY KEY, last_event_id CHAR(36));INSERT IGNORE INTO last_info (id, last_event_id) VALUES (1, NULL);";
 
         await using MySqlCommand cmdGetLastEventId = new MySqlCommand(queryToStart, connectionMySql);
         await cmdGetLastEventId.ExecuteNonQueryAsync();
