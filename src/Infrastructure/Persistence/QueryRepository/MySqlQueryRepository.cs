@@ -14,6 +14,7 @@ public class MySqlQueryRepository : IQueryRepository
     public MySqlQueryRepository(string connectionString)
     {
         _connection = new MySqlConnection(connectionString);
+        _connection.Open();
     }
 
     public async void Execute(string command, Guid eventId)
@@ -44,6 +45,8 @@ public class MySqlQueryRepository : IQueryRepository
 
         MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, _connection);
         DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync();
+
+        await result.ReadAsync();
 
         return result.GetGuid(result.GetOrdinal("last_event_id"));
     }
