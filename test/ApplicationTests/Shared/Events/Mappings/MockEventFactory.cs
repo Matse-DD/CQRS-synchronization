@@ -14,9 +14,9 @@ public class MockEventFactory() : IEventFactory
 
         return intermediateEvent?.EventType switch
         {
-            EventType.INSERT => new MockInsertEvent(intermediateEvent),
-            EventType.DELETE => new MockDeleteEvent(intermediateEvent),
-            EventType.UPDATE => new MockUpdateEvent(intermediateEvent),
+            EventType.Insert => new MockInsertEvent(intermediateEvent),
+            EventType.Delete => new MockDeleteEvent(intermediateEvent),
+            EventType.Update => new MockUpdateEvent(intermediateEvent),
             _ => throw new ArgumentOutOfRangeException()
         };
     }
