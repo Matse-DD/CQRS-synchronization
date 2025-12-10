@@ -62,14 +62,17 @@ public class MySqlQueryRepository : IQueryRepository
 
         if (!await result.ReadAsync())
         {
+            Console.WriteLine("result is empty");
             return Guid.Empty;
         }
 
-        int lastEventId = result.GetOrdinal("last_event_id");
-        if (lastEventId == 0)
+        int columnLastEventId = result.GetOrdinal("last_event_id");
+
+        if (result.IsDBNull(columnLastEventId))
         {
             return Guid.Empty;
         }
-        return result.GetGuid(lastEventId);
+        
+        return result.GetGuid(columnLastEventId);
     }
 }
