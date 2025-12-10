@@ -88,7 +88,7 @@ public class ProjectorIntegration
                 ");
         }
 
-        foreach(string eventItem in events)
+        foreach (string eventItem in events)
         {
             collection.InsertOne(BsonDocument.Parse(eventItem));
         }

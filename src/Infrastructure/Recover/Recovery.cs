@@ -17,8 +17,8 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         IEnumerable<OutboxEvent> outboxEvents = await commandRepository.GetAllEvents();
 
         Guid lastSuccessfulEventId = await queryRepository.GetLastSuccessfulEventId();
-        
-        if(lastSuccessfulEventId != Guid.Empty)
+
+        if (lastSuccessfulEventId != Guid.Empty)
         {
             outboxEvents = outboxEvents.ToList().Where(entry => !entry.eventId.Equals(lastSuccessfulEventId.ToString()));
         }

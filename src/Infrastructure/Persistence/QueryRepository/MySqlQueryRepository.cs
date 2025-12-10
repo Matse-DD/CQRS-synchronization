@@ -16,23 +16,23 @@ public class MySqlQueryRepository : IQueryRepository
     public async void Execute(string command, Guid eventId)
     {
         using MySqlConnection connection = new MySqlConnection(_connectionString);
-        
+
         await connection.OpenAsync();
 
         string commandLastEventId = $@"UPDATE last_info SET last_event_id = ""{eventId}""";
-        
+
         // TODO change this to logger
         Console.WriteLine(command);
         Console.WriteLine(commandLastEventId);
         Console.WriteLine();
-        
+
         using MySqlTransaction transaction = connection.BeginTransaction();
 
         try
         {
             using MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, connection, transaction);
             using MySqlCommand cmdDataUpdate = new MySqlCommand(command, connection, transaction);
-            
+
             int amountChangedLasteEventId = await cmdLastEventId.ExecuteNonQueryAsync();
             int amountChangedUpdate = await cmdDataUpdate.ExecuteNonQueryAsync();
 
@@ -70,7 +70,7 @@ public class MySqlQueryRepository : IQueryRepository
         {
             return Guid.Empty;
         }
-        
+
         return result.GetGuid(columnLastEventId);
     }
 }
