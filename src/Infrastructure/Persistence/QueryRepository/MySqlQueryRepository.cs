@@ -4,7 +4,8 @@ using System.Data.Common;
 
 namespace Infrastructure.Persistence.QueryRepository;
 
-public class MySqlQueryRepository(string connectionString) : IQueryRepository {
+public class MySqlQueryRepository(string connectionString) : IQueryRepository
+{
     public async Task Execute(string command, Guid eventId)
     {
         using MySqlConnection connection = new MySqlConnection(connectionString);
