@@ -20,20 +20,18 @@ public class MySqlQueryRepository : IQueryRepository
         await connection.OpenAsync();
 
         string commandLastEventId = $@"UPDATE last_info SET last_event_id = ""{eventId}""";
+        
+        // TODO change this to logger
+        Console.WriteLine(command);
         Console.WriteLine(commandLastEventId);
-
-        //MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, _connection);
-        //MySqlCommand cmdDataUpdate = new MySqlCommand(command, _connection);
-
+        Console.WriteLine();
+        
         using MySqlTransaction transaction = connection.BeginTransaction();
 
         try
         {
-            // 2. Initialize Commands and associate them with the Connection and Transaction
             using MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, connection, transaction);
             using MySqlCommand cmdDataUpdate = new MySqlCommand(command, connection, transaction);
-
-            Console.WriteLine("begin update");
             
             int amountChangedLasteEventId = await cmdLastEventId.ExecuteNonQueryAsync();
             int amountChangedUpdate = await cmdDataUpdate.ExecuteNonQueryAsync();
@@ -42,7 +40,7 @@ public class MySqlQueryRepository : IQueryRepository
         }
         catch (DbException ex)
         {
-            Console.WriteLine("something went back rolling back");
+            Console.WriteLine("something went wrong rolling back");
             Console.WriteLine(ex.ToString());
             transaction.Rollback();
 
