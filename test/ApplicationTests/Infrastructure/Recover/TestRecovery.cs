@@ -63,12 +63,13 @@ public class TestRecovery
         MockQueryRepository queryRepository = new MockQueryRepository();
         MockEventFactory eventFactory = new MockEventFactory();
         Projector projector = new Projector(commandRepository, queryRepository, eventFactory);
+
         Recovery recovery = new Recovery(commandRepository, queryRepository, projector);
+
         MockObserver observer = new MockObserver(seedingObserver);
 
         // Act
         projector.Lock();
-        
         observer.StartListening(projector.AddEvent, CancellationToken.None);
         recovery.Recover();
 
@@ -80,9 +81,7 @@ public class TestRecovery
         Guid expectedFirstEventIdObserver = eventFactory.DetermineEvent(seedingObserver.ElementAt(0)).EventId;
         Assert.That(queryRepository.History.ElementAt(15), Is.EqualTo($"delete {expectedFirstEventIdObserver}"));
     }
-
-
-
+    
     [Test]
     public void Recover_Should_Be_Able_To_Skip_LastSuccessEventId()
     {
