@@ -3,7 +3,8 @@ using Application.Contracts.Persistence;
 namespace ApplicationTests.Shared.Persistence;
 
 // Ok dit is ook redelijk hacky maar het is beter dan Thread.Sleep()
-public class SynchronizedQueryRepository(int expectedCount) : IQueryRepository {
+public class SynchronizedQueryRepository(int expectedCount) : IQueryRepository
+{
     private readonly List<string> _history = new();
     private readonly TaskCompletionSource _completionSource = new();
 
@@ -14,7 +15,7 @@ public class SynchronizedQueryRepository(int expectedCount) : IQueryRepository {
         lock (_history)
         {
             _history.Add(command);
-            
+
             if (_history.Count >= expectedCount)
             {
                 _completionSource.TrySetResult();
@@ -27,7 +28,7 @@ public class SynchronizedQueryRepository(int expectedCount) : IQueryRepository {
     {
         return Task.FromResult(Guid.Empty);
     }
-    
+
     public Task WaitForCompletionAsync()
     {
         return _completionSource.Task;

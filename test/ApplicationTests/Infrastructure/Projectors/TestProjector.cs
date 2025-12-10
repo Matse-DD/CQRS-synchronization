@@ -46,7 +46,7 @@ public class TestProjector
         }
 
         // Assert
-        try 
+        try
         {
             await syncQueryRepo.WaitForCompletionAsync().WaitAsync(TimeSpan.FromSeconds(5));
         }
@@ -54,7 +54,7 @@ public class TestProjector
         {
             Assert.Fail("Test gefaald door trage event projectie (timeout!!)");
         }
-        
+
         Assert.That(syncQueryRepo.History, Has.Count.EqualTo(expectedCommands.Count));
 
         for (int i = 0; i < expectedCommands.Count; i++)
