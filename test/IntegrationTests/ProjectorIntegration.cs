@@ -24,10 +24,12 @@ public class ProjectorIntegration
         MySqlConnection connectionMySql = new MySqlConnection(_connectionStringToStartRepoMySql);
         connectionMySql.Open();
 
-        string queryToStart = "CREATE DATABASE IF NOT EXISTS cqrs_read; USE cqrs_read; CREATE TABLE IF NOT EXISTS products (product_id CHAR(36) PRIMARY KEY, name VARCHAR(255) NOT NULL,sku VARCHAR(100) NOT NULL,price DECIMAL(10,2) NOT NULL,stock_level INT NOT NULL, is_active BOOLEAN NOT NULL);CREATE TABLE IF NOT EXISTS last_info (id INT AUTO_INCREMENT PRIMARY KEY, last_event_id CHAR(36) NOT NULL);INSERT INTO last_info (last_event_id) VALUES (UUID());";
+        string queryToStart = "CREATE DATABASE IF NOT EXISTS cqrs_read; USE cqrs_read; CREATE TABLE IF NOT EXISTS Products (product_id CHAR(36) PRIMARY KEY, name VARCHAR(255) NOT NULL,sku VARCHAR(100) NOT NULL,price DECIMAL(10,2) NOT NULL,stock_level INT NOT NULL, is_active BOOLEAN NOT NULL);CREATE TABLE IF NOT EXISTS last_info (id INT AUTO_INCREMENT PRIMARY KEY, last_event_id CHAR(36) NOT NULL);INSERT INTO last_info (last_event_id) VALUES (00000000-0000-0000-0000-000000000000);";
 
         MySqlCommand cmdGetLastEventId = new MySqlCommand(queryToStart, connectionMySql);
         await cmdGetLastEventId.ExecuteReaderAsync();
+
+        connectionMySql.Close();
     }
 
     [Test]
@@ -47,17 +49,19 @@ public class ProjectorIntegration
         // start listing for changes
         MongoDbObserver observer = new MongoDbObserver(_connectionStringCommandRepoMongo);
 
-        _ = Task.Run(async () =>
-        {
-            observer.StartListening(projector.ProjectEvent);
-            Recovery recover = new Recovery(commandRepo, queryRepo, projector);
-            await Task.Delay(5000);
-        });
-        observer.StopListening();
+        //observer.StartListening(projector.ProjectEvent);
+        Recovery recover = new Recovery(commandRepo, queryRepo, projector);
+
+        recover.Recover();
+
+        Thread.Sleep(5000);
+
+        //observer.StopListening();
 
         // Assert
         Task<Guid> eventId = queryRepo.GetLastSuccessfulEventId();
 
+        Console.WriteLine(eventId.Result);
         Assert.That(eventsAdded.Last().Contains((eventId.Result).ToString()), Is.EqualTo(true));
     }
 
@@ -77,7 +81,7 @@ public class ProjectorIntegration
                     {{
                       ""event_id"": ""{Guid.NewGuid().ToString()}"",
                       ""occured_at"": ""2025-11-29T17:15:00Z"",
-                      ""aggregate_name"": ""Product"",
+                      ""aggregate_name"": ""Products"",
                       ""status"": ""PENDING"",
                       ""event_type"": ""INSERT"",
                       ""payload"": {{
@@ -94,6 +98,7 @@ public class ProjectorIntegration
 
         foreach(string eventItem in events)
         {
+            Console.WriteLine(eventItem);
             collection.InsertOne(BsonDocument.Parse(eventItem));
         }
 
