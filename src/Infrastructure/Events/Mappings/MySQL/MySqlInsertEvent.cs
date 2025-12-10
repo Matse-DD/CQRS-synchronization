@@ -18,26 +18,14 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
         return string.Join(", ", keys);
     }
 
-    private string MapValuesClause(IEnumerable<object> incomingValues)
+    private static string MapValuesClause(IEnumerable<object> incomingValues)
     {
-        IEnumerable<string> convertedValues = incomingValues.Select(value => ConvertValue(value));
+        IEnumerable<string> convertedValues = incomingValues.Select(ConvertValue);
         return string.Join(", ", convertedValues);
-    }
 
-    private string ConvertValue(object incomingValue)
-    {
-        if (incomingValue is JsonElement value)
-        {
-            if (value.ValueKind == JsonValueKind.String)
-            {
-                return $"\"{value}\"";
-            }
-            else
-            {
-                return value.ToString();
-            }
+        static string ConvertValue(object incomingValue) {
+            if (incomingValue is not JsonElement value) return "NULL";
+            return value.ValueKind == JsonValueKind.String ? $"\"{value}\"" : value.ToString();
         }
-
-        return "NULL";
     }
 }

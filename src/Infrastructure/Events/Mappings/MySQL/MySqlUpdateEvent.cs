@@ -12,15 +12,12 @@ public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent
                $"WHERE {MapWhereClause(Condition)}";
     }
 
-    private string MapSetClause(IDictionary<string, string> change)
+    private static string MapSetClause(IDictionary<string, string> change)
     {
-        return string.Join(", ", change.Select(changePair =>
-        {
-            return $"{changePair.Key} = {changePair.Value}";
-        }));
+        return string.Join(", ", change.Select(changePair => $"{changePair.Key} = {changePair.Value}"));
     }
 
-    private string MapWhereClause(IDictionary<string, string> condition)
+    private static string MapWhereClause(IDictionary<string, string>? condition)
     {
         if (condition == null || !condition.Any()) return "True";
 
@@ -33,10 +30,8 @@ public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent
             {
                 return $"{key}{value}";
             }
-            else
-            {
-                return $"{key} = {value}";
-            }
+
+            return $"{key} = {value}";
         }));
     }
 }

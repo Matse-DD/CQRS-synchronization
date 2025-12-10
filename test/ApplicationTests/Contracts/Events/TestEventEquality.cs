@@ -40,9 +40,9 @@ public class TestEventEquality
         // Arrange
         MockInsertEvent event1 = new MockInsertEvent(CreateIntermediate(Guid.NewGuid()));
 
+        // Assert
         using (Assert.EnterMultipleScope())
         {
-            // Assert
             Assert.That(event1, Is.Not.Null);
             Assert.That(event1, Is.Not.EqualTo(new object()));
         }
