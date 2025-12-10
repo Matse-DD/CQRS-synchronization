@@ -13,7 +13,7 @@ public class MongoDbCommandRepository : ICommandRepository
     public MongoDbCommandRepository(string connectionString)
     {
         _client = new MongoClient(connectionString);
-        _database = _client.GetDatabase("users");
+        _database = _client.GetDatabase("users");  //cqrs_command
         _collection = _database.GetCollection<BsonDocument>("events")!;
     }
 

@@ -13,6 +13,7 @@ const string connectionStringCommandRepoMongo = "mongodb://localhost:27017/?conn
 
 ICommandRepository commandRepository = new MongoDbCommandRepository(connectionStringCommandRepoMongo);
 IQueryRepository queryRepository = new MySqlQueryRepository(connectionStringQueryRepoMySql);
+
 IEventFactory eventFactory = new MySqlEventFactory();
 
 Projector projector = new Projector(commandRepository, queryRepository, eventFactory);
