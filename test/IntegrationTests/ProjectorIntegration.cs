@@ -16,7 +16,7 @@ public class ProjectorIntegration
 {
     private readonly string _connectionStringToStartRepoMySql = "Server=localhost;Port=13306;User=root;Password=;";
     private readonly string _connectionStringQueryRepoMySql = "Server=localhost;Port=13306;Database=cqrs_read;User=root;Password=;";
-    private readonly string _connectionStringCommandRepoMongo = "mongodb://localhost:27017"; //?replicaSet=rs0
+    private readonly string _connectionStringCommandRepoMongo = "mongodb://localhost:27017/?connect=direct&replicaSet=rs0";
 
     [OneTimeSetUp]
     public async Task Set_DatabasesUp()
@@ -24,7 +24,7 @@ public class ProjectorIntegration
         MySqlConnection connectionMySql = new MySqlConnection(_connectionStringToStartRepoMySql);
         connectionMySql.Open();
 
-        string queryToStart = "CREATE DATABASE IF NOT EXISTS cqrs_command; USE cqrs_command; CREATE TABLE IF NOT EXISTS products (product_id CHAR(36) PRIMARY KEY, name VARCHAR(255) NOT NULL,sku VARCHAR(100) NOT NULL,price DECIMAL(10,2) NOT NULL,stock_level INT NOT NULL, is_active BOOLEAN NOT NULL);CREATE TABLE IF NOT EXISTS last_info (id INT AUTO_INCREMENT PRIMARY KEY, last_event_id CHAR(36) NOT NULL);-- Insert initial last_event_id with a new GUID\r\nINSERT INTO last_info (last_event_id) VALUES (UUID());";
+        string queryToStart = "CREATE DATABASE IF NOT EXISTS cqrs_read; USE cqrs_read; CREATE TABLE IF NOT EXISTS products (product_id CHAR(36) PRIMARY KEY, name VARCHAR(255) NOT NULL,sku VARCHAR(100) NOT NULL,price DECIMAL(10,2) NOT NULL,stock_level INT NOT NULL, is_active BOOLEAN NOT NULL);CREATE TABLE IF NOT EXISTS last_info (id INT AUTO_INCREMENT PRIMARY KEY, last_event_id CHAR(36) NOT NULL);INSERT INTO last_info (last_event_id) VALUES (UUID());";
 
         MySqlCommand cmdGetLastEventId = new MySqlCommand(queryToStart, connectionMySql);
         await cmdGetLastEventId.ExecuteReaderAsync();
@@ -46,8 +46,14 @@ public class ProjectorIntegration
 
         // start listing for changes
         MongoDbObserver observer = new MongoDbObserver(_connectionStringCommandRepoMongo);
-        observer.StartListening(projector.ProjectEvent);
-        Recovery recover = new Recovery(commandRepo, queryRepo, projector);
+
+        _ = Task.Run(async () =>
+        {
+            observer.StartListening(projector.ProjectEvent);
+            Recovery recover = new Recovery(commandRepo, queryRepo, projector);
+            await Task.Delay(5000);
+        });
+        observer.StopListening();
 
         // Assert
         Task<Guid> eventId = queryRepo.GetLastSuccessfulEventId();
@@ -59,6 +65,7 @@ public class ProjectorIntegration
     private ICollection<string> AddEventToOutbox()
     {
         ICollection<string> events = new List<string>();
+
         MongoClient client = new MongoClient(_connectionStringCommandRepoMongo);
         IMongoDatabase database = client.GetDatabase("users"); //cqrs_command
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events")!;
