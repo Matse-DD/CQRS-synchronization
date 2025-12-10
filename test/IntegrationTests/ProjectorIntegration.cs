@@ -46,17 +46,10 @@ public class ProjectorIntegration
         // Act
         ICollection<string> eventsAdded = AddEventToOutbox();
 
-        // start listing for changes
-        MongoDbObserver observer = new MongoDbObserver(_connectionStringCommandRepoMongo);
-
-        //observer.StartListening(projector.ProjectEvent);
         Recovery recover = new Recovery(commandRepo, queryRepo, projector);
-
         recover.Recover();
 
         Thread.Sleep(5000);
-
-        //observer.StopListening();
 
         // Assert
         Task<Guid> eventId = queryRepo.GetLastSuccessfulEventId();
