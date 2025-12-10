@@ -13,7 +13,7 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
             $"VALUES ({MapValuesClause(Properties.Values)})";
     }
 
-    private string MapColumns(IEnumerable<string> keys)
+    private static string MapColumns(IEnumerable<string> keys)
     {
         return string.Join(", ", keys);
     }
