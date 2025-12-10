@@ -10,9 +10,9 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MySql.Data.MySqlClient;
 
-namespace IntegrationTests;
+namespace IntegrationTests.Projectors;
 
-public class TestProjectorIntegration
+public class TestProjector
 {
     private const string ConnectionStringToStartRepoMySql = "Server=localhost;Port=13306;User=root;Password=;";
     private const string ConnectionStringQueryRepoMySql = "Server=localhost;Port=13306;Database=cqrs_read;User=root;Password=;";
