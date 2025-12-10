@@ -40,13 +40,13 @@ public class Projector
 
     private async Task ProjectEvent(string eventToProject)
     {
-        try 
+        try
         {
             Event convertedEvent = _eventFactory.DetermineEvent(eventToProject);
-            
+
             string commandForEvent = convertedEvent.GetCommand();
             Guid eventId = convertedEvent.EventId;
-            
+
             await _queryRepository.Execute(commandForEvent, eventId);
             await _commandRepository.RemoveEvent(eventId);
         }

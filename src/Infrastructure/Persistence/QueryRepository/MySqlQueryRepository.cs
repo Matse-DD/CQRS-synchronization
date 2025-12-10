@@ -12,7 +12,7 @@ public class MySqlQueryRepository : IQueryRepository
     {
         _connectionString = connectionString;
     }
-    
+
     public async Task Execute(string command, Guid eventId)
     {
         using MySqlConnection connection = new MySqlConnection(_connectionString);
@@ -24,14 +24,14 @@ public class MySqlQueryRepository : IQueryRepository
         Console.WriteLine(command);
         Console.WriteLine(commandLastEventId);
         Console.WriteLine();
-        
+
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
 
         try
         {
             using MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, connection, transaction);
             using MySqlCommand cmdDataUpdate = new MySqlCommand(command, connection, transaction);
-            
+
             await cmdLastEventId.ExecuteNonQueryAsync();
             await cmdDataUpdate.ExecuteNonQueryAsync();
 
@@ -55,7 +55,7 @@ public class MySqlQueryRepository : IQueryRepository
 
         MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, connection);
         using DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync();
-        
+
         if (!await result.ReadAsync())
         {
             Console.WriteLine("result is empty");
@@ -64,7 +64,7 @@ public class MySqlQueryRepository : IQueryRepository
 
         int columnLastEventId = result.GetOrdinal("last_event_id");
         if (result.IsDBNull(columnLastEventId)) return Guid.Empty;
-        
+
         return result.GetGuid(columnLastEventId);
     }
 }

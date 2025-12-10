@@ -6,7 +6,7 @@ public class MockQueryRepository : IQueryRepository
 {
     public ICollection<string> History { get; private set; } = [];
     public Guid LastSuccessfulEventId { get; set; }
-    
+
     public Task Execute(string command, Guid eventId)
     {
         string lowerCommand = command.ToLower();

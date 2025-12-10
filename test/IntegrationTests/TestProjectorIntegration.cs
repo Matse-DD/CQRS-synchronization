@@ -38,11 +38,11 @@ public class TestProjectorIntegration
         const string cleanupSql = "TRUNCATE TABLE Products; UPDATE last_info SET last_event_id = NULL WHERE id = 1;";
         await using MySqlCommand cmd = new MySqlCommand(cleanupSql, connectionMySql);
         await cmd.ExecuteNonQueryAsync();
-        
+
         MongoClient client = new MongoClient(ConnectionStringCommandRepoMongo);
         IMongoDatabase? database = client.GetDatabase("users");
         IMongoCollection<BsonDocument>? collection = database.GetCollection<BsonDocument>("events");
-        
+
         await collection.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
     }
 
@@ -53,7 +53,7 @@ public class TestProjectorIntegration
         ICommandRepository commandRepo = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo);
         IQueryRepository queryRepo = new MySqlQueryRepository(ConnectionStringQueryRepoMySql);
         IEventFactory eventFactory = new MySqlEventFactory();
-        
+
         Projector projector = new(commandRepo, queryRepo, eventFactory);
 
         // Act
@@ -64,13 +64,13 @@ public class TestProjectorIntegration
         recover.Recover();
 
         // Assert
-        await AssertEventuallyAsync(async () => 
+        await AssertEventuallyAsync(async () =>
         {
             Guid dbEventId = await queryRepo.GetLastSuccessfulEventId();
             return dbEventId.ToString() == lastEventId;
         }, timeoutMs: 5000);
     }
-    
+
     [Test]
     public async Task ChangeStream_Should_PickUp_New_Events()
     {
@@ -83,20 +83,20 @@ public class TestProjectorIntegration
 
         using CancellationTokenSource cancellationToken = new CancellationTokenSource();
         Task observerTask = observer.StartListening(projector.AddEvent, cancellationToken.Token);
-        
+
         // Act
         ICollection<string> events = AddEventToOutbox();
         string expectedId = ExtractEventId(events.Last());
 
         // Assert
-        await AssertEventuallyAsync(async () => 
+        await AssertEventuallyAsync(async () =>
         {
-             Guid dbEventId = await queryRepo.GetLastSuccessfulEventId();
-             return dbEventId.ToString() == expectedId;
+            Guid dbEventId = await queryRepo.GetLastSuccessfulEventId();
+            return dbEventId.ToString() == expectedId;
         }, 5000);
-        
+
         await cancellationToken.CancelAsync();
-        try { await observerTask; } catch (OperationCanceledException) {}
+        try { await observerTask; } catch (OperationCanceledException) { }
     }
 
     private string ExtractEventId(string json)
@@ -121,7 +121,7 @@ public class TestProjectorIntegration
         MongoClient client = new MongoClient(ConnectionStringCommandRepoMongo);
         IMongoDatabase database = client.GetDatabase("users");
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events")!;
-        
+
         for (int i = 0; i < 5; i++)
         {
             events.Add(
@@ -144,7 +144,7 @@ public class TestProjectorIntegration
                 ");
         }
 
-        foreach(string eventItem in events)
+        foreach (string eventItem in events)
         {
             collection.InsertOne(BsonDocument.Parse(eventItem));
         }

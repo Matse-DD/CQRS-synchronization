@@ -81,7 +81,7 @@ public class TestRecovery
         Guid expectedFirstEventIdObserver = eventFactory.DetermineEvent(seedingObserver.ElementAt(0)).EventId;
         Assert.That(queryRepository.History.ElementAt(15), Is.EqualTo($"delete {expectedFirstEventIdObserver}"));
     }
-    
+
     [Test]
     public void Recover_Should_Be_Able_To_Skip_LastSuccessEventId()
     {
