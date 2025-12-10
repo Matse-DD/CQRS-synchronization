@@ -48,7 +48,7 @@ public class MySqlQueryRepository : IQueryRepository
 
     public async Task<Guid> GetLastSuccessfulEventId()
     {
-        string queryLastEventId = $"SELECT last_event_id FROM last_info";
+        const string queryLastEventId = $"SELECT last_event_id FROM last_info";
 
         using MySqlConnection connection = new MySqlConnection(_connectionString);
         await connection.OpenAsync();
@@ -63,8 +63,6 @@ public class MySqlQueryRepository : IQueryRepository
         }
 
         int columnLastEventId = result.GetOrdinal("last_event_id");
-        if (result.IsDBNull(columnLastEventId)) return Guid.Empty;
-
-        return result.GetGuid(columnLastEventId);
+        return result.IsDBNull(columnLastEventId) ? Guid.Empty : result.GetGuid(columnLastEventId);
     }
 }

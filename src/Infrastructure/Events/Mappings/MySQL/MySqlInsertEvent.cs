@@ -8,9 +8,8 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
 {
     public override string GetCommand()
     {
-        return
-            $"INSERT INTO {AggregateName} ({MapColumns(Properties.Keys)})\n" +
-            $"VALUES ({MapValuesClause(Properties.Values)})";
+        return $"INSERT INTO {AggregateName} ({MapColumns(Properties.Keys)})\n" +
+               $"VALUES ({MapValuesClause(Properties.Values)})";
     }
 
     private static string MapColumns(IEnumerable<string> keys)

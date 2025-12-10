@@ -6,15 +6,13 @@ namespace Infrastructure.Persistence.CommandRepository;
 
 public class MongoDbCommandRepository : ICommandRepository
 {
-    private readonly MongoClient _client;
-    private readonly IMongoDatabase _database;
     private readonly IMongoCollection<BsonDocument> _collection;
 
     public MongoDbCommandRepository(string connectionString)
     {
-        _client = new MongoClient(connectionString);
-        _database = _client.GetDatabase("users");  //cqrs_command
-        _collection = _database.GetCollection<BsonDocument>("events")!;
+        MongoClient client = new(connectionString);
+        IMongoDatabase database = client.GetDatabase("users"); //cqrs_command
+        _collection = database.GetCollection<BsonDocument>("events")!;
     }
 
     public async Task<ICollection<OutboxEvent>> GetAllEvents()
