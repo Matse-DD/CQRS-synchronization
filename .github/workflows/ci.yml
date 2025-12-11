@@ -99,7 +99,7 @@ jobs:
       - name: Collect Coverage
         id: collect
         run: |
-          dotnet-coverage collect -f cobertura -o coverage.xml --include "Application" -- dotnet test test/ApplicationTests/ApplicationTests.csproj --configuration Release
+          dotnet-coverage collect -f cobertura -o coverage.xml --include-files "**/Application.dll" -- dotnet test test/ApplicationTests/ApplicationTests.csproj --configuration Release
 
       - name: Enforce 80% Threshold
         id: enforce
