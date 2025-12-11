@@ -93,27 +93,29 @@ jobs:
           dotnet-version: '10.0.x'
           dotnet-quality: 'preview'
 
-      - name: Install Dotnet Coverage
-        run: dotnet tool install --global dotnet-coverage
-
       - name: Collect Coverage
         id: collect
         run: |
-          dotnet-coverage collect "dotnet test test/ApplicationTests/ApplicationTests.csproj --configuration Release" \
-            -f cobertura \
-            -o coverage.xml \
-            --include "Application"
+          dotnet test test/ApplicationTests/ApplicationTests.csproj \
+            --configuration Release \
+            --collect:"XPlat Code Coverage" \
+            -- \
+            DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Include="[Application]*"
 
       - name: Enforce 80% Threshold
         id: enforce
         run: |
-          if [ ! -f coverage.xml ]; then
-            echo "❌ No coverage.xml found! Tests likely failed."
+          COVERAGE_FILE=$(find test/ApplicationTests/TestResults -name "*.xml" | head -n 1)
+          
+          if [ -z "$COVERAGE_FILE" ]; then
+            echo "❌ No coverage XML found! Tests likely failed or did not generate report."
             echo "percentage=0.00" >> $GITHUB_OUTPUT
             exit 1
           fi
           
-          COVERAGE_RATE=$(grep -o 'line-rate="[0-9.]*"' coverage.xml | head -1 | grep -o '[0-9.]*')
+          echo "Found coverage file at: $COVERAGE_FILE"
+          
+          COVERAGE_RATE=$(grep -o 'line-rate="[0-9.]*"' "$COVERAGE_FILE" | head -1 | grep -o '[0-9.]*')
           if [ -z "$COVERAGE_RATE" ]; then COVERAGE_RATE=0; fi
           
           COVERAGE_PCT=$(awk "BEGIN {printf \"%.2f\", $COVERAGE_RATE * 100}")
