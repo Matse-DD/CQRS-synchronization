@@ -48,7 +48,7 @@ jobs:
         run: |
           dotnet test test/ApplicationTests/ApplicationTests.csproj --configuration Release
 
-    integration:
+  integration:
     name: Integration
     runs-on: ubuntu-latest
     outputs:
