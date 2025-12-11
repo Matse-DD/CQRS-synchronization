@@ -23,6 +23,7 @@ public class MongoDbCommandRepository : ICommandRepository
             .Sort(sort)
             .ToListAsync();
 
+        // TODO look for correct formatting
         ICollection<OutboxEvent> outboxEvents = events.Select(
             d => new OutboxEvent(d.GetValue("id").AsString ?? string.Empty,
                 d.ToJson() ?? string.Empty)
