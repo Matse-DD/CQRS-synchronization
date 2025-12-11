@@ -26,7 +26,8 @@ public class MongoDbCommandRepository : ICommandRepository
             .ToListAsync();
 
         ICollection<OutboxEvent> outboxEvents = events.Select(
-            d => {
+            d =>
+            {
                 return new OutboxEvent(d.GetValue("id").AsString ?? string.Empty,
 
                 ConvertToPureBSON(d).ToJson() ?? string.Empty);
@@ -46,7 +47,7 @@ public class MongoDbCommandRepository : ICommandRepository
         return result.IsAcknowledged && result.DeletedCount > 0;
     }
 
-    private static BsonDocument ConvertToPureBSON(BsonDocument doc)
+    private static BsonDocument ConvertToPureBSON(BsonDocument doc) // TODO this method is double with the one in the mongodb observer
     {
         BsonDocument clone = new BsonDocument(doc);
 
