@@ -38,8 +38,8 @@ public class TestMongoDbCommandRepository
         {
             events.Add(BsonDocument.Parse($@"
             {{
-                ""event_id"": ""{Guid.NewGuid()}"",
-                ""occured_at"": ""{DateTime.UtcNow:O}"",
+                ""id"": ""{Guid.NewGuid()}"",
+                ""occurred_at"": ""{DateTime.UtcNow:O}"",
                 ""aggregate_name"": ""TestAgg"",
                 ""status"": ""PENDING"",
                 ""event_type"": ""INSERT"",
@@ -69,8 +69,8 @@ public class TestMongoDbCommandRepository
             DateTime time = baseTime.AddSeconds(i);
             events.Add(BsonDocument.Parse($@"
             {{
-                ""event_id"": ""{Guid.NewGuid()}"",
-                ""occured_at"": ""{time:O}"",
+                ""id"": ""{Guid.NewGuid()}"",
+                ""occurred_at"": ""{time:O}"",
                 ""aggregate_name"": ""TestAgg"",
                 ""status"": ""PENDING"",
                 ""event_type"": ""INSERT"",
@@ -89,7 +89,7 @@ public class TestMongoDbCommandRepository
         List<DateTime> loadedDates = result.Select(e =>
         {
             BsonDocument? doc = BsonDocument.Parse(e.eventItem);
-            return DateTime.Parse(doc["occured_at"].AsString);
+            return DateTime.Parse(doc["occurred_at"].AsString);
         }).ToList();
 
         Assert.That(loadedDates, Is.Ordered.Ascending);
@@ -102,8 +102,8 @@ public class TestMongoDbCommandRepository
         Guid eventId = Guid.NewGuid();
         BsonDocument? doc = BsonDocument.Parse($@"
             {{
-                ""event_id"": ""{eventId}"",
-                ""occured_at"": ""{DateTime.UtcNow:O}"",
+                ""id"": ""{eventId}"",
+                ""occurred_at"": ""{DateTime.UtcNow:O}"",
                 ""aggregate_name"": ""TestAgg"",
                 ""status"": ""PENDING"",
                 ""event_type"": ""INSERT"",

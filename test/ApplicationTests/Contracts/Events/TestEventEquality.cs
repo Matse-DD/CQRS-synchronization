@@ -68,8 +68,8 @@ public class TestEventEquality
     private IntermediateEvent CreateIntermediate(Guid id)
     {
         string json = $@"{{
-            ""event_id"": ""{id}"",
-            ""occured_at"": ""{DateTime.UtcNow:O}"",
+            ""id"": ""{id}"",
+            ""occurred_at"": ""{DateTime.UtcNow:O}"",
             ""aggregate_name"": ""Test"",
             ""status"": ""PENDING"",
             ""event_type"": ""INSERT"",

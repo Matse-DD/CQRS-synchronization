@@ -22,8 +22,8 @@ public class TestRecovery
                 new OutboxEvent(guid.ToString(),
                 $@"
                     {{
-                        ""event_id"": ""{guid}"",
-                        ""occured_at"": ""2025-11-29T17:15:00Z"",
+                        ""id"": ""{guid}"",
+                        ""occurred_at"": ""2025-11-29T17:15:00Z"",
                         ""aggregate_name"": ""Product"",
                         ""status"": ""PENDING"",
                         ""event_type"": ""DELETE"",
@@ -44,8 +44,8 @@ public class TestRecovery
             seedingObserver.Add(
                $@"
                     {{
-                      ""event_id"": ""{Guid.NewGuid()}"",
-                      ""occured_at"": ""2025-11-29T17:15:00Z"",
+                      ""id"": ""{Guid.NewGuid()}"",
+                      ""occurred_at"": ""2025-11-29T17:15:00Z"",
                       ""aggregate_name"": ""Product"",
                       ""status"": ""PENDING"",
                       ""event_type"": ""DELETE"",
@@ -95,8 +95,8 @@ public class TestRecovery
                 new OutboxEvent(guid.ToString(),
                 $@"
                     {{
-                        ""event_id"": ""{guid}"",
-                        ""occured_at"": ""2025-11-29T17:15:00Z"",
+                        ""id"": ""{guid}"",
+                        ""occurred_at"": ""2025-11-29T17:15:00Z"",
                         ""aggregate_name"": ""Product"",
                         ""status"": ""PENDING"",
                         ""event_type"": ""DELETE"",
