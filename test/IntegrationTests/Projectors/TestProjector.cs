@@ -128,10 +128,10 @@ public class TestProjector
                $@"
                     {{
                       ""id"": ""{Guid.NewGuid()}"",
-                      ""occurred_at"": ""{DateTime.UtcNow:O}"",
-                      ""aggregate_name"": ""Products"",
+                      ""occurredAt"": ""{DateTime.UtcNow:O}"",
+                      ""aggregateName"": ""Products"",
                       ""status"": ""PENDING"",
-                      ""event_type"": ""INSERT"",
+                      ""eventType"": ""INSERT"",
                       ""payload"": {{
                             ""product_id"": ""{Guid.NewGuid()}"",
                             ""name"": ""Test Product {i}"",

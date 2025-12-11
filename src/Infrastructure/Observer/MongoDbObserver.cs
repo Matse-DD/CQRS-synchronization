@@ -1,4 +1,5 @@
 ﻿using Application.Contracts.Observer;
+using Infrastructure.Tools.DatabaseExtensions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -28,7 +29,7 @@ public class MongoDbObserver : IObserver
         {
             foreach (ChangeStreamDocument<BsonDocument>? change in cursor.Current)
             {
-                callback(change.FullDocument.ToJson());
+                callback(change.FullDocument.SanitizeOccurredAt().ToJson());
             }
         }
     }

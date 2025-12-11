@@ -1,4 +1,5 @@
 ﻿using Application.Contracts.Persistence;
+using Infrastructure.Tools.DatabaseExtensions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -17,15 +18,20 @@ public class MongoDbCommandRepository : ICommandRepository
 
     public async Task<ICollection<OutboxEvent>> GetAllEvents()
     {
-        SortDefinition<BsonDocument>? sort = Builders<BsonDocument>.Sort.Ascending("_id"); // occurred_at is niet nodig sinds _id ook met timestamp word generate, dus dit is al integrated.
+
+        SortDefinition<BsonDocument>? sort = Builders<BsonDocument>.Sort.Ascending("_id"); // occurredAt is niet nodig sinds _id ook met timestamp word generate, dus dit is al integrated.
         ICollection<BsonDocument> events = await _collection
             .Find(_ => true)
             .Sort(sort)
             .ToListAsync();
 
         ICollection<OutboxEvent> outboxEvents = events.Select(
-            d => new OutboxEvent(d.GetValue("id").AsString ?? string.Empty,
-                d.ToJson() ?? string.Empty)
+            d =>
+            {
+                return new OutboxEvent(d.GetValue("id").AsString ?? string.Empty,
+
+                d.SanitizeOccurredAt().ToJson() ?? string.Empty);
+            }
         ).ToList();
 
         return outboxEvents;
