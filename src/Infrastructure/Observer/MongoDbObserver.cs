@@ -28,8 +28,21 @@ public class MongoDbObserver : IObserver
         {
             foreach (ChangeStreamDocument<BsonDocument>? change in cursor.Current)
             {
-                callback(change.FullDocument.ToJson());
+                callback(ConvertToPureBSON(change.FullDocument).ToJson());
             }
         }
+    }
+
+    private static BsonDocument ConvertToPureBSON(BsonDocument doc) //TODO this is double
+    {
+        BsonDocument clone = new BsonDocument(doc);
+
+        if (clone.Contains("occurredAt") && clone["occurredAt"].IsBsonDateTime)
+        {
+            string dt = clone["occurredAt"].ToUniversalTime().ToString("o");
+            clone["occurredAt"] = new BsonString(dt);
+        }
+
+        return clone;
     }
 }
