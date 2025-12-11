@@ -48,6 +48,35 @@ jobs:
         run: |
           dotnet test test/ApplicationTests/ApplicationTests.csproj --configuration Release
 
+  integration:
+    name: Integration
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.integration_test.outcome }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          dotnet-quality: 'preview'
+
+      - name: Start Infrastructure
+        run: |
+          docker compose -f test/IntegrationTests/config/docker-compose.yml up -d --wait
+
+      - name: Run Integration Tests
+        id: integration_test
+        run: |
+          dotnet test test/IntegrationTests/IntegrationTests.csproj --configuration Release
+
+      - name: Stop Infrastructure
+        if: always()
+        run: |
+          docker compose -f test/IntegrationTests/config/docker-compose.yml down
+
   coverage:
     name: Coverage
     runs-on: ubuntu-latest
@@ -117,7 +146,7 @@ jobs:
   discord:
     name: Discord
     runs-on: ubuntu-latest
-    needs: [ quality-control, testing, coverage, build ]
+    needs: [ quality-control, testing, integration, coverage, build ]
     if: always()
     steps:
       - name: Checkout code
@@ -133,6 +162,7 @@ jobs:
           
           if [ "${{ needs.quality-control.outputs.status }}" != "success" ] || \
              [ "${{ needs.testing.outputs.status }}" != "success" ] || \
+             [ "${{ needs.integration.outputs.status }}" != "success" ] || \
              [ "${{ needs.coverage.outputs.status }}" != "success" ] || \
              [ "${{ needs.build.outputs.status }}" != "success" ]; then
             OVERALL="Failed"
@@ -141,7 +171,7 @@ jobs:
           
           echo "overall=$OVERALL" >> $GITHUB_OUTPUT
           echo "color=$COLOR" >> $GITHUB_OUTPUT
-
+          
           get_icon() {
             if [ "$1" == "success" ]; then echo "✅";
             else echo "❌"; fi
@@ -156,7 +186,7 @@ jobs:
           COV_PCT="${{ needs.coverage.outputs.percentage }}"
           
           if [ -z "$COV_PCT" ]; then COV_PCT="0.00"; fi
-
+          
           if [ "$COV_STATUS" == "success" ]; then
              COV_MSG="✅ Coverage - Passed ($COV_PCT%)"
           else
@@ -165,10 +195,12 @@ jobs:
           
           QC="${{ needs.quality-control.outputs.status }}"
           TEST="${{ needs.testing.outputs.status }}"
+          INT="${{ needs.integration.outputs.status }}"
           BUILD="${{ needs.build.outputs.status }}"
-
+          
           echo "format_result=$(get_icon $QC) Quality Control - $(get_text $QC)" >> $GITHUB_OUTPUT
           echo "test_result=$(get_icon $TEST) Testing - $(get_text $TEST)" >> $GITHUB_OUTPUT
+          echo "integration_result=$(get_icon $INT) Integration - $(get_text $INT)" >> $GITHUB_OUTPUT
           echo "coverage_result=$COV_MSG" >> $GITHUB_OUTPUT
           echo "build_result=$(get_icon $BUILD) Build - $(get_text $BUILD)" >> $GITHUB_OUTPUT
 
@@ -207,6 +239,7 @@ jobs:
             **Pipeline Results:**
             ${{ steps.status.outputs.format_result }}
             ${{ steps.status.outputs.test_result }}
+            ${{ steps.status.outputs.integration_result }}
             ${{ steps.status.outputs.coverage_result }}
             ${{ steps.status.outputs.build_result }}
           embed-footer-text: Triggered by ${{ github.actor }} • ${{ steps.timestamp.outputs.time }}
