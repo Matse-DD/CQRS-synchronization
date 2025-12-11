@@ -102,7 +102,7 @@ public class TestProjector
     private string ExtractEventId(string json)
     {
         BsonDocument? doc = BsonDocument.Parse(json);
-        return doc["event_id"].AsString;
+        return doc["id"].AsString;
     }
 
     private async Task AssertEventuallyAsync(Func<Task<bool>> condition, int timeoutMs)
