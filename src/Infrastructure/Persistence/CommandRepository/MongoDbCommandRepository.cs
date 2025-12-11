@@ -19,7 +19,7 @@ public class MongoDbCommandRepository : ICommandRepository
     public async Task<ICollection<OutboxEvent>> GetAllEvents()
     {
 
-        SortDefinition<BsonDocument>? sort = Builders<BsonDocument>.Sort.Ascending("_id"); // occurred_at is niet nodig sinds _id ook met timestamp word generate, dus dit is al integrated.
+        SortDefinition<BsonDocument>? sort = Builders<BsonDocument>.Sort.Ascending("_id"); // occurredAt is niet nodig sinds _id ook met timestamp word generate, dus dit is al integrated.
         ICollection<BsonDocument> events = await _collection
             .Find(_ => true)
             .Sort(sort)
