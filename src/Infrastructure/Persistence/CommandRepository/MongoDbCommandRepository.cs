@@ -1,5 +1,6 @@
 ﻿using Application.Contracts.Persistence;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Driver;
 
 namespace Infrastructure.Persistence.CommandRepository;
@@ -17,16 +18,22 @@ public class MongoDbCommandRepository : ICommandRepository
 
     public async Task<ICollection<OutboxEvent>> GetAllEvents()
     {
+
         SortDefinition<BsonDocument>? sort = Builders<BsonDocument>.Sort.Ascending("_id"); // occurred_at is niet nodig sinds _id ook met timestamp word generate, dus dit is al integrated.
         ICollection<BsonDocument> events = await _collection
             .Find(_ => true)
             .Sort(sort)
             .ToListAsync();
 
-        // TODO look for correct formatting
         ICollection<OutboxEvent> outboxEvents = events.Select(
-            d => new OutboxEvent(d.GetValue("id").AsString ?? string.Empty,
-                d.ToJson() ?? string.Empty)
+            d => {
+                Console.WriteLine(d); 
+                Console.WriteLine(d["occurredAt"].BsonType);   // or whichever field contains your date
+
+                return new OutboxEvent(d.GetValue("id").AsString ?? string.Empty,
+
+                ConvertToPureBSON(d).ToJson() ?? string.Empty);
+            }
         ).ToList();
 
         return outboxEvents;
@@ -41,4 +48,18 @@ public class MongoDbCommandRepository : ICommandRepository
         DeleteResult result = await _collection.DeleteOneAsync(filter);
         return result.IsAcknowledged && result.DeletedCount > 0;
     }
+
+    private static BsonDocument ConvertToPureBSON(BsonDocument doc)
+    {
+        BsonDocument clone = new BsonDocument(doc);
+
+        if (clone.Contains("occurredAt") && clone["occurredAt"].IsBsonDateTime)
+        {
+            string dt = clone["occurredAt"].ToUniversalTime().ToString("o");
+            clone["occurredAt"] = new BsonString(dt);
+        }
+
+        return clone;
+    }
+
 }
