@@ -29,7 +29,7 @@ public class MongoDbObserver : IObserver
         {
             foreach (ChangeStreamDocument<BsonDocument>? change in cursor.Current)
             {
-                callback(change.FullDocument.SanitizeOccuredAt().ToJson());
+                callback(change.FullDocument.SanitizeOccurredAt().ToJson());
             }
         }
     }

@@ -30,7 +30,7 @@ public class MongoDbCommandRepository : ICommandRepository
             {
                 return new OutboxEvent(d.GetValue("id").AsString ?? string.Empty,
 
-                d.SanitizeOccuredAt().ToJson() ?? string.Empty);
+                d.SanitizeOccurredAt().ToJson() ?? string.Empty);
             }
         ).ToList();
 

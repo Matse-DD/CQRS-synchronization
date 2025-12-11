@@ -4,7 +4,7 @@ namespace Infrastructure.Tools.DatabaseExtensions
 {
     public static class MongoDbExtensions
     {
-        public static BsonDocument SanitizeOccuredAt(this BsonDocument document)
+        public static BsonDocument SanitizeOccurredAt(this BsonDocument document)
         {
             BsonDocument clone = new BsonDocument(document);
 
