@@ -42,6 +42,7 @@ public class Projector
     {
         try
         {
+            Console.WriteLine(eventToProject);
             Event convertedEvent = _eventFactory.DetermineEvent(eventToProject);
 
             string commandForEvent = convertedEvent.GetCommand();
