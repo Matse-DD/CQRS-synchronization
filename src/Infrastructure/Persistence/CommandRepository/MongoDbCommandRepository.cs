@@ -1,7 +1,6 @@
 ﻿using Application.Contracts.Persistence;
 using Infrastructure.Tools.DatabaseExtensions;
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
 using MongoDB.Driver;
 
 namespace Infrastructure.Persistence.CommandRepository;
