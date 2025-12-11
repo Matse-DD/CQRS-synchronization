@@ -24,8 +24,8 @@ public class SyncBuilder
     public SyncBuilder()
     {
         string? env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"); // TODO set ASPNETCORE_ENVIRONMENT=Production or Test from outside for production or other env
-        
-        if(env == null)
+
+        if (env == null)
         {
             Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
             env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
