@@ -22,8 +22,8 @@ public class TestProjector
             deleteEvents.Add(
                $@"
                     {{
-                      ""event_id"": ""{Guid.NewGuid().ToString()}"",
-                      ""occured_at"": ""2025-11-29T17:15:00Z"",
+                      ""id"": ""{Guid.NewGuid().ToString()}"",
+                      ""occurred_at"": ""2025-11-29T17:15:00Z"",
                       ""aggregate_name"": ""Product"",
                       ""status"": ""PENDING"",
                       ""event_type"": ""DELETE"",

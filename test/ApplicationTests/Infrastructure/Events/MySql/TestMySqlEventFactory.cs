@@ -29,8 +29,8 @@ public class TestMySqlEventFactory
         // Arrange
         string unknownTypeEvent = @"
         {
-          ""event_id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
-          ""occured_at"": ""2025-11-29T17:15:00Z"",
+          ""id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
+          ""occurred_at"": ""2025-11-29T17:15:00Z"",
           ""aggregate_name"": ""Product"",
           ""status"": ""PENDING"",
           ""event_type"": ""CREATE_TABLE"", 
@@ -47,8 +47,8 @@ public class TestMySqlEventFactory
         // Arrange
         string insertEventMessage = @"
         {
-          ""event_id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
-          ""occured_at"": ""2025-11-29T17:15:00Z"",
+          ""id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
+          ""occurred_at"": ""2025-11-29T17:15:00Z"",
           ""aggregate_name"": ""Product"",
           ""status"": ""PENDING"",
           ""event_type"": ""INSERT"",
@@ -82,8 +82,8 @@ public class TestMySqlEventFactory
         // Arrange
         string deleteEventMessage = @"
         {
-          ""event_id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
-          ""occured_at"": ""2025-11-29T17:15:00Z"",
+          ""id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
+          ""occurred_at"": ""2025-11-29T17:15:00Z"",
           ""aggregate_name"": ""Product"",
           ""status"": ""PENDING"",
           ""event_type"": ""DELETE"",
@@ -111,8 +111,8 @@ public class TestMySqlEventFactory
         // Arrange
         string updateEventMessage = @"
         {
-            ""event_id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
-            ""occured_at"": ""2025-11-29T17:15:00Z"",
+            ""id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
+            ""occurred_at"": ""2025-11-29T17:15:00Z"",
             ""aggregate_name"": ""Product"",
             ""status"": ""PENDING"",
             ""event_type"": ""UPDATE"",

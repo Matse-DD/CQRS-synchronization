@@ -127,8 +127,8 @@ public class TestProjector
             events.Add(
                $@"
                     {{
-                      ""event_id"": ""{Guid.NewGuid()}"",
-                      ""occured_at"": ""{DateTime.UtcNow:O}"",
+                      ""id"": ""{Guid.NewGuid()}"",
+                      ""occurred_at"": ""{DateTime.UtcNow:O}"",
                       ""aggregate_name"": ""Products"",
                       ""status"": ""PENDING"",
                       ""event_type"": ""INSERT"",
