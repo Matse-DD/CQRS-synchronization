@@ -30,10 +30,10 @@ public class TestMySqlEventFactory
         string unknownTypeEvent = @"
         {
           ""id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
-          ""occurred_at"": ""2025-11-29T17:15:00Z"",
-          ""aggregate_name"": ""Product"",
+          ""occurredAt"": ""2025-11-29T17:15:00Z"",
+          ""aggregateName"": ""Product"",
           ""status"": ""PENDING"",
-          ""event_type"": ""CREATE_TABLE"", 
+          ""eventType"": ""CREATE_TABLE"", 
           ""payload"": {}
         }";
 
@@ -48,10 +48,10 @@ public class TestMySqlEventFactory
         string insertEventMessage = @"
         {
           ""id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
-          ""occurred_at"": ""2025-11-29T17:15:00Z"",
-          ""aggregate_name"": ""Product"",
+          ""occurredAt"": ""2025-11-29T17:15:00Z"",
+          ""aggregateName"": ""Product"",
           ""status"": ""PENDING"",
-          ""event_type"": ""INSERT"",
+          ""eventType"": ""INSERT"",
           ""payload"": {
             ""product_id"": ""038e2f47-c1a0-4b3d-98e1-5f2d0c1b4e9f"",
             ""name"": ""Wireless Mechanical Keyboard"",
@@ -83,10 +83,10 @@ public class TestMySqlEventFactory
         string deleteEventMessage = @"
         {
           ""id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
-          ""occurred_at"": ""2025-11-29T17:15:00Z"",
-          ""aggregate_name"": ""Product"",
+          ""occurredAt"": ""2025-11-29T17:15:00Z"",
+          ""aggregateName"": ""Product"",
           ""status"": ""PENDING"",
-          ""event_type"": ""DELETE"",
+          ""eventType"": ""DELETE"",
           ""payload"": {
             ""condition"": {
                 ""amount_sold"": "">5"",
@@ -112,10 +112,10 @@ public class TestMySqlEventFactory
         string updateEventMessage = @"
         {
             ""id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
-            ""occurred_at"": ""2025-11-29T17:15:00Z"",
-            ""aggregate_name"": ""Product"",
+            ""occurredAt"": ""2025-11-29T17:15:00Z"",
+            ""aggregateName"": ""Product"",
             ""status"": ""PENDING"",
-            ""event_type"": ""UPDATE"",
+            ""eventType"": ""UPDATE"",
             ""payload"": {
                 ""condition"": {
                     ""amount_sold"": "">5"",

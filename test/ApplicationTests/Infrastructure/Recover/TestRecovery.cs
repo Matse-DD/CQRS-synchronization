@@ -23,10 +23,10 @@ public class TestRecovery
                 $@"
                     {{
                         ""id"": ""{guid}"",
-                        ""occurred_at"": ""2025-11-29T17:15:00Z"",
-                        ""aggregate_name"": ""Product"",
+                        ""occurredAt"": ""2025-11-29T17:15:00Z"",
+                        ""aggregateName"": ""Product"",
                         ""status"": ""PENDING"",
-                        ""event_type"": ""DELETE"",
+                        ""eventType"": ""DELETE"",
                         ""payload"": {{
                         ""condition"": {{
                             ""amount_sold"": "">5"",
@@ -45,10 +45,10 @@ public class TestRecovery
                $@"
                     {{
                       ""id"": ""{Guid.NewGuid()}"",
-                      ""occurred_at"": ""2025-11-29T17:15:00Z"",
-                      ""aggregate_name"": ""Product"",
+                      ""occurredAt"": ""2025-11-29T17:15:00Z"",
+                      ""aggregateName"": ""Product"",
                       ""status"": ""PENDING"",
-                      ""event_type"": ""DELETE"",
+                      ""eventType"": ""DELETE"",
                       ""payload"": {{
                         ""condition"": {{
                             ""amount_sold"": "">5"",
@@ -96,10 +96,10 @@ public class TestRecovery
                 $@"
                     {{
                         ""id"": ""{guid}"",
-                        ""occurred_at"": ""2025-11-29T17:15:00Z"",
-                        ""aggregate_name"": ""Product"",
+                        ""occurredAt"": ""2025-11-29T17:15:00Z"",
+                        ""aggregateName"": ""Product"",
                         ""status"": ""PENDING"",
-                        ""event_type"": ""DELETE"",
+                        ""eventType"": ""DELETE"",
                         ""payload"": {{
                         ""condition"": {{
                             ""amount_sold"": "">5"",

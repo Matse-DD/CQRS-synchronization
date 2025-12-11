@@ -69,10 +69,10 @@ public class TestEventEquality
     {
         string json = $@"{{
             ""id"": ""{id}"",
-            ""occurred_at"": ""{DateTime.UtcNow:O}"",
-            ""aggregate_name"": ""Test"",
+            ""occurredAt"": ""{DateTime.UtcNow:O}"",
+            ""aggregateName"": ""Test"",
             ""status"": ""PENDING"",
-            ""event_type"": ""INSERT"",
+            ""eventType"": ""INSERT"",
             ""payload"": {{ ""key"": ""value"" }}
         }}";
 

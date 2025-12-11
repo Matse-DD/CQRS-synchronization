@@ -39,10 +39,10 @@ public class TestMongoDbCommandRepository
             events.Add(BsonDocument.Parse($@"
             {{
                 ""id"": ""{Guid.NewGuid()}"",
-                ""occurred_at"": ""{DateTime.UtcNow:O}"",
-                ""aggregate_name"": ""TestAgg"",
+                ""occurredAt"": ""{DateTime.UtcNow:O}"",
+                ""aggregateName"": ""TestAgg"",
                 ""status"": ""PENDING"",
-                ""event_type"": ""INSERT"",
+                ""eventType"": ""INSERT"",
                 ""payload"": {{ ""index"": {i} }}
             }}"));
         }
@@ -70,10 +70,10 @@ public class TestMongoDbCommandRepository
             events.Add(BsonDocument.Parse($@"
             {{
                 ""id"": ""{Guid.NewGuid()}"",
-                ""occurred_at"": ""{time:O}"",
-                ""aggregate_name"": ""TestAgg"",
+                ""occurredAt"": ""{time:O}"",
+                ""aggregateName"": ""TestAgg"",
                 ""status"": ""PENDING"",
-                ""event_type"": ""INSERT"",
+                ""eventType"": ""INSERT"",
                 ""payload"": {{ ""sequence"": {i} }}
             }}"));
         }
@@ -89,7 +89,7 @@ public class TestMongoDbCommandRepository
         List<DateTime> loadedDates = result.Select(e =>
         {
             BsonDocument? doc = BsonDocument.Parse(e.eventItem);
-            return DateTime.Parse(doc["occurred_at"].AsString);
+            return DateTime.Parse(doc["occurredAt"].AsString);
         }).ToList();
 
         Assert.That(loadedDates, Is.Ordered.Ascending);
@@ -103,10 +103,10 @@ public class TestMongoDbCommandRepository
         BsonDocument? doc = BsonDocument.Parse($@"
             {{
                 ""id"": ""{eventId}"",
-                ""occurred_at"": ""{DateTime.UtcNow:O}"",
-                ""aggregate_name"": ""TestAgg"",
+                ""occurredAt"": ""{DateTime.UtcNow:O}"",
+                ""aggregateName"": ""TestAgg"",
                 ""status"": ""PENDING"",
-                ""event_type"": ""INSERT"",
+                ""eventType"": ""INSERT"",
                 ""payload"": {{}}
             }}");
 
