@@ -1,4 +1,5 @@
 ﻿using Application.Contracts.Observer;
+using Infrastructure.Tools.DatabaseExtensions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -28,21 +29,8 @@ public class MongoDbObserver : IObserver
         {
             foreach (ChangeStreamDocument<BsonDocument>? change in cursor.Current)
             {
-                callback(ConvertToPureBSON(change.FullDocument).ToJson());
+                callback(change.FullDocument.SanitizeOccuredAt().ToJson());
             }
         }
-    }
-
-    private static BsonDocument ConvertToPureBSON(BsonDocument doc) //TODO this is double
-    {
-        BsonDocument clone = new BsonDocument(doc);
-
-        if (clone.Contains("occurredAt") && clone["occurredAt"].IsBsonDateTime)
-        {
-            string dt = clone["occurredAt"].ToUniversalTime().ToString("o");
-            clone["occurredAt"] = new BsonString(dt);
-        }
-
-        return clone;
     }
 }

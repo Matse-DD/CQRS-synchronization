@@ -1,4 +1,5 @@
 ﻿using Application.Contracts.Persistence;
+using Infrastructure.Tools.DatabaseExtensions;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Driver;
@@ -30,7 +31,7 @@ public class MongoDbCommandRepository : ICommandRepository
             {
                 return new OutboxEvent(d.GetValue("id").AsString ?? string.Empty,
 
-                ConvertToPureBSON(d).ToJson() ?? string.Empty);
+                d.SanitizeOccuredAt().ToJson() ?? string.Empty);
             }
         ).ToList();
 
@@ -46,18 +47,4 @@ public class MongoDbCommandRepository : ICommandRepository
         DeleteResult result = await _collection.DeleteOneAsync(filter);
         return result.IsAcknowledged && result.DeletedCount > 0;
     }
-
-    private static BsonDocument ConvertToPureBSON(BsonDocument doc) // TODO this method is double with the one in the mongodb observer
-    {
-        BsonDocument clone = new BsonDocument(doc);
-
-        if (clone.Contains("occurredAt") && clone["occurredAt"].IsBsonDateTime)
-        {
-            string dt = clone["occurredAt"].ToUniversalTime().ToString("o");
-            clone["occurredAt"] = new BsonString(dt);
-        }
-
-        return clone;
-    }
-
 }
