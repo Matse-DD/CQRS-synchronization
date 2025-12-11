@@ -27,9 +27,6 @@ public class MongoDbCommandRepository : ICommandRepository
 
         ICollection<OutboxEvent> outboxEvents = events.Select(
             d => {
-                Console.WriteLine(d); 
-                Console.WriteLine(d["occurredAt"].BsonType);   // or whichever field contains your date
-
                 return new OutboxEvent(d.GetValue("id").AsString ?? string.Empty,
 
                 ConvertToPureBSON(d).ToJson() ?? string.Empty);
