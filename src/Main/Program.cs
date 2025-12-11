@@ -17,13 +17,8 @@ IConfiguration config = new ConfigurationBuilder()
     .AddJsonFile($"appsettings.{env}.json", true, false)
     .Build();
 
-//string connectionStringQueryRepoMySql = config.GetConnectionString("ReadDatabase") ?? "";
-//string connectionStringCommandRepoMongo = config.GetConnectionString("WriteDatabase") ?? "";
-
-//const string connectionStringQueryRepoMySql = "Server=localhost;Port=13306;Database=cqrs_read;User=root;Password=;";
-const string connectionStringQueryRepoMySql = "Server=localhost;Port=40132;Database=users;User=user;Password=userpassword;";
-//const string connectionStringCommandRepoMongo = "mongodb://localhost:27017/?connect=direct&replicaSet=rs0";
-const string connectionStringCommandRepoMongo = "mongodb://localhost:40131/?directConnection=true&replicaSet=rs0";
+string connectionStringQueryRepoMySql = config.GetConnectionString("ReadDatabase") ?? "";
+string connectionStringCommandRepoMongo = config.GetConnectionString("WriteDatabase") ?? "";
 
 ICommandRepository commandRepository = new MongoDbCommandRepository(connectionStringCommandRepoMongo);
 IQueryRepository queryRepository = new MySqlQueryRepository(connectionStringQueryRepoMySql);
