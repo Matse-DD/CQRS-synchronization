@@ -26,10 +26,12 @@ public class SyncBuilder
     public SyncBuilder()
     {
         string? connectionStringCommandDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_COMMAND_DB");
-        string? connectionStringQueryDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_READ_DB");
+        string? connectionStringQueryDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_QUERY_DB");
 
         if (connectionStringCommandDatabase == null || connectionStringQueryDatabase == null)
         {
+            Console.WriteLine("connectionStringCommandDatabase or connectionStringQueryDatabase not found falling back to appsettings.Test.json");
+            
             IConfiguration config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
