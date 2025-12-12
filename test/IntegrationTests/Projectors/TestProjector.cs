@@ -55,13 +55,13 @@ public class TestProjector
         IQueryRepository queryRepo = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
         IEventFactory eventFactory = new MySqlEventFactory();
 
-        Projector projector = new(commandRepo, queryRepo, eventFactory);
+        Projector projector = new(commandRepo, queryRepo, eventFactory, NullLogger<Projector>.Instance);
 
         // Act
         ICollection<string> eventsAdded = AddEventToOutbox();
         string lastEventId = ExtractEventId(eventsAdded.Last());
 
-        Recovery recover = new Recovery(commandRepo, queryRepo, projector);
+        Recovery recover = new Recovery(commandRepo, queryRepo, projector, NullLogger<Recovery>.Instance);
         recover.Recover();
 
         // Assert
@@ -79,7 +79,7 @@ public class TestProjector
         ICommandRepository commandRepo = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
         IQueryRepository queryRepo = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
         IEventFactory eventFactory = new MySqlEventFactory();
-        Projector projector = new Projector(commandRepo, queryRepo, eventFactory);
+        Projector projector = new Projector(commandRepo, queryRepo, eventFactory, NullLogger<Projector>.Instance);
         MongoDbObserver observer = new MongoDbObserver(ConnectionStringCommandRepoMongo, NullLogger<MongoDbObserver>.Instance);
 
         using CancellationTokenSource cancellationToken = new CancellationTokenSource();

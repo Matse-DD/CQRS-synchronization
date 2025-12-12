@@ -4,6 +4,7 @@ using ApplicationTests.Shared.Events.Mappings;
 using ApplicationTests.Shared.Persistence;
 using Infrastructure.Projectors;
 using Infrastructure.Replay;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ApplicationTests.Replay;
 
@@ -64,9 +65,9 @@ public class ReplayTest
         MockCommandRepository commandRepository = new MockCommandRepository(seedingOutbox);
         MockQueryRepository queryRepository = new MockQueryRepository();
         MockEventFactory eventFactory = new MockEventFactory();
-        Projector projector = new Projector(commandRepository, queryRepository, eventFactory);
+        Projector projector = new Projector(commandRepository, queryRepository, eventFactory, NullLogger<Projector>.Instance);
 
-        Replayer replayer = new Replayer(commandRepository, queryRepository, projector);
+        Replayer replayer = new Replayer(commandRepository, queryRepository, projector, NullLogger<Replayer>.Instance);
 
         MockObserver observer = new MockObserver(seedingObserver);
 

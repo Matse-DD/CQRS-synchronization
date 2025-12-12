@@ -4,6 +4,7 @@ using ApplicationTests.Shared.Events.Mappings;
 using ApplicationTests.Shared.Persistence;
 using Infrastructure.Projectors;
 using Infrastructure.Recover;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ApplicationTests.Infrastructure.Recover;
 
@@ -62,9 +63,9 @@ public class TestRecovery
         MockCommandRepository commandRepository = new MockCommandRepository(seedingOutbox);
         MockQueryRepository queryRepository = new MockQueryRepository();
         MockEventFactory eventFactory = new MockEventFactory();
-        Projector projector = new Projector(commandRepository, queryRepository, eventFactory);
+        Projector projector = new Projector(commandRepository, queryRepository, eventFactory, NullLogger<Projector>.Instance);
 
-        Recovery recovery = new Recovery(commandRepository, queryRepository, projector);
+        Recovery recovery = new Recovery(commandRepository, queryRepository, projector, NullLogger<Recovery>.Instance);
 
         MockObserver observer = new MockObserver(seedingObserver);
 
@@ -112,13 +113,14 @@ public class TestRecovery
         }
 
         MockCommandRepository commandRepository = new MockCommandRepository(seedingOutbox);
-        MockQueryRepository queryRepository = new MockQueryRepository();
-        queryRepository.LastSuccessfulEventId = new Guid(seedingOutbox.ElementAt(0).eventId);
+        MockQueryRepository queryRepository = new MockQueryRepository {
+            LastSuccessfulEventId = new Guid(seedingOutbox.ElementAt(0).eventId)
+        };
 
         MockEventFactory eventFactory = new MockEventFactory();
-        Projector projector = new Projector(commandRepository, queryRepository, eventFactory);
+        Projector projector = new Projector(commandRepository, queryRepository, eventFactory, NullLogger<Projector>.Instance);
 
-        Recovery recovery = new Recovery(commandRepository, queryRepository, projector);
+        Recovery recovery = new Recovery(commandRepository, queryRepository, projector, NullLogger<Recovery>.Instance);
 
         // Act
         recovery.Recover();
