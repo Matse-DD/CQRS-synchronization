@@ -34,11 +34,10 @@ services:
 
 if environment variables are correcly set, the service will automatically connect to the two databases and update the query database when necessary.
 
-## Environment variables
+## Configuration
 
 a short explanation of the necessary environment variables:
 
-- ASPNETCORE_ENVIRONMENT: environment in which the service runs in (`Production` reccomended)
 - CONNECTION_STRING_COMMAND_DB: connection string of the command database
 - CONNECTION_STRING_QUERY_DB: connection string of the query database
 
