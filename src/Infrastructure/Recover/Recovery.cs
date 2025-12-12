@@ -33,7 +33,7 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         }
         catch (Exception e)
         {
-            Console.WriteLine($"error in recovery: ${e.Message}");
+            Console.WriteLine($"error in recovery: {e.Message}");
         }
     }
 }
