@@ -21,7 +21,7 @@ public class MockQueryRepository : IQueryRepository
 
     public Task Clear()
     {
-        History = [];
+        History.Clear();
         return Task.CompletedTask;
     }
 
