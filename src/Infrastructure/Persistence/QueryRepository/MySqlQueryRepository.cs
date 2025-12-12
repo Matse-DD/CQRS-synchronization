@@ -41,9 +41,43 @@ public class MySqlQueryRepository(string connectionString) : IQueryRepository
         }
     }
 
-    public Task Clear()
+    public async Task Clear()
     {
-        throw new NotImplementedException();
+        using MySqlConnection connection = new MySqlConnection(connectionString);
+        await connection.OpenAsync();
+        
+        using MySqlTransaction transaction = await connection.BeginTransactionAsync();
+        try
+        {
+            string tableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE()";
+            using MySqlCommand cmd = new MySqlCommand(tableQuery, connection);
+            using DbDataReader reader = await cmd.ExecuteReaderAsync();
+
+            ICollection<string> tables = [];
+
+            while (await reader.ReadAsync())
+            {
+                tables.Add(reader.GetString(0));
+            }
+
+            reader.Close();
+
+            foreach (string tableName in tables)
+            {
+                string delete = $"DELETE FROM {tableName}";
+                using MySqlCommand cmdDelete = new MySqlCommand(delete, connection, transaction);
+                await cmdDelete.ExecuteNonQueryAsync();
+            }
+
+            await transaction.CommitAsync();
+            Console.WriteLine("Cleared repository tables");
+        }
+        catch (DbException e)
+        {
+            Console.WriteLine($"Error during clear, rolling back: {e.Message}");
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<Guid> GetLastSuccessfulEventId()
