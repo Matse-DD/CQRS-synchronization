@@ -19,8 +19,8 @@ public class Projector
     private readonly Channel<bool> _signalChannel;
 
     public Projector(
-        ICommandRepository commandRepository, 
-        IQueryRepository queryRepository, 
+        ICommandRepository commandRepository,
+        IQueryRepository queryRepository,
         IEventFactory eventFactory,
         ILogger<Projector> logger)
     {
@@ -29,7 +29,7 @@ public class Projector
         _eventFactory = eventFactory;
         _logger = logger;
         _signalChannel = Channel.CreateUnbounded<bool>();
-        
+
         _logger.LogInformation("Projector started. Waiting for events...");
         _ = ProcessEvents();
     }
@@ -39,7 +39,7 @@ public class Projector
         List<string> ofEvents = batchOfEvents.ToList();
         IList<string> eventList = [.. ofEvents, .. _eventQueue];
         _eventQueue = new ConcurrentQueue<string>(eventList.Distinct());
-        
+
         _logger.LogInformation("Added {Count} events to the front of the queue.", ofEvents.Count());
         _signalChannel.Writer.TryWrite(true);
     }
@@ -64,7 +64,7 @@ public class Projector
 
             await _queryRepository.Execute(commandForEvent, eventId);
             await _commandRepository.RemoveEvent(eventId);
-            
+
             _logger.LogInformation("Successfully projected Event {EventId}", eventId);
         }
         catch (Exception ex)
@@ -90,7 +90,7 @@ public class Projector
         }
     }
 
-    public void Lock() 
+    public void Lock()
     {
         _locked = true;
         _logger.LogWarning("Projector LOCKED.");

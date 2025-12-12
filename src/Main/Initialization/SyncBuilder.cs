@@ -25,7 +25,7 @@ public class SyncBuilder
         _logger.LogInformation("Initializing SyncBuilder...");
 
         ConfigurationBuilder configBuilder = new ConfigurationBuilder();
-        
+
         configBuilder.SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
             .AddJsonFile("appsettings.Test.json", optional: true, reloadOnChange: false)
@@ -33,7 +33,7 @@ public class SyncBuilder
 
         _configuration = configBuilder.Build();
         _services.AddSingleton(_configuration);
-        
+
         _services.AddLogging(builder =>
         {
             builder.AddConsole();
@@ -46,10 +46,10 @@ public class SyncBuilder
         _logger.LogInformation("Adding Repositories...");
         string mongoConn = _configuration["CommandDatabase:ConnectionString"] ?? throw new InvalidOperationException("Missing ConnectionString for Command/Write Database");
         string mysqlConn = _configuration["QueryDatabase:ConnectionString"] ?? throw new InvalidOperationException("Missing ConnectionString for Query/Read Database");
-        
+
         _services.AddSingleton<ICommandRepository>(sp => new MongoDbCommandRepository(mongoConn, sp.GetRequiredService<ILogger<MongoDbCommandRepository>>()));
         _services.AddSingleton<IQueryRepository>(sp => new MySqlQueryRepository(mysqlConn, sp.GetRequiredService<ILogger<MySqlQueryRepository>>()));
-        
+
         return this;
     }
 
@@ -79,7 +79,7 @@ public class SyncBuilder
         _logger.LogInformation("Adding Observer...");
         string mongoConn = _configuration["CommandDatabase:ConnectionString"]!;
         _services.AddSingleton<IObserver>(sp => new MongoDbObserver(mongoConn, sp.GetRequiredService<ILogger<MongoDbObserver>>()));
-            
+
         return this;
     }
 
@@ -87,10 +87,10 @@ public class SyncBuilder
     {
         _logger.LogInformation("Building Application...");
         _services.AddSingleton<SyncApplication>();
-        
+
         ServiceProvider provider = _services.BuildServiceProvider();
         _logger.LogInformation("Application has finished building.");
-        
+
         return provider.GetRequiredService<SyncApplication>();
     }
 }

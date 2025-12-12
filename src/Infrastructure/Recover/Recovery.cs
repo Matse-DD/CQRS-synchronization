@@ -4,8 +4,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Recover;
 
-public class Recovery(ICommandRepository commandRepository, IQueryRepository queryRepository, Projector projector, ILogger<Recovery> logger) {
-    
+public class Recovery(ICommandRepository commandRepository, IQueryRepository queryRepository, Projector projector, ILogger<Recovery> logger)
+{
+
     public void Recover()
     {
         logger.LogInformation("Initiating Recovery Process...");
@@ -20,7 +21,7 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         {
             logger.LogInformation("Fetching all events from Command Repository...");
             IEnumerable<OutboxEvent> outboxEvents = await commandRepository.GetAllEvents();
-            
+
             logger.LogInformation("Fetching last successful event ID from Query Repository...");
             Guid lastSuccessfulEventId = await queryRepository.GetLastSuccessfulEventId();
 
@@ -35,15 +36,15 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
             }
 
             IList<string> pureEvents = [];
-            
+
             var eventList = outboxEvents.ToList();
             eventList.ForEach(entry => pureEvents.Add(entry.eventItem));
-            
+
             logger.LogInformation("Replaying {Count} events to Projector...", pureEvents.Count);
-            
+
             projector.AddEventsToFront(pureEvents);
             projector.Unlock();
-            
+
             logger.LogInformation("Recovery completed successfully.");
         }
         catch (Exception e)

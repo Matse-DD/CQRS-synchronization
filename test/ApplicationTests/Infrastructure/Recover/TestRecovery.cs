@@ -113,7 +113,8 @@ public class TestRecovery
         }
 
         MockCommandRepository commandRepository = new MockCommandRepository(seedingOutbox);
-        MockQueryRepository queryRepository = new MockQueryRepository {
+        MockQueryRepository queryRepository = new MockQueryRepository
+        {
             LastSuccessfulEventId = new Guid(seedingOutbox.ElementAt(0).eventId)
         };
 

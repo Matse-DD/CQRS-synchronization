@@ -21,7 +21,7 @@ public class MongoDbCommandRepository : ICommandRepository
 
     public async Task<ICollection<OutboxEvent>> GetAllEvents()
     {
-        SortDefinition<BsonDocument>? sort = Builders<BsonDocument>.Sort.Ascending("_id"); 
+        SortDefinition<BsonDocument>? sort = Builders<BsonDocument>.Sort.Ascending("_id");
         ICollection<BsonDocument> events = await _collection
             .Find(_ => true)
             .Sort(sort)
@@ -40,7 +40,7 @@ public class MongoDbCommandRepository : ICommandRepository
         );
 
         DeleteResult result = await _collection.DeleteOneAsync(filter);
-        
+
         if (result.DeletedCount > 0)
         {
             _logger.LogInformation("Removed event {EventId} from Outbox", eventId);
