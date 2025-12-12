@@ -52,7 +52,7 @@ public class Projector
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"error met de projector: {ex.Message}");
+            Console.WriteLine($"Projector error: {ex.Message}");
         }
     }
 
