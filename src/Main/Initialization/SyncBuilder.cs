@@ -16,8 +16,10 @@ namespace Main.Initialization;
 public class SyncBuilder
 {
     private readonly ServiceCollection _services = new();
-    private readonly IConfiguration _configuration;
     private readonly ILogger<SyncBuilder> _logger;
+
+    private readonly string _connectionStringCommandDatabase;
+    private readonly string _connectionStringQueryDatabase;
 
     public SyncBuilder(ILogger<SyncBuilder> logger)
     {
@@ -25,30 +27,48 @@ public class SyncBuilder
         _logger.LogInformation("Initializing SyncBuilder...");
 
         ConfigurationBuilder configBuilder = new ConfigurationBuilder();
-
         configBuilder.SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
             .AddJsonFile("appsettings.Test.json", optional: true, reloadOnChange: false)
             .AddEnvironmentVariables();
 
-        _configuration = configBuilder.Build();
-        _services.AddSingleton(_configuration);
+        IConfiguration configuration = configBuilder.Build();
+        _services.AddSingleton(configuration);
 
         _services.AddLogging(builder =>
         {
             builder.AddConsole();
             builder.SetMinimumLevel(LogLevel.Information);
         });
+
+        string? connectionStringCommandDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_COMMAND_DB");
+        string? connectionStringQueryDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_QUERY_DB");
+
+        if (!string.IsNullOrEmpty(connectionStringCommandDatabase) && !string.IsNullOrEmpty(connectionStringQueryDatabase))
+        {
+            _logger.LogInformation("Found connection strings in Environment Variables.");
+            _connectionStringCommandDatabase = connectionStringCommandDatabase;
+            _connectionStringQueryDatabase = connectionStringQueryDatabase;
+        }
+        else
+        {
+            _logger.LogInformation("Environment variables not found. Falling back to appsettings configuration.");
+
+            _connectionStringCommandDatabase = configuration["CommandDatabase:ConnectionString"]
+            ?? throw new InvalidOperationException("Connection string 'CommandDatabase' not found in configuration.");
+            _connectionStringQueryDatabase = configuration["QueryDatabase:ConnectionString"]
+            ?? throw new InvalidOperationException("Connection string 'QueryDatabase' not found in configuration.");
+        }
     }
 
     public SyncBuilder AddRepositories()
     {
         _logger.LogInformation("Adding Repositories...");
-        string mongoConn = _configuration["CommandDatabase:ConnectionString"] ?? throw new InvalidOperationException("Missing ConnectionString for Command/Write Database");
-        string mysqlConn = _configuration["QueryDatabase:ConnectionString"] ?? throw new InvalidOperationException("Missing ConnectionString for Query/Read Database");
+        _logger.LogInformation("Command DB Connection: {ConnectionString}", _connectionStringCommandDatabase);
+        _logger.LogInformation("Query DB Connection: {ConnectionString}", _connectionStringQueryDatabase);
 
-        _services.AddSingleton<ICommandRepository>(sp => new MongoDbCommandRepository(mongoConn, sp.GetRequiredService<ILogger<MongoDbCommandRepository>>()));
-        _services.AddSingleton<IQueryRepository>(sp => new MySqlQueryRepository(mysqlConn, sp.GetRequiredService<ILogger<MySqlQueryRepository>>()));
+        _services.AddSingleton<ICommandRepository>(sp => new MongoDbCommandRepository(_connectionStringCommandDatabase, sp.GetRequiredService<ILogger<MongoDbCommandRepository>>()));
+        _services.AddSingleton<IQueryRepository>(sp => new MySqlQueryRepository(_connectionStringQueryDatabase, sp.GetRequiredService<ILogger<MySqlQueryRepository>>()));
 
         return this;
     }
@@ -77,9 +97,7 @@ public class SyncBuilder
     public SyncBuilder AddObserver()
     {
         _logger.LogInformation("Adding Observer...");
-        string mongoConn = _configuration["CommandDatabase:ConnectionString"]!;
-        _services.AddSingleton<IObserver>(sp => new MongoDbObserver(mongoConn, sp.GetRequiredService<ILogger<MongoDbObserver>>()));
-
+        _services.AddSingleton<IObserver>(sp => new MongoDbObserver(_connectionStringCommandDatabase, sp.GetRequiredService<ILogger<MongoDbObserver>>()));
         return this;
     }
 
