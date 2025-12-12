@@ -17,6 +17,17 @@ public class Replayer(ICommandRepository commandRepository, IQueryRepository que
 
     private async void StartReplaying()
     {
-        
+        try
+        {
+            IEnumerable<OutboxEvent> outboxEvents = await _commandRepository.GetAllEvents();
+            await _queryRepository.Clear();
+
+            _projector.AddEventsToFront(outboxEvents.Select(e => e.eventItem));
+            _projector.Unlock();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in Replay Mechanism: {e.Message}");
+        }
     }
 }
