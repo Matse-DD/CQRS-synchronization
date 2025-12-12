@@ -34,11 +34,4 @@
 		</None>
 	</ItemGroup>
 
-
-	<ItemGroup>
-		<None Update="appsettings.Production.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-	</ItemGroup>
-
 </Project>

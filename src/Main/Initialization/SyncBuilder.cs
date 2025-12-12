@@ -13,7 +13,6 @@ namespace Main.Initialization;
 
 public class SyncBuilder
 {
-    private readonly IConfiguration _configuration;
     private ICommandRepository? _commandRepository;
     private IQueryRepository? _queryRepository;
     private IEventFactory? _eventFactory;
@@ -21,35 +20,45 @@ public class SyncBuilder
     private Recovery? _recovery;
     private IObserver? _observer;
 
+    private readonly string _connectionStringCommandDatabase;
+    private readonly string _connectionStringQueryDatabase;
+
     public SyncBuilder()
     {
-        string? env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"); // TODO set ASPNETCORE_ENVIRONMENT=Production or Test from outside for production or other env
+        string? connectionStringCommandDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_COMMAND_DB");
+        string? connectionStringQueryDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_QUERY_DB");
 
-        if (env == null)
+        if (connectionStringCommandDatabase == null || connectionStringQueryDatabase == null)
         {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
-            env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            Console.WriteLine("connectionStringCommandDatabase or connectionStringQueryDatabase not found falling back to appsettings.Test.json");
+
+            IConfiguration config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+                .AddJsonFile($"appsettings.Test.json", optional: false, reloadOnChange: false)
+                .Build();
+
+            _connectionStringCommandDatabase = config["CommandDatabase:ConnectionString"]
+                ?? throw new InvalidOperationException("Connection string 'CommandDatabase' not found.");
+
+            _connectionStringQueryDatabase = config["QueryDatabase:ConnectionString"]
+                ?? throw new InvalidOperationException("Connection string 'QueryDatabase' not found.");
         }
-
-        Console.WriteLine(env); //TODO remove once we are sure the production env can be selected
-
-        _configuration = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-            .AddJsonFile($"appsettings.{env}.json", optional: false, reloadOnChange: false)
-            .Build();
+        else
+        {
+            _connectionStringCommandDatabase = connectionStringCommandDatabase;
+            _connectionStringQueryDatabase = connectionStringQueryDatabase;
+        }
     }
 
     public SyncBuilder AddRepositories()
     {
-        string connectionStringQueryRepoMySql = _configuration["ReadDatabase:ConnectionString"]
-        ?? throw new InvalidOperationException("Connection string 'ReadDatabase' not found.");
+        _commandRepository = new MongoDbCommandRepository(_connectionStringCommandDatabase);
+        _queryRepository = new MySqlQueryRepository(_connectionStringQueryDatabase);
 
-        string connectionStringCommandRepoMongo = _configuration["WriteDatabase:ConnectionString"]
-        ?? throw new InvalidOperationException("Connection string 'WriteDatabase' not found.");
+        Console.WriteLine(_connectionStringCommandDatabase);
+        Console.WriteLine(_connectionStringQueryDatabase);
 
-        _commandRepository = new MongoDbCommandRepository(connectionStringCommandRepoMongo);
-        _queryRepository = new MySqlQueryRepository(connectionStringQueryRepoMySql);
         return this;
     }
 
@@ -73,8 +82,7 @@ public class SyncBuilder
 
     public SyncBuilder AddObserver()
     {
-        string connectionStringCommandRepoMongo = _configuration["WriteDatabase:ConnectionString"]
-        ?? throw new InvalidOperationException("Connection string 'WriteDatabase' not found.");
+        string connectionStringCommandRepoMongo = _connectionStringCommandDatabase;
 
         _observer = new MongoDbObserver(connectionStringCommandRepoMongo);
         return this;
