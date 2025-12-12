@@ -1,10 +1,11 @@
 ﻿using Application.Contracts.Persistence;
 using MySql.Data.MySqlClient;
 using System.Data.Common;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Persistence.QueryRepository;
 
-public class MySqlQueryRepository(string connectionString) : IQueryRepository
+public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRepository> logger) : IQueryRepository
 {
     public async Task Execute(string command, Guid eventId)
     {
@@ -12,11 +13,7 @@ public class MySqlQueryRepository(string connectionString) : IQueryRepository
         await connection.OpenAsync();
 
         string commandLastEventId = $@"UPDATE last_info SET last_event_id = ""{eventId}""";
-
-        // TODO change this to logger
-        Console.WriteLine(command);
-        Console.WriteLine(commandLastEventId);
-        Console.WriteLine();
+        logger.LogInformation(command + "\n" + commandLastEventId + "\n\n");
 
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
 
@@ -32,8 +29,7 @@ public class MySqlQueryRepository(string connectionString) : IQueryRepository
         }
         catch (DbException ex)
         {
-            Console.WriteLine("something went wrong rolling back");
-            Console.WriteLine(ex.ToString());
+            logger.LogCritical("Something went wrong, rolling back transaction. Exception: {Exception}", ex);
             await transaction.RollbackAsync();
             throw;
         }
@@ -51,7 +47,7 @@ public class MySqlQueryRepository(string connectionString) : IQueryRepository
 
         if (!await result.ReadAsync())
         {
-            Console.WriteLine("result is empty");
+            logger.LogWarning("Result is empty.");
             return Guid.Empty;
         }
 
