@@ -28,7 +28,7 @@ public class MongoDbCommandRepository : ICommandRepository
             .Sort(sort)
             .ToListAsync();
 
-        ICollection<OutboxEvent> outboxEvents = events.Select(d => 
+        ICollection<OutboxEvent> outboxEvents = events.Select(d =>
             new OutboxEvent(d.GetValue("id").AsString ?? string.Empty, d.SanitizeOccurredAt().ToJson() ?? string.Empty)).ToList();
 
         return outboxEvents;
