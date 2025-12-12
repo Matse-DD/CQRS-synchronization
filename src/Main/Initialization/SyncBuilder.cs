@@ -31,14 +31,14 @@ public class SyncBuilder
         if (connectionStringCommandDatabase == null || connectionStringQueryDatabase == null)
         {
             Console.WriteLine("connectionStringCommandDatabase or connectionStringQueryDatabase not found falling back to appsettings.Test.json");
-            
+
             IConfiguration config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
                 .AddJsonFile($"appsettings.Test.json", optional: false, reloadOnChange: false)
                 .Build();
 
-            _connectionStringCommandDatabase = config["CommandDatabase:ConnectionString"] 
+            _connectionStringCommandDatabase = config["CommandDatabase:ConnectionString"]
                 ?? throw new InvalidOperationException("Connection string 'CommandDatabase' not found.");
 
             _connectionStringQueryDatabase = config["QueryDatabase:ConnectionString"]
