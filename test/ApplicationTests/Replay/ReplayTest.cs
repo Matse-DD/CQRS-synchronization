@@ -13,8 +13,8 @@ public class ReplayTest
     public void Test_Replay_Should_Get_Priority_On_Change_Stream()
     {
         ICollection<OutboxEvent> seedingOutbox = [];
-        
-        
+
+
         for (int i = 0; i < 15; i++)
         {
             Guid guid = Guid.NewGuid();
@@ -39,7 +39,7 @@ public class ReplayTest
         }
 
         ICollection<string> seedingObserver = [];
-        
+
         for (int i = 0; i < 15; i++)
         {
             seedingObserver.Add(
@@ -60,26 +60,26 @@ public class ReplayTest
                 "
             );
         }
-        
+
         MockCommandRepository commandRepository = new MockCommandRepository(seedingOutbox);
         MockQueryRepository queryRepository = new MockQueryRepository();
         MockEventFactory eventFactory = new MockEventFactory();
         Projector projector = new Projector(commandRepository, queryRepository, eventFactory);
-        
+
         Replayer replayer = new Replayer(commandRepository, queryRepository, projector);
-        
+
         MockObserver observer = new MockObserver(seedingObserver);
-        
+
         //Act
         projector.Lock();
         observer.StartListening(projector.AddEvent, CancellationToken.None);
         replayer.Replay();
-        
+
         //ASSERT
         SleepTillReady(queryRepository);
-        
+
         Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(0).eventId}"));
-        
+
         Guid expectedFirstEventIdObserver = eventFactory.DetermineEvent(seedingObserver.ElementAt(0)).EventId;
         Assert.That(queryRepository.History.ElementAt(15), Is.EqualTo($"delete {expectedFirstEventIdObserver}"));
     }
