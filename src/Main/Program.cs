@@ -1,8 +1,9 @@
 ﻿using Main.Initialization;
 using Microsoft.Extensions.Logging;
 
-using ILoggerFactory loggerFactory = LoggerFactory.Create(builder => {
-        builder.AddConsole(); builder.SetMinimumLevel(LogLevel.Information);
+using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+{
+    builder.AddConsole(); builder.SetMinimumLevel(LogLevel.Information);
 });
 
 ILogger<SyncBuilder> logger = loggerFactory.CreateLogger<SyncBuilder>();
