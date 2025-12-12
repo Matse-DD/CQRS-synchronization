@@ -27,10 +27,12 @@ services:
         restart: always
         depends_on:
             command-db: service_healthy
-        query-db: service_healthy
+            query-db: service_healthy
         env_file: .cqrs-sync.env
 
 ```
+
+if environment variables are correcly set, the service will automatically connect to the two databases and update the query database when necessary.
 
 ## Demo
 
