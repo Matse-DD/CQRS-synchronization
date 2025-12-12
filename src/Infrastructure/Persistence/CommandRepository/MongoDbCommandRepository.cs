@@ -1,5 +1,6 @@
 ﻿using Application.Contracts.Persistence;
 using Infrastructure.Tools.DatabaseExtensions;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -8,12 +9,14 @@ namespace Infrastructure.Persistence.CommandRepository;
 public class MongoDbCommandRepository : ICommandRepository
 {
     private readonly IMongoCollection<BsonDocument> _collection;
+    private readonly ILogger<MongoDbCommandRepository> _logger;
 
-    public MongoDbCommandRepository(string connectionString)
+    public MongoDbCommandRepository(string connectionString, ILogger<MongoDbCommandRepository> logger)
     {
         MongoClient client = new(connectionString);
         IMongoDatabase database = client.GetDatabase("users"); //cqrs_command
         _collection = database.GetCollection<BsonDocument>("events")!;
+        _logger = logger;
     }
 
     public async Task<ICollection<OutboxEvent>> GetAllEvents()
@@ -25,14 +28,8 @@ public class MongoDbCommandRepository : ICommandRepository
             .Sort(sort)
             .ToListAsync();
 
-        ICollection<OutboxEvent> outboxEvents = events.Select(
-            d =>
-            {
-                return new OutboxEvent(d.GetValue("id").AsString ?? string.Empty,
-
-                d.SanitizeOccurredAt().ToJson() ?? string.Empty);
-            }
-        ).ToList();
+        ICollection<OutboxEvent> outboxEvents = events.Select(d => 
+            new OutboxEvent(d.GetValue("id").AsString ?? string.Empty, d.SanitizeOccurredAt().ToJson() ?? string.Empty)).ToList();
 
         return outboxEvents;
     }
