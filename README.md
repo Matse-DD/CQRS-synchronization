@@ -12,7 +12,7 @@ In order to utilize the application, you will have to build the container by run
 dotnet publish src/Main/Main.csproj --os linux --arch x64 /t:PublishContainer               
 ```
 
-Than you can utilize it in your application by adding it to a docker compose file:
+Then you can utilize it in your application by adding it to a docker compose file:
 
 ```yaml
 services:
@@ -32,11 +32,11 @@ services:
 
 ```
 
-if environment variables are correcly set, the service will automatically connect to the two databases and update the query database when necessary.
+If the environment variables are correcly set, the service will automatically connect to the two databases and update the query database when necessary.
 
 ## Configuration
 
-a short explanation of the necessary environment variables:
+A short explanation of the necessary environment variables:
 
 - CONNECTION_STRING_COMMAND_DB: connection string of the command database
 - CONNECTION_STRING_QUERY_DB: connection string of the query database
