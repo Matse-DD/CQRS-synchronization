@@ -44,6 +44,8 @@ a short explanation of the necessary environment variables:
 
 ## Demo
 
+The demo (in the repos below) is a simple user management application using a MongoDB command database and a MySQL query database
+
 ## Links
 
 - [Demo frontend](https://github.com/howest-ti-sep/group-05-CQRS-demo-frontend)
