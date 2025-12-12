@@ -21,19 +21,35 @@ public class MongoDbObserver : IObserver
 
     public async Task StartListening(Action<string> callback, CancellationToken cancellationToken)
     {
+        _logger.LogInformation("Observer starting to listen for changes...");
+
         PipelineDefinition<ChangeStreamDocument<BsonDocument>, ChangeStreamDocument<BsonDocument>>? pipeline = new EmptyPipelineDefinition<ChangeStreamDocument<BsonDocument>>()
             .Match("{operationType: { $in: ['insert'] }}");
 
         ChangeStreamOptions options = new ChangeStreamOptions();
         options.FullDocument = ChangeStreamFullDocumentOption.UpdateLookup;
-        using IChangeStreamCursor<ChangeStreamDocument<BsonDocument>>? cursor = await _collection.WatchAsync(pipeline, options, cancellationToken);
 
-        while (await cursor.MoveNextAsync(cancellationToken))
+        try
         {
-            foreach (ChangeStreamDocument<BsonDocument>? change in cursor.Current)
+            using IChangeStreamCursor<ChangeStreamDocument<BsonDocument>>? cursor = await _collection.WatchAsync(pipeline, options, cancellationToken);
+
+            while (await cursor.MoveNextAsync(cancellationToken))
             {
-                callback(change.FullDocument.SanitizeOccurredAt().ToJson());
+                foreach (ChangeStreamDocument<BsonDocument>? change in cursor.Current)
+                {
+                    _logger.LogInformation("Change detected (Operation: {OperationType}). Processing...", change.OperationType);
+                    callback(change.FullDocument.SanitizeOccurredAt().ToJson());
+                }
             }
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogInformation("Observer stopped.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in Observer occurred while listening for changes.");
+            throw;
         }
     }
 }
