@@ -19,6 +19,11 @@ public class MockQueryRepository : IQueryRepository
         return Task.CompletedTask;
     }
 
+    public Task Clear()
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<Guid> GetLastSuccessfulEventId()
     {
         return Task.FromResult(LastSuccessfulEventId);

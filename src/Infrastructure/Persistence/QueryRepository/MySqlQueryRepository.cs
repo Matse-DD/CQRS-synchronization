@@ -41,6 +41,11 @@ public class MySqlQueryRepository(string connectionString) : IQueryRepository
         }
     }
 
+    public Task Clear()
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task<Guid> GetLastSuccessfulEventId()
     {
         using MySqlConnection connection = new MySqlConnection(connectionString);
