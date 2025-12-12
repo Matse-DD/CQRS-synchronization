@@ -7,5 +7,16 @@ public class Replayer(ICommandRepository commandRepository, IQueryRepository que
 {
     private readonly ICommandRepository _commandRepository = commandRepository;
     private readonly IQueryRepository _queryRepository = queryRepository;
-    private readonly Projector projector = projector;
+    private readonly Projector _projector = projector;
+
+    public void Replay()
+    {
+        _projector.Lock();
+        StartReplaying();
+    }
+
+    private async void StartReplaying()
+    {
+        
+    }
 }
