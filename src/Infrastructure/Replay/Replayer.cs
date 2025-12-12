@@ -1,17 +1,14 @@
 ﻿using Application.Contracts.Persistence;
 using Infrastructure.Projectors;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Replay;
 
-public class Replayer(ICommandRepository commandRepository, IQueryRepository queryRepository, Projector projector)
+public class Replayer(ICommandRepository commandRepository, IQueryRepository queryRepository, Projector projector, ILogger<Replayer> logger)
 {
-    private readonly ICommandRepository _commandRepository = commandRepository;
-    private readonly IQueryRepository _queryRepository = queryRepository;
-    private readonly Projector _projector = projector;
-
     public void Replay()
     {
-        _projector.Lock();
+        projector.Lock();
         StartReplaying();
     }
 
@@ -19,15 +16,15 @@ public class Replayer(ICommandRepository commandRepository, IQueryRepository que
     {
         try
         {
-            IEnumerable<OutboxEvent> outboxEvents = await _commandRepository.GetAllEvents();
-            await _queryRepository.Clear();
+            IEnumerable<OutboxEvent> outboxEvents = await commandRepository.GetAllEvents();
+            await queryRepository.Clear();
 
-            _projector.AddEventsToFront(outboxEvents.Select(e => e.eventItem));
-            _projector.Unlock();
+            projector.AddEventsToFront(outboxEvents.Select(e => e.eventItem));
+            projector.Unlock();
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Error in Replay Mechanism: {e.Message}");
+            logger.LogError(e, "Error during replay: {Message}", e.Message);
         }
     }
 }
