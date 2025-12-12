@@ -1,6 +1,8 @@
 ﻿using Application.Contracts.Persistence;
 using MySql.Data.MySqlClient;
+using Mysqlx.Crud;
 using System.Data.Common;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.QueryRepository;
 
@@ -41,21 +43,38 @@ public class MySqlQueryRepository(string connectionString) : IQueryRepository
 
     public async Task<Guid> GetLastSuccessfulEventId()
     {
-        const string queryLastEventId = "SELECT last_event_id FROM last_info";
-
         using MySqlConnection connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, connection);
-        using DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync();
+        Guid resultGuid = Guid.Empty;
+        bool needsDefaultValue = false;
 
-        if (!await result.ReadAsync())
+        const string queryLastEventId = "SELECT last_event_id FROM last_info";
+        using MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, connection);
+        using (DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync())
         {
-            Console.WriteLine("result is empty");
-            return Guid.Empty;
+            if (await result.ReadAsync())
+            {
+                int columnLastEventId = result.GetOrdinal("last_event_id");
+                resultGuid = result.IsDBNull(columnLastEventId) ? Guid.Empty : result.GetGuid(columnLastEventId);
+            }
+            else
+            {
+                needsDefaultValue = true;
+            }
         }
 
-        int columnLastEventId = result.GetOrdinal("last_event_id");
-        return result.IsDBNull(columnLastEventId) ? Guid.Empty : result.GetGuid(columnLastEventId);
+        if (needsDefaultValue) await PlaceEmptyGuidInLastEventId(connection);
+
+        return resultGuid;
+    }
+
+    private async Task PlaceEmptyGuidInLastEventId(MySqlConnection connection)
+    {
+        string commandCreatePlace = $"INSERT INTO last_info VALUES(1, {Guid.Empty})";
+        using MySqlCommand createDefaultValueForLastInfo = new MySqlCommand(commandCreatePlace, connection);
+        await createDefaultValueForLastInfo.ExecuteNonQueryAsync();
+
+        Console.WriteLine("Placed empty guid in last_info...");
     }
 }
