@@ -37,7 +37,7 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
 
             IList<string> pureEvents = [];
 
-            var eventList = outboxEvents.ToList();
+            List<OutboxEvent> eventList = outboxEvents.ToList();
             eventList.ForEach(entry => pureEvents.Add(entry.eventItem));
 
             logger.LogInformation("Replaying {Count} events to Projector...", pureEvents.Count);
