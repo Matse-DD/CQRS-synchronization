@@ -24,6 +24,11 @@ public class SynchronizedQueryRepository(int expectedCount) : IQueryRepository
         return Task.CompletedTask;
     }
 
+    public Task Clear()
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<Guid> GetLastSuccessfulEventId()
     {
         return Task.FromResult(Guid.Empty);
