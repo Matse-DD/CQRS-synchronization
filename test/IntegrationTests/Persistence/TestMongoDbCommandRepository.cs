@@ -1,5 +1,6 @@
 using Application.Contracts.Persistence;
 using Infrastructure.Persistence.CommandRepository;
+using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -20,7 +21,7 @@ public class TestMongoDbCommandRepository
 
         await _collection.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
 
-        _repository = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo);
+        _repository = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
     }
 
     [TearDown]
