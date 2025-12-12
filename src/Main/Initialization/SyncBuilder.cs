@@ -44,14 +44,14 @@ public class SyncBuilder
     public SyncBuilder AddRepositories()
     {
         _logger.LogInformation("Adding Repositories.");
-        string mongoConn = _configuration["WriteDatabase:ConnectionString"] 
+        string mongoConn = _configuration["WriteDatabase:ConnectionString"]
         ?? throw new InvalidOperationException("Missing WriteDatabase:ConnectionString in appsettings");
         _logger.LogInformation("MongoDB Connected.");
-        
-        string mysqlConn = _configuration["ReadDatabase:ConnectionString"] 
+
+        string mysqlConn = _configuration["ReadDatabase:ConnectionString"]
         ?? throw new InvalidOperationException("Missing ReadDatabase:ConnectionString in appsettings");
         _logger.LogInformation("MySQL Connected.");
-        
+
         _services.AddSingleton<ICommandRepository>(sp => new MongoDbCommandRepository(mongoConn, sp.GetRequiredService<ILogger<MongoDbCommandRepository>>()));
         _services.AddSingleton<IQueryRepository>(sp => new MySqlQueryRepository(mysqlConn, sp.GetRequiredService<ILogger<MySqlQueryRepository>>()));
 
@@ -84,7 +84,7 @@ public class SyncBuilder
         _logger.LogInformation("Adding Observer.");
         string mongoConn = _configuration["WriteDatabase:ConnectionString"]!;
         _services.AddSingleton<IObserver>(sp => new MongoDbObserver(mongoConn, sp.GetRequiredService<ILogger<MongoDbObserver>>()));
-            
+
         return this;
     }
 
