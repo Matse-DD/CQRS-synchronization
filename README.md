@@ -44,5 +44,9 @@ a short explanation of the necessary environment variables:
 
 ## Demo
 
+## Links
+
 - [Demo frontend](https://github.com/howest-ti-sep/group-05-CQRS-demo-frontend)
 - [Demo backend](https://github.com/howest-ti-sep/group-05-CQRS-synchronization-demo-backend)
+- [Research](RESEARCH.md)
+- [Architecture](https://miro.com/welcomeonboard/bTVjNWdhY0FmTHB6WWFMUDNqQ25veHhUczI2SnFHN1gwVlMxa0xJRVlqMFdXMEJWSVdmcXdGWlFNRjlTbGpJdUNwcDQ2V3kzMFBDZmcwYTBldENnVDUwRkpVZ1Mvby9VeldlTnpCRzZSNGZuVmNqQ1VkUy9aZ3ZoZTYyWDFSY3RBd044SHFHaVlWYWk0d3NxeHNmeG9BPT0hdjE=?share_link_id=954245417354)
