@@ -8,88 +8,89 @@ using Infrastructure.Persistence.QueryRepository;
 using Infrastructure.Projectors;
 using Infrastructure.Recover;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Main.Initialization;
 
 public class SyncBuilder
 {
-    private ICommandRepository? _commandRepository;
-    private IQueryRepository? _queryRepository;
-    private IEventFactory? _eventFactory;
-    private Projector? _projector;
-    private Recovery? _recovery;
-    private IObserver? _observer;
+    private readonly ServiceCollection _services = new();
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<SyncBuilder> _logger;
 
-    private readonly string _connectionStringCommandDatabase;
-    private readonly string _connectionStringQueryDatabase;
-
-    public SyncBuilder()
+    public SyncBuilder(ILogger<SyncBuilder> logger)
     {
-        string? connectionStringCommandDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_COMMAND_DB");
-        string? connectionStringQueryDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_QUERY_DB");
+        _logger = logger;
+        _logger.LogInformation("Initializing SyncBuilder...");
 
-        if (connectionStringCommandDatabase == null || connectionStringQueryDatabase == null)
+        ConfigurationBuilder configBuilder = new ConfigurationBuilder();
+        
+        configBuilder.SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+            .AddJsonFile("appsettings.Test.json", optional: true, reloadOnChange: false)
+            .AddEnvironmentVariables();
+
+        _configuration = configBuilder.Build();
+        _services.AddSingleton(_configuration);
+        
+        _services.AddLogging(builder =>
         {
-            Console.WriteLine("connectionStringCommandDatabase or connectionStringQueryDatabase not found falling back to appsettings.Test.json");
-
-            IConfiguration config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-                .AddJsonFile("appsettings.Test.json", optional: false, reloadOnChange: false)
-                .Build();
-
-            _connectionStringCommandDatabase = config["CommandDatabase:ConnectionString"]
-                ?? throw new InvalidOperationException("Connection string 'CommandDatabase' not found.");
-
-            _connectionStringQueryDatabase = config["QueryDatabase:ConnectionString"]
-                ?? throw new InvalidOperationException("Connection string 'QueryDatabase' not found.");
-        }
-        else
-        {
-            _connectionStringCommandDatabase = connectionStringCommandDatabase;
-            _connectionStringQueryDatabase = connectionStringQueryDatabase;
-        }
+            builder.AddConsole();
+            builder.SetMinimumLevel(LogLevel.Information);
+        });
     }
 
     public SyncBuilder AddRepositories()
     {
-        _commandRepository = new MongoDbCommandRepository(_connectionStringCommandDatabase);
-        _queryRepository = new MySqlQueryRepository(_connectionStringQueryDatabase);
-
-        Console.WriteLine(_connectionStringCommandDatabase);
-        Console.WriteLine(_connectionStringQueryDatabase);
-
+        _logger.LogInformation("Adding Repositories...");
+        string mongoConn = _configuration["CommandDatabase:ConnectionString"] ?? throw new InvalidOperationException("Missing ConnectionString for Command/Write Database");
+        string mysqlConn = _configuration["QueryDatabase:ConnectionString"] ?? throw new InvalidOperationException("Missing ConnectionString for Query/Read Database");
+        
+        _services.AddSingleton<ICommandRepository>(sp => new MongoDbCommandRepository(mongoConn, sp.GetRequiredService<ILogger<MongoDbCommandRepository>>()));
+        _services.AddSingleton<IQueryRepository>(sp => new MySqlQueryRepository(mysqlConn, sp.GetRequiredService<ILogger<MySqlQueryRepository>>()));
+        
         return this;
     }
 
     public SyncBuilder AddEventFactory()
     {
-        _eventFactory = new MySqlEventFactory();
+        _logger.LogInformation("Adding Event Factory...");
+        _services.AddSingleton<IEventFactory, MySqlEventFactory>();
         return this;
     }
 
     public SyncBuilder AddProjector()
     {
-        _projector = new Projector(_commandRepository!, _queryRepository!, _eventFactory!);
+        _logger.LogInformation("Adding Projector...");
+        _services.AddSingleton<Projector>();
         return this;
     }
 
     public SyncBuilder AddRecovery()
     {
-        _recovery = new Recovery(_commandRepository!, _queryRepository!, _projector!);
+        _logger.LogInformation("Adding Recovery...");
+        _services.AddSingleton<Recovery>();
         return this;
     }
 
     public SyncBuilder AddObserver()
     {
-        string connectionStringCommandRepoMongo = _connectionStringCommandDatabase;
-
-        _observer = new MongoDbObserver(connectionStringCommandRepoMongo);
+        _logger.LogInformation("Adding Observer...");
+        string mongoConn = _configuration["CommandDatabase:ConnectionString"]!;
+        _services.AddSingleton<IObserver>(sp => new MongoDbObserver(mongoConn, sp.GetRequiredService<ILogger<MongoDbObserver>>()));
+            
         return this;
     }
 
     public SyncApplication Build()
     {
-        return new SyncApplication(_recovery!, _observer!, _projector!);
+        _logger.LogInformation("Building Application...");
+        _services.AddSingleton<SyncApplication>();
+        
+        ServiceProvider provider = _services.BuildServiceProvider();
+        _logger.LogInformation("Application has finished building.");
+        
+        return provider.GetRequiredService<SyncApplication>();
     }
 }
