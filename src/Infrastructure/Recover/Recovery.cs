@@ -45,7 +45,7 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
             projector.AddEventsToFront(pureEvents);
             projector.Unlock();
 
-            logger.LogInformation("Recovery completed successfully.");
+            logger.LogInformation("Events successfully added to Projector for recovery. Recovery process done.");
         }
         catch (Exception e)
         {
