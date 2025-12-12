@@ -21,8 +21,7 @@ public class MongoDbCommandRepository : ICommandRepository
 
     public async Task<ICollection<OutboxEvent>> GetAllEvents()
     {
-
-        SortDefinition<BsonDocument>? sort = Builders<BsonDocument>.Sort.Ascending("_id"); // occurredAt is niet nodig sinds _id ook met timestamp word generate, dus dit is al integrated.
+        SortDefinition<BsonDocument>? sort = Builders<BsonDocument>.Sort.Ascending("_id"); 
         ICollection<BsonDocument> events = await _collection
             .Find(_ => true)
             .Sort(sort)
@@ -41,6 +40,12 @@ public class MongoDbCommandRepository : ICommandRepository
         );
 
         DeleteResult result = await _collection.DeleteOneAsync(filter);
-        return result.IsAcknowledged && result.DeletedCount > 0;
+        
+        if (result.DeletedCount > 0)
+        {
+            _logger.LogInformation("Removed event {EventId} from Outbox", eventId);
+        }
+
+        return result is { IsAcknowledged: true, DeletedCount: > 0 };
     }
 }

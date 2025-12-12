@@ -1,12 +1,12 @@
 ﻿using Application.Contracts.Persistence;
 using MySql.Data.MySqlClient;
-using Mysqlx.Crud;
 using System.Data.Common;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Persistence.QueryRepository;
 
-public class MySqlQueryRepository(string connectionString) : IQueryRepository
+public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRepository> logger) : IQueryRepository 
 {
     public async Task Execute(string command, Guid eventId)
     {
@@ -15,10 +15,8 @@ public class MySqlQueryRepository(string connectionString) : IQueryRepository
 
         string commandLastEventId = $@"UPDATE last_info SET last_event_id = ""{eventId}""";
 
-        // TODO change this to logger
-        Console.WriteLine(command);
-        Console.WriteLine(commandLastEventId);
-        Console.WriteLine();
+        logger.LogInformation("Executing Update: {Command}", command);
+        logger.LogDebug("Updating LastEventId: {CommandLastEventId}", commandLastEventId);
 
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
 
@@ -34,8 +32,7 @@ public class MySqlQueryRepository(string connectionString) : IQueryRepository
         }
         catch (DbException ex)
         {
-            Console.WriteLine("something went wrong rolling back");
-            Console.WriteLine(ex.ToString());
+            logger.LogError(ex, "Transaction failed. Rolling back.");
             await transaction.RollbackAsync();
             throw;
         }
@@ -76,10 +73,10 @@ public class MySqlQueryRepository(string connectionString) : IQueryRepository
 
     private async Task PlaceEmptyGuidInLastEventId(MySqlConnection connection)
     {
-        string commandCreatePlace = $"INSERT INTO last_info VALUES(1, {Guid.Empty})";
+        string commandCreatePlace = $"INSERT INTO last_info VALUES(1, '{Guid.Empty}')";
         using MySqlCommand createDefaultValueForLastInfo = new MySqlCommand(commandCreatePlace, connection);
         await createDefaultValueForLastInfo.ExecuteNonQueryAsync();
 
-        Console.WriteLine("Placed empty guid in last_info...");
+        logger.LogInformation("Initialized 'last_info' table with empty GUID.");
     }
 }
