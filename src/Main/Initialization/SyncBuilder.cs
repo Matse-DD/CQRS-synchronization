@@ -35,7 +35,7 @@ public class SyncBuilder
             IConfiguration config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
-                .AddJsonFile($"appsettings.Test.json", optional: false, reloadOnChange: false)
+                .AddJsonFile("appsettings.Test.json", optional: false, reloadOnChange: false)
                 .Build();
 
             _connectionStringCommandDatabase = config["CommandDatabase:ConnectionString"]
