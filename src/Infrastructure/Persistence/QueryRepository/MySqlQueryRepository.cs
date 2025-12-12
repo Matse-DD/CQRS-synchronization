@@ -45,7 +45,7 @@ public class MySqlQueryRepository(string connectionString) : IQueryRepository
     {
         using MySqlConnection connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
-        
+
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
         try
         {
