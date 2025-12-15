@@ -49,7 +49,7 @@ public class MongoDbCommandRepository : ICommandRepository
         return result is { IsAcknowledged: true, DeletedCount: > 0 };
     }
 
-    public async Task MarkAsDone(Guid eventId)
+    public async Task<bool> MarkAsDone(Guid eventId)
     {
         FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Eq("id", eventId.ToString());
         
@@ -59,5 +59,7 @@ public class MongoDbCommandRepository : ICommandRepository
         {
             _logger.LogInformation("Marked event {EventId} as DONE", eventId);
         }
+        
+        return result is { IsAcknowledged: true, ModifiedCount: > 0 };
     }
 }

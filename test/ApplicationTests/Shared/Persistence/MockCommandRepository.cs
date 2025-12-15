@@ -30,12 +30,13 @@ public class MockCommandRepository(ICollection<OutboxEvent> seededEvents) : ICom
         return Task.FromResult(true);
     }
 
-    public Task MarkAsDone(Guid eventId)
+    public Task<bool> MarkAsDone(Guid eventId)
     {
-        OutboxEvent currentEvent = _eventOutbox.FirstOrDefault(e => e.eventId == eventId.ToString()) ?? throw new InvalidOperationException("Event not found");
+        OutboxEvent currentEvent = _eventOutbox.FirstOrDefault(e => e.eventId == eventId.ToString());
+        if (currentEvent ==null) return Task.FromResult(false);
         
         string newEvent = currentEvent.eventItem.Replace("\"status\":\"PENDING\"", "\"status\":\"DONE\"");
         currentEvent = currentEvent with { eventItem = newEvent };
-        return Task.CompletedTask;
+        return Task.FromResult(true);
     }
 }
