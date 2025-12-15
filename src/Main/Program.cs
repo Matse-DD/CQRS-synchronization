@@ -15,6 +15,7 @@ SyncApplication app = syncBuilder
     .AddEventFactory()
     .AddProjector()
     .AddRecovery()
+    .AddReplay()
     .AddObserver()
     .Build();
 
