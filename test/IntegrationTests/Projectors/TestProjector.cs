@@ -6,6 +6,7 @@ using Infrastructure.Persistence.CommandRepository;
 using Infrastructure.Persistence.QueryRepository;
 using Infrastructure.Projectors;
 using Infrastructure.Recover;
+using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MySql.Data.MySqlClient;
@@ -50,17 +51,17 @@ public class TestProjector
     public async Task Recover_Should_Handle_Events_That_Are_In_Outbox()
     {
         // Arrange
-        ICommandRepository commandRepo = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo);
-        IQueryRepository queryRepo = new MySqlQueryRepository(ConnectionStringQueryRepoMySql);
+        ICommandRepository commandRepo = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
+        IQueryRepository queryRepo = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
         IEventFactory eventFactory = new MySqlEventFactory();
 
-        Projector projector = new(commandRepo, queryRepo, eventFactory);
+        Projector projector = new(commandRepo, queryRepo, eventFactory, NullLogger<Projector>.Instance);
 
         // Act
         ICollection<string> eventsAdded = AddEventToOutbox();
         string lastEventId = ExtractEventId(eventsAdded.Last());
 
-        Recovery recover = new Recovery(commandRepo, queryRepo, projector);
+        Recovery recover = new Recovery(commandRepo, queryRepo, projector, NullLogger<Recovery>.Instance);
         recover.Recover();
 
         // Assert
@@ -75,11 +76,11 @@ public class TestProjector
     public async Task ChangeStream_Should_PickUp_New_Events()
     {
         // Arrange
-        ICommandRepository commandRepo = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo);
-        IQueryRepository queryRepo = new MySqlQueryRepository(ConnectionStringQueryRepoMySql);
+        ICommandRepository commandRepo = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
+        IQueryRepository queryRepo = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
         IEventFactory eventFactory = new MySqlEventFactory();
-        Projector projector = new Projector(commandRepo, queryRepo, eventFactory);
-        MongoDbObserver observer = new MongoDbObserver(ConnectionStringCommandRepoMongo);
+        Projector projector = new Projector(commandRepo, queryRepo, eventFactory, NullLogger<Projector>.Instance);
+        MongoDbObserver observer = new MongoDbObserver(ConnectionStringCommandRepoMongo, NullLogger<MongoDbObserver>.Instance);
 
         using CancellationTokenSource cancellationToken = new CancellationTokenSource();
         Task observerTask = observer.StartListening(projector.AddEvent, cancellationToken.Token);

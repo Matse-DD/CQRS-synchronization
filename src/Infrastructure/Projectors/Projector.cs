@@ -1,6 +1,7 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
 using Application.Contracts.Persistence;
+using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Threading.Channels;
 
@@ -11,30 +12,42 @@ public class Projector
     private readonly ICommandRepository _commandRepository;
     private readonly IQueryRepository _queryRepository;
     private readonly IEventFactory _eventFactory;
+    private readonly ILogger<Projector> _logger;
 
     private volatile bool _locked = false;
     private ConcurrentQueue<string> _eventQueue = new ConcurrentQueue<string>();
     private readonly Channel<bool> _signalChannel;
 
-    public Projector(ICommandRepository commandRepository, IQueryRepository queryRepository, IEventFactory eventFactory)
+    public Projector(
+        ICommandRepository commandRepository,
+        IQueryRepository queryRepository,
+        IEventFactory eventFactory,
+        ILogger<Projector> logger)
     {
         _commandRepository = commandRepository;
         _queryRepository = queryRepository;
         _eventFactory = eventFactory;
+        _logger = logger;
         _signalChannel = Channel.CreateUnbounded<bool>();
-        _ = ProcessEvents(); // Normaal moet dit await zijn maar we kunnen de constructor niet async maken, de compiler geeft een waarschuwing als hier geen discard zit
+
+        _logger.LogInformation("Projector started. Waiting for events...");
+        _ = ProcessEvents();
     }
 
     public void AddEventsToFront(IEnumerable<string> batchOfEvents)
     {
-        IList<string> eventList = [.. batchOfEvents, .. _eventQueue];
+        List<string> ofEvents = batchOfEvents.ToList();
+        IList<string> eventList = [.. ofEvents, .. _eventQueue];
         _eventQueue = new ConcurrentQueue<string>(eventList.Distinct());
+
+        _logger.LogInformation("Added {Count} events to the front of the queue.", ofEvents.Count());
         _signalChannel.Writer.TryWrite(true);
     }
 
     public void AddEvent(string incomingEvent)
     {
         _eventQueue.Enqueue(incomingEvent);
+        _logger.LogDebug("Enqueued event: {EventSnippet}...", incomingEvent.Length > 50 ? incomingEvent[..50] : incomingEvent);
         _signalChannel.Writer.TryWrite(true);
     }
 
@@ -47,12 +60,16 @@ public class Projector
             string commandForEvent = convertedEvent.GetCommand();
             Guid eventId = convertedEvent.EventId;
 
+            _logger.LogDebug("Projecting Event {EventId}", eventId);
+
             await _queryRepository.Execute(commandForEvent, eventId);
             await _commandRepository.RemoveEvent(eventId);
+
+            _logger.LogInformation("Successfully projected Event {EventId}", eventId);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Projector error: {ex.Message}");
+            _logger.LogError(ex, "Error projecting event: {Message}", ex.Message);
         }
     }
 
@@ -60,7 +77,11 @@ public class Projector
     {
         await foreach (bool _ in _signalChannel.Reader.ReadAllAsync())
         {
-            if (_locked) continue;
+            if (_locked)
+            {
+                _logger.LogDebug("Projector is locked. Skipping processing cycle.");
+                continue;
+            }
 
             while (!_locked && _eventQueue.TryDequeue(out string? currentEvent))
             {
@@ -69,10 +90,16 @@ public class Projector
         }
     }
 
-    public void Lock() => _locked = true;
+    public void Lock()
+    {
+        _locked = true;
+        _logger.LogWarning("Projector LOCKED.");
+    }
+
     public void Unlock()
     {
         _locked = false;
+        _logger.LogInformation("Projector UNLOCKED.");
         _signalChannel.Writer.TryWrite(true);
     }
 }

@@ -1,6 +1,14 @@
 ﻿using Main.Initialization;
+using Microsoft.Extensions.Logging;
 
-SyncBuilder syncBuilder = new();
+using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+{
+    builder.AddConsole(); builder.SetMinimumLevel(LogLevel.Information);
+});
+
+ILogger<SyncBuilder> logger = loggerFactory.CreateLogger<SyncBuilder>();
+
+SyncBuilder syncBuilder = new(logger);
 
 SyncApplication app = syncBuilder
     .AddRepositories()

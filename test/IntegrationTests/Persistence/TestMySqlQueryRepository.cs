@@ -1,4 +1,5 @@
 using Infrastructure.Persistence.QueryRepository;
+using Microsoft.Extensions.Logging.Abstractions;
 using MySql.Data.MySqlClient;
 
 namespace IntegrationTests.Persistence;
@@ -30,7 +31,7 @@ public class TestMySqlQueryRepository
     [SetUp]
     public async Task SetUp()
     {
-        _repository = new MySqlQueryRepository(ConnectionStringQueryRepoMySql);
+        _repository = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
 
         await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
         await connection.OpenAsync();
