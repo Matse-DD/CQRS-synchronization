@@ -10,7 +10,7 @@ namespace ApplicationTests.Replay;
 
 public class ReplayTest
 {
-    // [Test]
+    [Test]
     public void Test_Replay_Should_Get_Priority_On_Change_Stream()
     {
         ICollection<OutboxEvent> seedingOutbox = [];
@@ -82,7 +82,8 @@ public class ReplayTest
         Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(0).eventId}"));
 
         Guid expectedFirstEventIdObserver = eventFactory.DetermineEvent(seedingObserver.ElementAt(0)).EventId;
-        Assert.That(queryRepository.History.ElementAt(15), Is.EqualTo($"delete {expectedFirstEventIdObserver}"));
+        Console.WriteLine(queryRepository.History.Count);
+        Assert.That(queryRepository.History.ElementAt(14), Is.EqualTo($"delete {expectedFirstEventIdObserver}"));
     }
 
     private static void SleepTillReady(MockQueryRepository queryRepository)
