@@ -7,6 +7,7 @@ using Infrastructure.Persistence.CommandRepository;
 using Infrastructure.Persistence.QueryRepository;
 using Infrastructure.Projectors;
 using Infrastructure.Recover;
+using Infrastructure.Replay;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -91,6 +92,13 @@ public class SyncBuilder
     {
         _logger.LogInformation("Adding Recovery...");
         _services.AddSingleton<Recovery>();
+        return this;
+    }
+
+    public SyncBuilder AddReplay()
+    {
+        _logger.LogInformation("Adding Replay...");
+        _services.AddSingleton<Replayer>();
         return this;
     }
 
