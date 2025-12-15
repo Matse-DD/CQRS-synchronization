@@ -63,7 +63,7 @@ public class Projector
             _logger.LogDebug("Projecting Event {EventId}", eventId);
 
             await _queryRepository.Execute(commandForEvent, eventId);
-            await _commandRepository.RemoveEvent(eventId);
+            await _commandRepository.MarkAsDone(eventId);
 
             _logger.LogInformation("Successfully projected Event {EventId}", eventId);
         }
