@@ -48,4 +48,9 @@ public class MongoDbCommandRepository : ICommandRepository
 
         return result is { IsAcknowledged: true, DeletedCount: > 0 };
     }
+
+    public Task MarkAsDone(Guid eventId)
+    {
+        throw new NotImplementedException();
+    }
 }

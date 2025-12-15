@@ -29,4 +29,9 @@ public class MockCommandRepository(ICollection<OutboxEvent> seededEvents) : ICom
         _eventOutbox = _eventOutbox.Where(item => item.eventId != eventId.ToString()).ToList();
         return Task.FromResult(true);
     }
+
+    public Task MarkAsDone(Guid eventId)
+    {
+        throw new NotImplementedException();
+    }
 }
