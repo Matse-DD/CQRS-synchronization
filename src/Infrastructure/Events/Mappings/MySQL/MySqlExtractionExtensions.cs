@@ -12,7 +12,7 @@ namespace Infrastructure.Events.Mappings.MySQL
 
             string value = incoming.ExtractValue();
             value = value.Sanitize();
-            return $"'{value}`";
+            return $"'{value}'";
         }
         public static string ExtractValue(this string value)
         {
