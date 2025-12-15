@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Infrastructure.Events.Mappings.MySQL
 {
-    public static class ExtractionExtensions
+    public static class MySqlExtractionExtensions
     {
         public static string ExtractValue(this string value)
         {
