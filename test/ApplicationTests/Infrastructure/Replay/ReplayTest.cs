@@ -1,4 +1,5 @@
-﻿using Application.Contracts.Persistence;
+﻿using System.ComponentModel.DataAnnotations;
+using Application.Contracts.Persistence;
 using ApplicationTests.Shared;
 using ApplicationTests.Shared.Events.Mappings;
 using ApplicationTests.Shared.Persistence;
@@ -10,7 +11,7 @@ namespace ApplicationTests.Replay;
 
 public class ReplayTest
 {
-    // [Test]
+    [Test]
     public void Test_Replay_Should_Get_Priority_On_Change_Stream()
     {
         ICollection<OutboxEvent> seedingOutbox = [];
@@ -77,7 +78,7 @@ public class ReplayTest
         replayer.Replay();
 
         //ASSERT
-        SleepTillReady(queryRepository);
+        SleepTillReady(queryRepository, 30);
 
         Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(0).eventId}"));
 
@@ -85,10 +86,10 @@ public class ReplayTest
         Assert.That(queryRepository.History.ElementAt(15), Is.EqualTo($"delete {expectedFirstEventIdObserver}"));
     }
 
-    private static void SleepTillReady(MockQueryRepository queryRepository)
+    private static void SleepTillReady(MockQueryRepository queryRepository, int amountOfEvents)
     {
         int count = 0;
-        while (count < 500 && queryRepository.History.Count == 0)
+        while (count < 500 && queryRepository.History.Count < amountOfEvents)
         {
             Thread.Sleep(10);
             count++;
