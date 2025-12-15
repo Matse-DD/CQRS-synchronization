@@ -83,7 +83,7 @@ public class ReplayTest
 
         Guid expectedFirstEventIdObserver = eventFactory.DetermineEvent(seedingObserver.ElementAt(0)).EventId;
         Console.WriteLine(queryRepository.History.Count);
-        Assert.That(queryRepository.History.ElementAt(14), Is.EqualTo($"delete {expectedFirstEventIdObserver}"));
+        Assert.That(queryRepository.History.ElementAt(15), Is.EqualTo($"delete {expectedFirstEventIdObserver}"));
     }
 
     private static void SleepTillReady(MockQueryRepository queryRepository)
