@@ -82,7 +82,7 @@ public class ReplayTest
         Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(0).eventId}"));
 
         Guid expectedFirstEventIdObserver = eventFactory.DetermineEvent(seedingObserver.ElementAt(0)).EventId;
-        Console.WriteLine(queryRepository.History.Count);
+        //somehow this fails if there isn't a line between these 2 statements
         Assert.That(queryRepository.History.ElementAt(15), Is.EqualTo($"delete {expectedFirstEventIdObserver}"));
     }
 
