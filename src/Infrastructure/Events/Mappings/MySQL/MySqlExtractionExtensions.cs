@@ -6,6 +6,14 @@ namespace Infrastructure.Events.Mappings.MySQL
 {
     public static class MySqlExtractionExtensions
     {
+        public static string DetermineMySqlValue(this string incoming)
+        {
+            if (!incoming.IsString()) return incoming;
+
+            string value = incoming.ExtractValue();
+            value = value.Sanitize();
+            return $"'{value}`";
+        }
         public static string ExtractValue(this string value)
         {
             if (value.Contains('\''))
