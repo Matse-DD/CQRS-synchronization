@@ -32,6 +32,10 @@ public class MockCommandRepository(ICollection<OutboxEvent> seededEvents) : ICom
 
     public Task MarkAsDone(Guid eventId)
     {
-        throw new NotImplementedException();
+        OutboxEvent currentEvent = _eventOutbox.FirstOrDefault(e => e.eventId == eventId.ToString()) ?? throw new InvalidOperationException("Event not found");
+        
+        string newEvent = currentEvent.eventItem.Replace("\"status\":\"PENDING\"", "\"status\":\"DONE\"");
+        currentEvent = currentEvent with { eventItem = newEvent };
+        return Task.CompletedTask;
     }
 }
