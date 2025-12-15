@@ -52,14 +52,14 @@ public class MongoDbCommandRepository : ICommandRepository
     public async Task<bool> MarkAsDone(Guid eventId)
     {
         FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Eq("id", eventId.ToString());
-        
+
         UpdateResult result = await _collection.UpdateOneAsync(filter, Builders<BsonDocument>.Update.Set("status", "DONE"));
 
         if (result.ModifiedCount > 0)
         {
             _logger.LogInformation("Marked event {EventId} as DONE", eventId);
         }
-        
+
         return result is { IsAcknowledged: true, ModifiedCount: > 0 };
     }
 }

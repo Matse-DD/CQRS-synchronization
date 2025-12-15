@@ -33,8 +33,8 @@ public class MockCommandRepository(ICollection<OutboxEvent> seededEvents) : ICom
     public Task<bool> MarkAsDone(Guid eventId)
     {
         OutboxEvent currentEvent = _eventOutbox.FirstOrDefault(e => e.eventId == eventId.ToString());
-        if (currentEvent ==null) return Task.FromResult(false);
-        
+        if (currentEvent == null) return Task.FromResult(false);
+
         string newEvent = currentEvent.eventItem.Replace("\"status\":\"PENDING\"", "\"status\":\"DONE\"");
         currentEvent = currentEvent with { eventItem = newEvent };
         return Task.FromResult(true);
