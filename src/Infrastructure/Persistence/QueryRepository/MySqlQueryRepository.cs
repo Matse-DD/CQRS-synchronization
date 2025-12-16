@@ -83,7 +83,6 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         await connection.OpenAsync();
 
         Guid resultGuid = Guid.Empty;
-        bool needsDefaultValue = false;
 
         const string queryLastEventId = "SELECT last_event_id FROM last_info";
         using MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, connection);
@@ -92,24 +91,21 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
             if (await result.ReadAsync())
             {
                 int columnLastEventId = result.GetOrdinal("last_event_id");
-                resultGuid = result.IsDBNull(columnLastEventId) ? Guid.Empty : result.GetGuid(columnLastEventId);
-            }
-            else
-            {
-                needsDefaultValue = true;
+                resultGuid = result.IsDBNull(columnLastEventId) ? Guid.Empty : result.GetGuid(columnLastEventId);   
             }
         }
-
-        if (needsDefaultValue) await PlaceEmptyGuidInLastEventId(connection);
 
         return resultGuid;
     }
 
-    private async Task PlaceEmptyGuidInLastEventId(MySqlConnection connection)
+    public async static Task CreateBasicStructureQueryDatabase(string queryDatabaseName, MySqlConnection connection, ILogger<MySqlQueryRepository> logger)
     {
-        string commandCreatePlace = $"CREATE TABLE IF NOT EXISTS last_info (id INT, last_event_id VARCHAR(36), PRIMARY(id))" +
+        string commandCreateBasicStructure = 
+                                    $"CREATE DATABASE {queryDatabaseName}" +
+                                    $"CREATE TABLE IF NOT EXISTS last_info (id INT, last_event_id VARCHAR(36), PRIMARY(id))" +
                                     $"INSERT INTO last_info VALUES(1, '{Guid.Empty}')";
-        using MySqlCommand createDefaultValueForLastInfo = new MySqlCommand(commandCreatePlace, connection);
+
+        using MySqlCommand createDefaultValueForLastInfo = new MySqlCommand(commandCreateBasicStructure, connection);
         await createDefaultValueForLastInfo.ExecuteNonQueryAsync();
 
         logger.LogInformation("Initialized 'last_info' table with empty GUID.");
