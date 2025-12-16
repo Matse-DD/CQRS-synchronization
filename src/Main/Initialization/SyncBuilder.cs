@@ -22,6 +22,7 @@ public class SyncBuilder
 
     private readonly string _connectionStringCommandDatabase;
     private readonly string _connectionStringQueryDatabase;
+    private readonly string _queryDatabaseName;
 
     public SyncBuilder(ILogger<SyncBuilder> logger)
     {
@@ -45,12 +46,14 @@ public class SyncBuilder
 
         string? connectionStringCommandDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_COMMAND_DB");
         string? connectionStringQueryDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_QUERY_DB");
+        string? databaseName = Environment.GetEnvironmentVariable("QUERY_DATABASE_NAME");
 
         if (!string.IsNullOrEmpty(connectionStringCommandDatabase) && !string.IsNullOrEmpty(connectionStringQueryDatabase))
         {
             _logger.LogInformation("Found connection strings in Environment Variables.");
             _connectionStringCommandDatabase = connectionStringCommandDatabase;
             _connectionStringQueryDatabase = connectionStringQueryDatabase;
+            _queryDatabaseName = databaseName;
         }
         else
         {
@@ -60,6 +63,9 @@ public class SyncBuilder
             ?? throw new InvalidOperationException("Connection string 'CommandDatabase' not found in configuration.");
             _connectionStringQueryDatabase = configuration["QueryDatabase:ConnectionString"]
             ?? throw new InvalidOperationException("Connection string 'QueryDatabase' not found in configuration.");
+
+            _queryDatabaseName = configuration["QueryDatabase:QueryDatabaseName"]
+                ?? throw new InvalidOperationException("Name for 'QueryDataBaseName' not found in configuration");
         }
     }
 
