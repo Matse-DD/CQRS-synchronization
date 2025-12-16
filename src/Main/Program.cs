@@ -6,7 +6,7 @@ using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
     builder.AddConsole(); builder.SetMinimumLevel(LogLevel.Information);
 });
 
-ILogger<SyncBuilder> logger = loggerFactory.CreateLogger<SyncBuilder>();
+ILogger<SyncBuilder> logger = loggerFactory.AddSeq().CreateLogger<SyncBuilder>();
 
 SyncBuilder syncBuilder = new(logger);
 
