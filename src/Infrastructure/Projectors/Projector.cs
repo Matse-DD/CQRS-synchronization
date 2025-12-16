@@ -1,4 +1,6 @@
-﻿using Application.Contracts.Events.EventOptions;
+﻿using Application.Contracts.Events;
+using Application.Contracts.Events.Enums;
+using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
 using Application.Contracts.Persistence;
 using Microsoft.Extensions.Logging;
@@ -13,6 +15,7 @@ public class Projector
     private readonly IQueryRepository _queryRepository;
     private readonly IEventFactory _eventFactory;
     private readonly ILogger<Projector> _logger;
+    private readonly ISchemaMapper _schemaMapper;
 
     private volatile bool _locked = false;
     private ConcurrentQueue<string> _eventQueue = new ConcurrentQueue<string>();
@@ -22,12 +25,14 @@ public class Projector
         ICommandRepository commandRepository,
         IQueryRepository queryRepository,
         IEventFactory eventFactory,
-        ILogger<Projector> logger)
+        ILogger<Projector> logger,
+        ISchemaMapper schemaMapper)
     {
         _commandRepository = commandRepository;
         _queryRepository = queryRepository;
         _eventFactory = eventFactory;
         _logger = logger;
+        _schemaMapper = schemaMapper;
         _signalChannel = Channel.CreateUnbounded<bool>();
 
         _logger.LogInformation("Projector started. Waiting for events...");
@@ -56,6 +61,11 @@ public class Projector
         try
         {
             Event convertedEvent = _eventFactory.DetermineEvent(eventToProject);
+
+            if (convertedEvent.EventType == EventType.INSERT)
+            {
+                await _schemaMapper.Map(_commandRepository, (InsertEvent)convertedEvent);
+            }
 
             string commandForEvent = convertedEvent.GetCommand();
             Guid eventId = convertedEvent.EventId;
