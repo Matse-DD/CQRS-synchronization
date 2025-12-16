@@ -23,7 +23,7 @@ public class MySqlSchemaBuilder : ISchemaBuilder
         ICollection<string> resultArr = [];
         foreach(KeyValuePair<string, object> pair in properties)
         {
-            resultArr.Add(DetermineDataType(pair.Key, pair.Value));
+            resultArr.Add($"{pair.Key} {DetermineDataType(pair.Key, pair.Value)}");
         }
 
         resultArr.Add($"PRIMARY KEY (id)");
