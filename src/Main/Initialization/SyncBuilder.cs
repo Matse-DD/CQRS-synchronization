@@ -44,29 +44,48 @@ public class SyncBuilder
             builder.SetMinimumLevel(LogLevel.Information);
         });
 
+        (_connectionStringCommandDatabase, _connectionStringQueryDatabase) = DetermineConnectionStrings(configuration);
+
+        _queryDatabaseName = DetermineQueryDatabaseName(configuration);
+    }
+
+    private (string connectionStringCommandDatabase, string connectionStringQueryDatabase) DetermineConnectionStrings(IConfiguration configuration)
+    {
         string? connectionStringCommandDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_COMMAND_DB");
         string? connectionStringQueryDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_QUERY_DB");
-        string? databaseName = Environment.GetEnvironmentVariable("QUERY_DATABASE_NAME");
 
         if (!string.IsNullOrEmpty(connectionStringCommandDatabase) && !string.IsNullOrEmpty(connectionStringQueryDatabase))
         {
             _logger.LogInformation("Found connection strings in Environment Variables.");
-            _connectionStringCommandDatabase = connectionStringCommandDatabase;
-            _connectionStringQueryDatabase = connectionStringQueryDatabase;
-            _queryDatabaseName = databaseName;
+            return (connectionStringCommandDatabase, connectionStringQueryDatabase);
         }
         else
         {
             _logger.LogInformation("Environment variables not found. Falling back to appsettings configuration.");
 
-            _connectionStringCommandDatabase = configuration["CommandDatabase:ConnectionString"]
+            connectionStringCommandDatabase = configuration["CommandDatabase:ConnectionString"]
             ?? throw new InvalidOperationException("Connection string 'CommandDatabase' not found in configuration.");
-            _connectionStringQueryDatabase = configuration["QueryDatabase:ConnectionString"]
+            connectionStringQueryDatabase = configuration["QueryDatabase:ConnectionString"]
             ?? throw new InvalidOperationException("Connection string 'QueryDatabase' not found in configuration.");
 
-            _queryDatabaseName = configuration["QueryDatabase:QueryDatabaseName"]
-                ?? throw new InvalidOperationException("Name for 'QueryDataBaseName' not found in configuration");
+            return (connectionStringCommandDatabase, connectionStringQueryDatabase);
         }
+    }
+
+    private string DetermineQueryDatabaseName(IConfiguration configuration)
+    {
+        string? queryDatabaseName = Environment.GetEnvironmentVariable("QUERY_DATABASE_NAME");
+        
+        if (!string.IsNullOrEmpty(queryDatabaseName))
+        {
+            _logger.LogInformation("Found query database name in Environment Variables.");
+            return queryDatabaseName;
+        }
+
+        string queryDatabaseNameFromConfiguration = configuration["QueryDatabase:QueryDatabaseName"]
+               ?? throw new InvalidOperationException("Name for 'QueryDataBaseName' not found in configuration");
+
+        return queryDatabaseNameFromConfiguration;
     }
 
     public SyncBuilder AddRepositories()
