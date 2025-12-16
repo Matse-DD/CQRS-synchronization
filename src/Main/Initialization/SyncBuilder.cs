@@ -104,6 +104,7 @@ public class SyncBuilder
         return this;
     }
 
+
     public SyncBuilder AddEventFactory()
     {
         _logger.LogInformation("Adding Event Factory...");
@@ -139,13 +140,15 @@ public class SyncBuilder
         return this;
     }
 
-    public SyncApplication Build()
+    public async Task<SyncApplication> Build()
     {
         _logger.LogInformation("Building Application...");
         _services.AddSingleton<SyncApplication>();
 
         ServiceProvider provider = _services.BuildServiceProvider();
         _logger.LogInformation("Application has finished building.");
+
+        await MySqlQueryRepository.CreateBasicStructureQueryDatabase(_queryDatabaseName, _connectionStringQueryDatabase, provider.GetRequiredService<ILogger<MySqlQueryRepository>>());
 
         return provider.GetRequiredService<SyncApplication>();
     }
