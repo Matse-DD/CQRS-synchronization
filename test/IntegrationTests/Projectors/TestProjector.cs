@@ -6,6 +6,7 @@ using Infrastructure.Persistence.CommandRepository;
 using Infrastructure.Persistence.QueryRepository;
 using Infrastructure.Projectors;
 using Infrastructure.Recover;
+using Infrastructure.Replay;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -70,6 +71,29 @@ public class TestProjector
             Guid dbEventId = await queryRepo.GetLastSuccessfulEventId();
             return dbEventId.ToString() == lastEventId;
         }, timeoutMs: 5000);
+    }
+
+    [Test]
+    public async Task Replay_Should_Handle_Events_That_Are_In_Outbox()
+    {
+        //Arrange
+        ICommandRepository commandRepository = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
+        IQueryRepository queryRepository = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        IEventFactory eventFactory = new MySqlEventFactory();
+
+        Projector projector = new(commandRepository, queryRepository, eventFactory, NullLogger<Projector>.Instance);
+        //Act
+        ICollection<string> eventsAdded = AddEventToOutbox();
+        string lastEventId = ExtractEventId(eventsAdded.Last());
+
+        Replayer replay = new(commandRepository, queryRepository, projector, NullLogger<Replayer>.Instance);
+        replay.Replay();
+        //Assert
+        await AssertEventuallyAsync(async () =>
+        {
+            Guid dbEventId = await queryRepository.GetLastSuccessfulEventId();
+            return dbEventId.ToString() == lastEventId;
+        }, 5000);
     }
 
     [Test]
