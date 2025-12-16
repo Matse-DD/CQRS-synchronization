@@ -21,7 +21,7 @@ public class MySqlSchemaBuilder : ISchemaBuilder
     private string DetermineFields(IDictionary<string, object> properties)
     {
         ICollection<string> resultArr = [];
-        foreach(KeyValuePair<string, object> pair in properties)
+        foreach (KeyValuePair<string, object> pair in properties)
         {
             resultArr.Add($"{pair.Key} {DetermineDataType(pair.Key, pair.Value)}");
         }
