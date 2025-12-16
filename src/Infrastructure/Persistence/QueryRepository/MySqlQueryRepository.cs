@@ -101,7 +101,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
     public async static Task CreateBasicStructureQueryDatabase(string queryDatabaseName, string connectionString, ILogger<MySqlQueryRepository> logger)
     {
         string commandCreateBasicStructure =
-                                    $"CREATE DATABASE {queryDatabaseName};" +
+                                    $"CREATE DATABASE IF NOT EXISTS {queryDatabaseName};" +
                                     $"CREATE TABLE IF NOT EXISTS last_info (id INT, last_event_id VARCHAR(36), PRIMARY(id));" +
                                     $"INSERT INTO last_info VALUES(1, '{Guid.Empty}');";
 
