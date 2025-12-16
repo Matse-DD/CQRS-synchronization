@@ -98,16 +98,20 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         return resultGuid;
     }
 
-    public async static Task CreateBasicStructureQueryDatabase(string queryDatabaseName, MySqlConnection connection, ILogger<MySqlQueryRepository> logger)
+    public async static Task CreateBasicStructureQueryDatabase(string queryDatabaseName, string connectionString, ILogger<MySqlQueryRepository> logger)
     {
         string commandCreateBasicStructure = 
                                     $"CREATE DATABASE {queryDatabaseName}" +
                                     $"CREATE TABLE IF NOT EXISTS last_info (id INT, last_event_id VARCHAR(36), PRIMARY(id))" +
                                     $"INSERT INTO last_info VALUES(1, '{Guid.Empty}')";
 
+        using MySqlConnection connection = new MySqlConnection(connectionString);
+        await connection.OpenAsync();
+
         using MySqlCommand createDefaultValueForLastInfo = new MySqlCommand(commandCreateBasicStructure, connection);
         await createDefaultValueForLastInfo.ExecuteNonQueryAsync();
 
+        logger.LogInformation("Created {queryDatabaseName} database with empty.", queryDatabaseName);
         logger.LogInformation("Initialized 'last_info' table with empty GUID.");
     }
 }
