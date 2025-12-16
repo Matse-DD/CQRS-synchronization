@@ -42,7 +42,8 @@ public class MySqlSchemaBuilder : ISchemaBuilder
             JsonValueKind.Number => "INT",
             JsonValueKind.True => "BOOL",
             JsonValueKind.False => "BOOL",
-            JsonValueKind.Object => "VARCHAR(255)",
+            JsonValueKind.Object => "JSON",
+            JsonValueKind.Array => "JSON",
             _ => throw new ArgumentOutOfRangeException()
         };
     }
