@@ -2,21 +2,27 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Infrastructure.Events.Mappings.MySQL
+namespace Infrastructure.Events.Mappings.MySQL.Shared
 {
     public static class MySqlExtractionExtensions
     {
         public static string DetermineMySqlValue(this string incoming)
         {
             if (!incoming.IsString()) return incoming;
-
+            string sign = incoming.ExtractSign();
             string value = incoming.ExtractValue();
             value = value.Sanitize();
-            return $"'{value}'";
+            return $"{sign}'{value}'";
         }
+        public static string ExtractSign(this string incoming)
+        {
+            if (!incoming.IsString()) return incoming;
+            return incoming.Substring(0, incoming.IndexOf('\'') - 1);
+        }
+
         public static string ExtractValue(this string value)
         {
-            if (value.Contains('\''))
+            if (value.IsString())
             {
                 int indexFirstQuote = value.IndexOf('\'');
                 int indexLastQuote = value.LastIndexOf('\'');
@@ -33,7 +39,7 @@ namespace Infrastructure.Events.Mappings.MySQL
             return value.Replace("\'", "\'\'");
         }
 
-        public static bool IsString(this string value)
+        public static bool IsString(this string value)  
         {
             return value.Contains('\'');
         }
