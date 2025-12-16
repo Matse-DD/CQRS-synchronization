@@ -100,16 +100,21 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 
     public async static Task CreateBasicStructureQueryDatabase(string queryDatabaseName, string connectionString, ILogger<MySqlQueryRepository> logger)
     {
-        string commandCreateBasicStructure =
-                                    $"CREATE DATABASE IF NOT EXISTS {queryDatabaseName};" +
-                                    $"CREATE TABLE IF NOT EXISTS last_info (id INT, last_event_id VARCHAR(36), PRIMARY(id));" +
-                                    $"INSERT INTO last_info VALUES(1, '{Guid.Empty}');";
+        string commandCreateDatabase = $"CREATE DATABASE IF NOT EXISTS {queryDatabaseName};";
+        string commandCreateTable = $"CREATE TABLE IF NOT EXISTS last_info (id INT, last_event_id VARCHAR(36), PRIMARY KEY (id));";
+        string commandInsertTable = $"INSERT INTO last_info VALUES(1, '{Guid.Empty}');";
 
         using MySqlConnection connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
 
-        using MySqlCommand createDefaultValueForLastInfo = new MySqlCommand(commandCreateBasicStructure, connection);
-        await createDefaultValueForLastInfo.ExecuteNonQueryAsync();
+        using MySqlCommand createDatabase = new MySqlCommand(commandCreateDatabase, connection);
+        await createDatabase.ExecuteNonQueryAsync();
+
+        using MySqlCommand createTable = new MySqlCommand(commandCreateTable, connection);
+        await createTable.ExecuteNonQueryAsync();
+
+        using MySqlCommand insertTable = new MySqlCommand(commandInsertTable, connection);
+        await insertTable.ExecuteNonQueryAsync();
 
         logger.LogInformation("Created {queryDatabaseName} database with empty.", queryDatabaseName);
         logger.LogInformation("Initialized 'last_info' table with empty GUID.");
