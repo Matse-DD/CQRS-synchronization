@@ -1,5 +1,6 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
+using Infrastructure.Events.Mappings.MySQL.Shared;
 using System.Text.Json;
 
 namespace Infrastructure.Events.Mappings.MySQL;
@@ -25,7 +26,7 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
         static string ConvertValue(object incomingValue)
         {
             if (incomingValue is not JsonElement value) return "NULL";
-            return value.ValueKind == JsonValueKind.String ? $"\"{value}\"" : value.ToString();
+            return value.ToString().DetermineMySqlValue();
         }
     }
 }

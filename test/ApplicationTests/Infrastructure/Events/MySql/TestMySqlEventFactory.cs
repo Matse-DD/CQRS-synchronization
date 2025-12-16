@@ -53,9 +53,9 @@ public class TestMySqlEventFactory
           ""status"": ""PENDING"",
           ""eventType"": ""INSERT"",
           ""payload"": {
-            ""product_id"": ""038e2f47-c1a0-4b3d-98e1-5f2d0c1b4e9f"",
-            ""name"": ""Wireless Mechanical Keyboard"",
-            ""sku"": ""KB-WM-001"",
+            ""product_id"": ""'038e2f47-c1a0-4b3d-98e1-5f2d0c1b4e9f'"",
+            ""name"": ""'Wireless Mechanical Keyboard'"",
+            ""sku"": ""'KB-WM-001'"",
             ""price"": 129.99,
             ""stock_level"": 50,
             ""is_active"": true
@@ -71,7 +71,7 @@ public class TestMySqlEventFactory
 
         string expectedMySqlCommand =
             "INSERT INTO Product (product_id, name, sku, price, stock_level, is_active)\n" +
-            @"VALUES (""038e2f47-c1a0-4b3d-98e1-5f2d0c1b4e9f"", ""Wireless Mechanical Keyboard"", ""KB-WM-001"", 129.99, 50, True)";
+            @"VALUES ('038e2f47-c1a0-4b3d-98e1-5f2d0c1b4e9f', 'Wireless Mechanical Keyboard', 'KB-WM-001', 129.99, 50, True)";
 
         Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
     }
