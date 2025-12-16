@@ -40,6 +40,8 @@ A short explanation of the necessary environment variables:
 
 - CONNECTION_STRING_COMMAND_DB: connection string of the command database
 - CONNECTION_STRING_QUERY_DB: connection string of the query database
+- SEQ_SERVER_URL= url of the SEQ log monitoring dashboard
+- SEQ_API_KEY= API key of the SEQ log monitoring dashboard
 
 ## Demo
 
