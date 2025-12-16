@@ -15,7 +15,7 @@ public class Projector
     private readonly IQueryRepository _queryRepository;
     private readonly IEventFactory _eventFactory;
     private readonly ILogger<Projector> _logger;
-    private readonly ISchemaMapper _schemaMapper;
+    private readonly ISchemaBuilder _schemaMapper;
 
     private volatile bool _locked = false;
     private ConcurrentQueue<string> _eventQueue = new ConcurrentQueue<string>();
@@ -26,7 +26,7 @@ public class Projector
         IQueryRepository queryRepository,
         IEventFactory eventFactory,
         ILogger<Projector> logger,
-        ISchemaMapper schemaMapper)
+        ISchemaBuilder schemaMapper)
     {
         _commandRepository = commandRepository;
         _queryRepository = queryRepository;

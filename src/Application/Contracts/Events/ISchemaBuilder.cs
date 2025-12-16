@@ -2,7 +2,7 @@
 using Application.Contracts.Persistence;
 namespace Application.Contracts.Events;
 
-public interface ISchemaMapper
+public interface ISchemaBuilder
 {
     public Task Map(IQueryRepository queryRepository, InsertEvent insertEvent);
 }

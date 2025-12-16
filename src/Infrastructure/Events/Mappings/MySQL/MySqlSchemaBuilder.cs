@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace Infrastructure.Events.Mappings.MySQL;
 
-public class MySqlSchemaMapper : ISchemaMapper
+public class MySqlSchemaBuilder : ISchemaBuilder
 {
     private readonly HashSet<string> alreadyCreatedTables = new HashSet<string>();
 
