@@ -39,6 +39,7 @@ public class MySqlSchemaBuilder : ISchemaBuilder
         return jsonValue.ValueKind switch
         {
             JsonValueKind.String => "VARCHAR(100)",
+            JsonValueKind.Number => "INT",
             JsonValueKind.True => "BOOL",
             JsonValueKind.False => "BOOL",
             JsonValueKind.Object => "VARCHAR(255)",
