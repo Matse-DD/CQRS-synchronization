@@ -1,5 +1,4 @@
 ﻿using Main.Initialization;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
@@ -11,7 +10,7 @@ ILogger<SyncBuilder> logger = loggerFactory.AddSeq(Environment.GetEnvironmentVar
 
 SyncBuilder syncBuilder = new(logger);
 
-SyncApplication app = syncBuilder
+SyncApplication app = await syncBuilder
     .AddRepositories()
     .AddEventFactory()
     .AddProjector()
