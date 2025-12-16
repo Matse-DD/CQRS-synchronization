@@ -39,7 +39,7 @@ namespace Infrastructure.Events.Mappings.MySQL.Shared
             return value.Replace("\'", "\'\'");
         }
 
-        public static bool IsString(this string value)  
+        public static bool IsString(this string value)
         {
             return value.Contains('\'');
         }
