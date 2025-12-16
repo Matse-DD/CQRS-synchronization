@@ -106,6 +106,64 @@ public class TestMySqlEventFactory
     }
 
     [Test]
+    public void MySqlEventFactory_Gives_MySqlDeleteEvent_Back_When_Given_A_Event_Of_EventType_Delete_WithStringAndNumberIn()
+    {
+        // Arrange
+        string deleteEventMessage = @"
+        {
+          ""id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
+          ""occurredAt"": ""2025-11-29T17:15:00Z"",
+          ""aggregateName"": ""Product"",
+          ""status"": ""PENDING"",
+          ""eventType"": ""DELETE"",
+          ""payload"": {
+            ""condition"": {
+                ""name"": ""'gene in a bottle'"",
+                ""price"": "">10""
+            }
+          }
+        }";
+
+        // Act
+        Event determinedEvent = _eventFactory.DetermineEvent(deleteEventMessage);
+        string mySqlCommand = determinedEvent.GetCommand();
+
+        // Assert
+        Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlDeleteEvent)));
+        const string expectedMySqlCommand = "DELETE FROM Product WHERE name = 'gene in a bottle' AND price>10";
+        Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
+    }
+
+    [Test]
+    public void MySqlEventFactory_Gives_MySqlDeleteEvent_Back_When_Given_A_Event_Of_EventType_Delete_With_DoubleSingleQuoteInName()
+    {
+        // Arrange
+        string deleteEventMessage = @"
+        {
+          ""id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
+          ""occurredAt"": ""2025-11-29T17:15:00Z"",
+          ""aggregateName"": ""Product"",
+          ""status"": ""PENDING"",
+          ""eventType"": ""DELETE"",
+          ""payload"": {
+            ""condition"": {
+                ""name"": ""'gene's in a bottle'"",
+                ""price"": "">10""
+            }
+          }
+        }";
+
+        // Act
+        Event determinedEvent = _eventFactory.DetermineEvent(deleteEventMessage);
+        string mySqlCommand = determinedEvent.GetCommand();
+
+        // Assert
+        Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlDeleteEvent)));
+        const string expectedMySqlCommand = "DELETE FROM Product WHERE name = 'gene''s in a bottle' AND price>10";
+        Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
+    }
+
+    [Test]
     public void MySqlEventFactory_Gives_MySqlUpdateEvent_Back_When_Given_A_Event_Of_EventType_Update()
     {
         // Arrange
@@ -139,6 +197,43 @@ public class TestMySqlEventFactory
             "UPDATE Product\n" +
             "SET price = price * 1.10, amount_sold = amount_sold + 1\n" +
             "WHERE amount_sold>5 AND price>10";
+
+        Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
+    }
+    [Test]
+    public void MySqlEventFactory_Gives_MySqlUpdateEvent_Back_When_Given_A_Event_Of_EventType_Update_With_A_Bool()
+    {
+        // Arrange
+        string updateEventMessage = @"
+        {
+            ""id"": ""84c9d1a3-b0e7-4f6c-9a2f-1e5b8d2c6f0a"",
+            ""occurredAt"": ""2025-11-29T17:15:00Z"",
+            ""aggregateName"": ""Product"",
+            ""status"": ""PENDING"",
+            ""eventType"": ""UPDATE"",
+            ""payload"": {
+                ""condition"": {
+                    ""is_active"": ""false"",
+                    ""price"": "">10""
+                },
+                ""change"": {
+                    ""price"": ""price * 1.10"",
+                    ""is_active"":""true""
+                }
+            }
+        }";
+
+        // Act
+        Event determinedEvent = _eventFactory.DetermineEvent(updateEventMessage);
+        string mySqlCommand = determinedEvent.GetCommand();
+
+        // Assert
+        Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlUpdateEvent)));
+
+        string expectedMySqlCommand =
+            "UPDATE Product\n" +
+            "SET price = price * 1.10, is_active = true\n" +
+            "WHERE is_active = false AND price>10";
 
         Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
     }
