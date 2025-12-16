@@ -107,7 +107,8 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 
     private async Task PlaceEmptyGuidInLastEventId(MySqlConnection connection)
     {
-        string commandCreatePlace = $"INSERT INTO last_info VALUES(1, '{Guid.Empty}')";
+        string commandCreatePlace = $"CREATE TABLE IF NOT EXISTS last_info (id INT, last_event_id VARCHAR(36), PRIMARY(id))" +
+                                    $"INSERT INTO last_info VALUES(1, '{Guid.Empty}')";
         using MySqlCommand createDefaultValueForLastInfo = new MySqlCommand(commandCreatePlace, connection);
         await createDefaultValueForLastInfo.ExecuteNonQueryAsync();
 
