@@ -17,7 +17,7 @@ namespace Infrastructure.Events.Mappings.MySQL.Shared
         public static string ExtractSign(this string incoming)
         {
             if (!incoming.IsString()) return incoming;
-            return incoming.Substring(0, incoming.IndexOf('\'') - 1);
+            return incoming.Substring(0, incoming.IndexOf('\''));
         }
 
         public static string ExtractValue(this string value)
