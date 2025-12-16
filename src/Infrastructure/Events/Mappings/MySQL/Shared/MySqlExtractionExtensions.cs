@@ -14,6 +14,7 @@ namespace Infrastructure.Events.Mappings.MySQL.Shared
             value = value.Sanitize();
             return $"{sign}'{value}'";
         }
+
         public static string ExtractSign(this string incoming)
         {
             if (!incoming.IsString()) return incoming;
