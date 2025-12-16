@@ -1,5 +1,6 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
+using Infrastructure.Events.Mappings.MySQL.Shared;
 using System.Text.Json;
 
 namespace Infrastructure.Events.Mappings.MySQL;
