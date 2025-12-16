@@ -80,12 +80,12 @@ public class TestProjector
         ICommandRepository commandRepository = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
         IQueryRepository queryRepository = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
         IEventFactory eventFactory = new MySqlEventFactory();
-        
+
         Projector projector = new(commandRepository, queryRepository, eventFactory, NullLogger<Projector>.Instance);
         //Act
         ICollection<string> eventsAdded = AddEventToOutbox();
         string lastEventId = ExtractEventId(eventsAdded.Last());
-        
+
         Replayer replay = new(commandRepository, queryRepository, projector, NullLogger<Replayer>.Instance);
         replay.Replay();
         //Assert
