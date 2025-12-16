@@ -1,3 +1,4 @@
+using Application.Contracts.Events;
 using Application.Contracts.Events.Factory;
 using Application.Contracts.Observer;
 using Application.Contracts.Persistence;
@@ -70,7 +71,7 @@ public class SyncBuilder
 
         _services.AddSingleton<ICommandRepository>(sp => new MongoDbCommandRepository(_connectionStringCommandDatabase, sp.GetRequiredService<ILogger<MongoDbCommandRepository>>()));
         _services.AddSingleton<IQueryRepository>(sp => new MySqlQueryRepository(_connectionStringQueryDatabase, sp.GetRequiredService<ILogger<MySqlQueryRepository>>()));
-
+        _services.AddSingleton<ISchemaBuilder>(sp => new MySqlSchemaBuilder());
         return this;
     }
 
