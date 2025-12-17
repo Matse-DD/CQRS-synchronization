@@ -28,7 +28,7 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
             if (lastSuccessfulEventId != Guid.Empty)
             {
                 logger.LogInformation("Found last checkpoint: {EventId}. Filtering outbox...", lastSuccessfulEventId);
-                outboxEvents = outboxEvents.ToList().Where(entry => !(entry.eventId.Equals(lastSuccessfulEventId.ToString())|| entry.eventItem.Contains("\"status\": \"DONE\",")));
+                outboxEvents = outboxEvents.ToList().Where(entry => !(entry.eventId.Equals(lastSuccessfulEventId.ToString()) || entry.eventItem.Contains("\"status\": \"DONE\",")));
             }
             else
             {
