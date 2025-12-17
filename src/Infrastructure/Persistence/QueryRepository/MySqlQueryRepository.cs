@@ -1,8 +1,9 @@
 ﻿using Application.Contracts.Persistence;
+using Infrastructure.Replay;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System.Data.Common;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Persistence.QueryRepository;
 
@@ -12,8 +13,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
     {
         using MySqlConnection connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
-
-        string commandLastEventId = $@"UPDATE last_info SET last_event_id = ""{eventId}""";
+        string commandLastEventId = $@"REPLACE INTO last_info VALUES(1, '{eventId}')";
 
         logger.LogInformation("Executing Update: {Command}", command);
         logger.LogDebug("Updating LastEventId: {CommandLastEventId}", commandLastEventId);
@@ -102,7 +102,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
     {
         string commandCreateDatabase = $"CREATE DATABASE IF NOT EXISTS {queryDatabaseName};";
         string commandCreateTable = $"CREATE TABLE IF NOT EXISTS last_info (id INT, last_event_id VARCHAR(36), PRIMARY KEY (id));";
-        string commandInsertTable = $"INSERT INTO last_info VALUES(1, '{Guid.Empty}');";
+        string commandInsertTable = $"REPLACE INTO last_info VALUES(1, '{Guid.Empty}');";
 
         using MySqlConnection connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
