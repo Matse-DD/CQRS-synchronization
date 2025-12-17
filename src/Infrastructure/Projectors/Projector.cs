@@ -15,7 +15,7 @@ public class Projector
     private readonly IQueryRepository _queryRepository;
     private readonly IEventFactory _eventFactory;
     private readonly ILogger<Projector> _logger;
-    private readonly ISchemaBuilder _schemaMapper;
+    private readonly ISchemaBuilder _schemaBuilder;
 
     private volatile bool _locked = false;
     private ConcurrentQueue<string> _eventQueue = new ConcurrentQueue<string>();
@@ -26,13 +26,13 @@ public class Projector
         IQueryRepository queryRepository,
         IEventFactory eventFactory,
         ILogger<Projector> logger,
-        ISchemaBuilder schemaMapper)
+        ISchemaBuilder schemaBuilder)
     {
         _commandRepository = commandRepository;
         _queryRepository = queryRepository;
         _eventFactory = eventFactory;
         _logger = logger;
-        _schemaMapper = schemaMapper;
+        _schemaBuilder = schemaBuilder;
         _signalChannel = Channel.CreateUnbounded<bool>();
 
         _logger.LogInformation("Projector started. Waiting for events...");
@@ -64,7 +64,7 @@ public class Projector
 
             if (convertedEvent.EventType == EventType.INSERT)
             {
-                await _schemaMapper.Map(_queryRepository, (InsertEvent)convertedEvent);
+                await _schemaBuilder.Map(_queryRepository, (InsertEvent) convertedEvent);
             }
 
             string commandForEvent = convertedEvent.GetCommand();
