@@ -66,7 +66,9 @@ public class ReplayTest
         MockCommandRepository commandRepository = new MockCommandRepository(seedingOutbox);
         MockQueryRepository queryRepository = new MockQueryRepository();
         MockEventFactory eventFactory = new MockEventFactory();
-        Projector projector = new Projector(commandRepository, queryRepository, eventFactory, NullLogger<Projector>.Instance);
+        MockSchemaBuilder mockSchemaBuilder = new MockSchemaBuilder();
+
+        Projector projector = new Projector(commandRepository, queryRepository, eventFactory, NullLogger<Projector>.Instance, mockSchemaBuilder);
 
         Replayer replayer = new Replayer(commandRepository, queryRepository, projector, NullLogger<Replayer>.Instance);
 
