@@ -1,3 +1,4 @@
+using Application.Contracts.Events;
 using Application.Contracts.Events.Factory;
 using Application.Contracts.Observer;
 using Application.Contracts.Persistence;
@@ -21,6 +22,7 @@ public class SyncBuilder
 
     private readonly string _connectionStringCommandDatabase;
     private readonly string _connectionStringQueryDatabase;
+    private readonly string _queryDatabaseName;
 
     public SyncBuilder(ILogger<SyncBuilder> logger)
     {
@@ -42,23 +44,51 @@ public class SyncBuilder
             builder.SetMinimumLevel(LogLevel.Information);
         });
 
+        (_connectionStringCommandDatabase, _connectionStringQueryDatabase) = DetermineConnectionStrings(configuration);
+
+        _queryDatabaseName = DetermineQueryDatabaseName(configuration);
+    }
+
+    private (string connectionStringCommandDatabase, string connectionStringQueryDatabase) DetermineConnectionStrings(IConfiguration configuration)
+    {
         string? connectionStringCommandDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_COMMAND_DB");
         string? connectionStringQueryDatabase = Environment.GetEnvironmentVariable("CONNECTION_STRING_QUERY_DB");
 
         if (!string.IsNullOrEmpty(connectionStringCommandDatabase) && !string.IsNullOrEmpty(connectionStringQueryDatabase))
         {
             _logger.LogInformation("Found connection strings in Environment Variables.");
-            _connectionStringCommandDatabase = connectionStringCommandDatabase;
-            _connectionStringQueryDatabase = connectionStringQueryDatabase;
+            return (connectionStringCommandDatabase, connectionStringQueryDatabase);
         }
         else
         {
-            _logger.LogInformation("Environment variables not found. Falling back to appsettings configuration.");
+            _logger.LogInformation("Environment variables for connection strings not found. Falling back to appsettings configuration.");
 
-            _connectionStringCommandDatabase = configuration["CommandDatabase:ConnectionString"]
-            ?? throw new InvalidOperationException("Connection string 'CommandDatabase' not found in configuration.");
-            _connectionStringQueryDatabase = configuration["QueryDatabase:ConnectionString"]
-            ?? throw new InvalidOperationException("Connection string 'QueryDatabase' not found in configuration.");
+            connectionStringCommandDatabase = configuration["CommandDatabase:ConnectionString"]
+                ?? throw new InvalidOperationException("Connection string 'CommandDatabase' not found in configuration.");
+            connectionStringQueryDatabase = configuration["QueryDatabase:ConnectionString"]
+                ?? throw new InvalidOperationException("Connection string 'QueryDatabase' not found in configuration.");
+
+            return (connectionStringCommandDatabase, connectionStringQueryDatabase);
+        }
+    }
+
+    private string DetermineQueryDatabaseName(IConfiguration configuration)
+    {
+        string? queryDatabaseName = Environment.GetEnvironmentVariable("QUERY_DATABASE_NAME");
+
+        if (!string.IsNullOrEmpty(queryDatabaseName))
+        {
+            _logger.LogInformation("Found query database name in Environment Variables.");
+            return queryDatabaseName;
+        }
+        else
+        {
+            _logger.LogInformation("Environment variable for query database name not found. Falling back to appsettings configuration.");
+
+            string queryDatabaseNameFromConfiguration = configuration["QueryDatabase:QueryDatabaseName"]
+                   ?? throw new InvalidOperationException("Name for 'QueryDataBaseName' not found in configuration");
+
+            return queryDatabaseNameFromConfiguration;
         }
     }
 
@@ -70,9 +100,10 @@ public class SyncBuilder
 
         _services.AddSingleton<ICommandRepository>(sp => new MongoDbCommandRepository(_connectionStringCommandDatabase, sp.GetRequiredService<ILogger<MongoDbCommandRepository>>()));
         _services.AddSingleton<IQueryRepository>(sp => new MySqlQueryRepository(_connectionStringQueryDatabase, sp.GetRequiredService<ILogger<MySqlQueryRepository>>()));
-
+        _services.AddSingleton<ISchemaBuilder>(sp => new MySqlSchemaBuilder());
         return this;
     }
+
 
     public SyncBuilder AddEventFactory()
     {
@@ -109,13 +140,15 @@ public class SyncBuilder
         return this;
     }
 
-    public SyncApplication Build()
+    public async Task<SyncApplication> Build()
     {
         _logger.LogInformation("Building Application...");
         _services.AddSingleton<SyncApplication>();
 
         ServiceProvider provider = _services.BuildServiceProvider();
         _logger.LogInformation("Application has finished building.");
+
+        await MySqlQueryRepository.CreateBasicStructureQueryDatabase(_queryDatabaseName, _connectionStringQueryDatabase, provider.GetRequiredService<ILogger<MySqlQueryRepository>>());
 
         return provider.GetRequiredService<SyncApplication>();
     }

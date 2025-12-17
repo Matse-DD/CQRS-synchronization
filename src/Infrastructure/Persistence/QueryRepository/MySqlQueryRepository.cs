@@ -1,8 +1,9 @@
 ﻿using Application.Contracts.Persistence;
+using Infrastructure.Replay;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System.Data.Common;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Persistence.QueryRepository;
 
@@ -12,8 +13,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
     {
         using MySqlConnection connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
-
-        string commandLastEventId = $@"UPDATE last_info SET last_event_id = ""{eventId}""";
+        string commandLastEventId = $@"REPLACE INTO last_info VALUES(1, '{eventId}')";
 
         logger.LogInformation("Executing Update: {Command}", command);
         logger.LogDebug("Updating LastEventId: {CommandLastEventId}", commandLastEventId);
@@ -83,7 +83,6 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         await connection.OpenAsync();
 
         Guid resultGuid = Guid.Empty;
-        bool needsDefaultValue = false;
 
         const string queryLastEventId = "SELECT last_event_id FROM last_info";
         using MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, connection);
@@ -94,23 +93,30 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
                 int columnLastEventId = result.GetOrdinal("last_event_id");
                 resultGuid = result.IsDBNull(columnLastEventId) ? Guid.Empty : result.GetGuid(columnLastEventId);
             }
-            else
-            {
-                needsDefaultValue = true;
-            }
         }
-
-        if (needsDefaultValue) await PlaceEmptyGuidInLastEventId(connection);
 
         return resultGuid;
     }
 
-    private async Task PlaceEmptyGuidInLastEventId(MySqlConnection connection)
+    public async static Task CreateBasicStructureQueryDatabase(string queryDatabaseName, string connectionString, ILogger<MySqlQueryRepository> logger)
     {
-        string commandCreatePlace = $"INSERT INTO last_info VALUES(1, '{Guid.Empty}')";
-        using MySqlCommand createDefaultValueForLastInfo = new MySqlCommand(commandCreatePlace, connection);
-        await createDefaultValueForLastInfo.ExecuteNonQueryAsync();
+        string commandCreateDatabase = $"CREATE DATABASE IF NOT EXISTS {queryDatabaseName};";
+        string commandCreateTable = $"CREATE TABLE IF NOT EXISTS last_info (id INT, last_event_id VARCHAR(36), PRIMARY KEY (id));";
+        string commandInsertTable = $"REPLACE INTO last_info VALUES(1, '{Guid.Empty}');";
 
+        using MySqlConnection connection = new MySqlConnection(connectionString);
+        await connection.OpenAsync();
+
+        using MySqlCommand createDatabase = new MySqlCommand(commandCreateDatabase, connection);
+        await createDatabase.ExecuteNonQueryAsync();
+
+        using MySqlCommand createTable = new MySqlCommand(commandCreateTable, connection);
+        await createTable.ExecuteNonQueryAsync();
+
+        using MySqlCommand insertTable = new MySqlCommand(commandInsertTable, connection);
+        await insertTable.ExecuteNonQueryAsync();
+
+        logger.LogInformation("Created {queryDatabaseName} database with empty.", queryDatabaseName);
         logger.LogInformation("Initialized 'last_info' table with empty GUID.");
     }
 }

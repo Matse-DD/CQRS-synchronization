@@ -1,48 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Infrastructure.Events.Mappings.MySQL.Shared;
 
-namespace Infrastructure.Events.Mappings.MySQL.Shared
+public static class MySqlExtractionExtensions
 {
-    public static class MySqlExtractionExtensions
+    public static string DetermineMySqlValue(this string incoming)
     {
-        public static string DetermineMySqlValue(this string incoming)
+        if (!incoming.IsString()) return incoming;
+        string sign = incoming.ExtractSign();
+        string value = incoming.ExtractValue();
+        value = value.Sanitize();
+        return $"{sign}'{value}'";
+    }
+
+    public static string ExtractSign(this string incoming)
+    {
+        if (!incoming.IsString()) return incoming;
+        return incoming.Substring(0, incoming.IndexOf('\''));
+    }
+
+    public static string ExtractValue(this string value)
+    {
+        if (value.IsString())
         {
-            if (!incoming.IsString()) return incoming;
-            string sign = incoming.ExtractSign();
-            string value = incoming.ExtractValue();
-            value = value.Sanitize();
-            return $"{sign}'{value}'";
+            int indexFirstQuote = value.IndexOf('\'');
+            int indexLastQuote = value.LastIndexOf('\'');
+
+            int length = indexLastQuote - indexFirstQuote - 1;
+            value = value.Substring(indexFirstQuote + 1, length);
         }
 
-        public static string ExtractSign(this string incoming)
-        {
-            if (!incoming.IsString()) return incoming;
-            return incoming.Substring(0, incoming.IndexOf('\''));
-        }
+        return value;
+    }
 
-        public static string ExtractValue(this string value)
-        {
-            if (value.IsString())
-            {
-                int indexFirstQuote = value.IndexOf('\'');
-                int indexLastQuote = value.LastIndexOf('\'');
+    public static string Sanitize(this string value)
+    {
+        return value.Replace("\'", "\'\'");
+    }
 
-                int length = indexLastQuote - indexFirstQuote - 1;
-                value = value.Substring(indexFirstQuote + 1, length);
-            }
-
-            return value;
-        }
-
-        public static string Sanitize(this string value)
-        {
-            return value.Replace("\'", "\'\'");
-        }
-
-        public static bool IsString(this string value)
-        {
-            return value.Contains('\'');
-        }
+    public static bool IsString(this string value)
+    {
+        return value.Contains('\'');
     }
 }

@@ -1,4 +1,5 @@
-﻿using Application.Contracts.Events.Factory;
+﻿using Application.Contracts.Events;
+using Application.Contracts.Events.Factory;
 using Application.Contracts.Persistence;
 using Infrastructure.Events.Mappings.MySQL;
 using Infrastructure.Observer;
@@ -26,7 +27,7 @@ public class TestProjector
         await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringToStartRepoMySql);
         await connectionMySql.OpenAsync();
 
-        string queryToStart = "CREATE DATABASE IF NOT EXISTS cqrs_read; USE cqrs_read; CREATE TABLE IF NOT EXISTS Products (product_id CHAR(36) PRIMARY KEY, name VARCHAR(255) NOT NULL, sku VARCHAR(100) NOT NULL, price DECIMAL(10,2) NOT NULL, stock_level INT NOT NULL, is_active BOOLEAN NOT NULL);CREATE TABLE IF NOT EXISTS last_info (id INT AUTO_INCREMENT PRIMARY KEY, last_event_id CHAR(36));";
+        string queryToStart = "CREATE DATABASE IF NOT EXISTS cqrs_read; USE cqrs_read;";
 
         await using MySqlCommand cmdGetLastEventId = new MySqlCommand(queryToStart, connectionMySql);
         await cmdGetLastEventId.ExecuteNonQueryAsync();
@@ -37,7 +38,7 @@ public class TestProjector
     {
         await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringQueryRepoMySql);
         await connectionMySql.OpenAsync();
-        const string cleanupSql = "TRUNCATE TABLE Products; UPDATE last_info SET last_event_id = NULL WHERE id = 1;";
+        const string cleanupSql = "DROP TABLE IF EXISTS Products; UPDATE last_info SET last_event_id = NULL WHERE id = 1";
         await using MySqlCommand cmd = new MySqlCommand(cleanupSql, connectionMySql);
         await cmd.ExecuteNonQueryAsync();
 
@@ -55,8 +56,10 @@ public class TestProjector
         ICommandRepository commandRepo = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
         IQueryRepository queryRepo = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
         IEventFactory eventFactory = new MySqlEventFactory();
+        ISchemaBuilder schemaBuilder = new MySqlSchemaBuilder();
 
-        Projector projector = new(commandRepo, queryRepo, eventFactory, NullLogger<Projector>.Instance);
+        Projector projector = new(commandRepo, queryRepo, eventFactory, NullLogger<Projector>.Instance, schemaBuilder);
+
 
         // Act
         ICollection<string> eventsAdded = AddEventToOutbox();
@@ -80,8 +83,10 @@ public class TestProjector
         ICommandRepository commandRepository = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
         IQueryRepository queryRepository = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
         IEventFactory eventFactory = new MySqlEventFactory();
+        ISchemaBuilder schemaBuilder = new MySqlSchemaBuilder();
 
-        Projector projector = new(commandRepository, queryRepository, eventFactory, NullLogger<Projector>.Instance);
+        Projector projector = new(commandRepository, queryRepository, eventFactory, NullLogger<Projector>.Instance, schemaBuilder);
+
         //Act
         ICollection<string> eventsAdded = AddEventToOutbox();
         string lastEventId = ExtractEventId(eventsAdded.Last());
@@ -103,7 +108,9 @@ public class TestProjector
         ICommandRepository commandRepo = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
         IQueryRepository queryRepo = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
         IEventFactory eventFactory = new MySqlEventFactory();
-        Projector projector = new Projector(commandRepo, queryRepo, eventFactory, NullLogger<Projector>.Instance);
+        ISchemaBuilder schemaBuilder = new MySqlSchemaBuilder();
+
+        Projector projector = new Projector(commandRepo, queryRepo, eventFactory, NullLogger<Projector>.Instance, schemaBuilder);
         MongoDbObserver observer = new MongoDbObserver(ConnectionStringCommandRepoMongo, NullLogger<MongoDbObserver>.Instance);
 
         using CancellationTokenSource cancellationToken = new CancellationTokenSource();

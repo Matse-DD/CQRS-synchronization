@@ -1,4 +1,5 @@
-﻿using ApplicationTests.Shared.Events.Mappings;
+﻿using ApplicationTests.Shared;
+using ApplicationTests.Shared.Events.Mappings;
 using ApplicationTests.Shared.Persistence;
 using Infrastructure.Projectors;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -15,7 +16,9 @@ public class TestProjector
         MockCommandRepository mockCommandRepo = new MockCommandRepository([]);
         SynchronizedQueryRepository syncQueryRepo = new SynchronizedQueryRepository(expectedEventCount);
         MockEventFactory mockEventFactory = new MockEventFactory();
-        Projector projector = new Projector(mockCommandRepo, syncQueryRepo, mockEventFactory, NullLogger<Projector>.Instance);
+        MockSchemaBuilder mockSchemaBuilder = new MockSchemaBuilder();
+
+        Projector projector = new Projector(mockCommandRepo, syncQueryRepo, mockEventFactory, NullLogger<Projector>.Instance, mockSchemaBuilder);
         ICollection<string> deleteEvents = new List<string>();
 
         for (int i = 0; i < expectedEventCount; i++)
