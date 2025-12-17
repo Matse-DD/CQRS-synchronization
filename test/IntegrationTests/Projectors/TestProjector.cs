@@ -38,7 +38,7 @@ public class TestProjector
     {
         await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringQueryRepoMySql);
         await connectionMySql.OpenAsync();
-        const string cleanupSql = "DROP TABLE Products; UPDATE last_info SET last_event_id = NULL WHERE id = 1";
+        const string cleanupSql = "DROP TABLE IF EXISTS Products; UPDATE last_info SET last_event_id = NULL WHERE id = 1";
         //const string cleanupSql = "TRUNCATE TABLE Products; UPDATE last_info SET last_event_id = NULL WHERE id = 1;";
         await using MySqlCommand cmd = new MySqlCommand(cleanupSql, connectionMySql);
         await cmd.ExecuteNonQueryAsync();
