@@ -42,8 +42,9 @@ public class TestProjector
         await using MySqlCommand cmd = new MySqlCommand(cleanupSql, connectionMySql);
         await cmd.ExecuteNonQueryAsync();
 
-        MongoClient client = new MongoClient(ConnectionStringCommandRepoMongo);
-        IMongoDatabase? database = client.GetDatabase("users");
+        MongoUrl mongoUrl = new(ConnectionStringCommandRepoMongo);
+        MongoClient client = new MongoClient(mongoUrl);
+        IMongoDatabase? database = client.GetDatabase(mongoUrl.DatabaseName);
         IMongoCollection<BsonDocument>? collection = database.GetCollection<BsonDocument>("events");
 
         await collection.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
