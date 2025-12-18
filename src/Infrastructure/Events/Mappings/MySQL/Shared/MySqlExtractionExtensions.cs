@@ -5,16 +5,21 @@ public static class MySqlExtractionExtensions
     public static string DetermineMySqlValue(this string incoming)
     {
         if (!incoming.IsString()) return incoming;
+        
         string sign = incoming.ExtractSign();
         string value = incoming.ExtractValue();
+        
         value = value.Sanitize();
+
         return $"{sign}'{value}'";
     }
 
     public static string ExtractSign(this string incoming)
     {
         if (!incoming.IsString()) return incoming;
-        return incoming.Substring(0, incoming.IndexOf('\''));
+        int startIndexStringForLength = incoming.IndexOf('\'');
+
+        return incoming.Substring(0, startIndexStringForLength);
     }
 
     public static string ExtractValue(this string value)
