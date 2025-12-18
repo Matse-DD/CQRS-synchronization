@@ -16,7 +16,7 @@ public class Replayer(ICommandRepository commandRepository, IQueryRepository que
     {
         try
         {
-            IEnumerable<OutboxEvent> outboxEvents = (await commandRepository.GetAllEvents()).Reverse();
+            IEnumerable<OutboxEvent> outboxEvents = (await commandRepository.GetAllEvents());
             await queryRepository.Clear();
 
             projector.AddEventsToFront(outboxEvents.Select(e => e.eventItem));
