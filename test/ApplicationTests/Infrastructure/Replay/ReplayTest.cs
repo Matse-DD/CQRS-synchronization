@@ -82,7 +82,7 @@ public class ReplayTest
         //ASSERT
         SleepTillReady(queryRepository, 30);
 
-        for(int i = 0; i < 30; i++)
+        for (int i = 0; i < 30; i++)
         {
             Console.WriteLine($"{i} {queryRepository.History.ElementAt(i)}");
         }
