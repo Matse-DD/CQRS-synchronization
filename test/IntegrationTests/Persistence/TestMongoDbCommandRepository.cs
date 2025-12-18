@@ -56,7 +56,7 @@ public class TestMongoDbCommandRepository
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(3));
-        Assert.That(result.First().eventItem, Does.Contain("\"index\" : 0"));
+        Assert.That(result.First().EventItem, Does.Contain("\"index\" : 0"));
     }
 
     [Test]
@@ -90,7 +90,7 @@ public class TestMongoDbCommandRepository
 
         List<DateTime> loadedDates = result.Select(e =>
         {
-            BsonDocument? doc = BsonDocument.Parse(e.eventItem);
+            BsonDocument? doc = BsonDocument.Parse(e.EventItem);
             return DateTime.Parse(doc["occurredAt"].AsString);
         }).ToList();
 

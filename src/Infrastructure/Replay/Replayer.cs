@@ -19,7 +19,7 @@ public class Replayer(ICommandRepository commandRepository, IQueryRepository que
             IEnumerable<OutboxEvent> outboxEvents = (await commandRepository.GetAllEvents()).Reverse();
             await queryRepository.Clear();
 
-            projector.AddEventsToFront(outboxEvents.Select(e => e.eventItem));
+            projector.AddEventsToFront(outboxEvents.Select(e => e.EventItem));
             projector.Unlock();
         }
         catch (Exception e)

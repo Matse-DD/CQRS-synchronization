@@ -28,7 +28,7 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
             if (lastSuccessfulEventId != Guid.Empty)
             {
                 logger.LogInformation("Found last checkpoint: {EventId}. Filtering outbox...", lastSuccessfulEventId);
-                outboxEvents = outboxEvents.ToList().Where(entry => !(entry.eventId.Equals(lastSuccessfulEventId.ToString()) || entry.eventItem.Contains("\"status\" : \"DONE\"")));
+                outboxEvents = outboxEvents.ToList().Where(entry => !(entry.EventId.Equals(lastSuccessfulEventId.ToString()) || entry.EventItem.Contains("\"status\" : \"DONE\"")));
             }
             else
             {
@@ -38,7 +38,7 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
             IList<string> pureEvents = [];
 
             List<OutboxEvent> eventList = outboxEvents.ToList();
-            eventList.ForEach(entry => pureEvents.Add(entry.eventItem));
+            eventList.ForEach(entry => pureEvents.Add(entry.EventItem));
 
             logger.LogInformation("Replaying {Count} events to Projector...", pureEvents.Count);
 

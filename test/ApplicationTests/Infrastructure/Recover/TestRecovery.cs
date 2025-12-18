@@ -79,7 +79,7 @@ public class TestRecovery
         // Assert
         SleepTillReady(queryRepository);
 
-        Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(0).eventId}"));
+        Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(0).EventId}"));
 
         Guid expectedFirstEventIdObserver = eventFactory.DetermineEvent(seedingObserver.ElementAt(0)).EventId;
         Assert.That(queryRepository.History.ElementAt(15), Is.EqualTo($"delete {expectedFirstEventIdObserver}"));
@@ -117,7 +117,7 @@ public class TestRecovery
         MockCommandRepository commandRepository = new MockCommandRepository(seedingOutbox);
         MockQueryRepository queryRepository = new MockQueryRepository
         {
-            LastSuccessfulEventId = new Guid(seedingOutbox.ElementAt(0).eventId)
+            LastSuccessfulEventId = new Guid(seedingOutbox.ElementAt(0).EventId)
         };
 
         MockEventFactory eventFactory = new MockEventFactory();
@@ -133,7 +133,7 @@ public class TestRecovery
         // Assert
         SleepTillReady(queryRepository);
 
-        Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(1).eventId}"));
+        Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(1).EventId}"));
     }
 
     private void SleepTillReady(MockQueryRepository mockQueryRepo)
