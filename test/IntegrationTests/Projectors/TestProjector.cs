@@ -151,8 +151,9 @@ public class TestProjector
     private ICollection<string> AddEventToOutbox()
     {
         ICollection<string> events = new List<string>();
-        MongoClient client = new MongoClient(ConnectionStringCommandRepoMongo);
-        IMongoDatabase database = client.GetDatabase("users");
+        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoClient client = new MongoClient(url);
+        IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events")!;
 
         for (int i = 0; i < 5; i++)
