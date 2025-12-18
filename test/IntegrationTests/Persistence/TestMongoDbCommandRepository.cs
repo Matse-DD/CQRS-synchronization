@@ -15,8 +15,9 @@ public class TestMongoDbCommandRepository
     [SetUp]
     public async Task SetUp()
     {
-        MongoClient client = new MongoClient(ConnectionStringCommandRepoMongo);
-        IMongoDatabase? database = client.GetDatabase("users");
+        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoClient client = new MongoClient(url);
+        IMongoDatabase? database = client.GetDatabase(url.DatabaseName);
         _collection = database.GetCollection<BsonDocument>("events");
 
         await _collection.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
