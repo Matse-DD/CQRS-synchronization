@@ -42,11 +42,11 @@ public static class MySqlExtractionExtensions
         int indexFirstQuote = incoming.IndexOf('\'');
         int indexLastQuote = incoming.LastIndexOf('\'');
 
-        int startIndexString = indexFirstQuote + 1;
-        int lastIndexString = indexLastQuote - 1;
+        int startIndexStringValue = indexFirstQuote + 1;
+        int lastIndexStringValue = indexLastQuote - 1;
 
-        int stringLength = indexLastQuote - lastIndexString;
-        return incoming.Substring(startIndexString, stringLength);
+        int stringLength = indexLastQuote - lastIndexStringValue;
+        return incoming.Substring(startIndexStringValue, stringLength);
     }
 
     public static string Sanitize(this string value)
