@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Events.Mappings.MySQL.Shared;
+﻿using MySqlX.XDevAPI.Common;
+
+namespace Infrastructure.Events.Mappings.MySQL.Shared;
 
 public static class MySqlExtractionExtensions
 {
@@ -22,18 +24,29 @@ public static class MySqlExtractionExtensions
         return incoming.Substring(0, startIndexStringForLength);
     }
 
-    public static string ExtractValue(this string value)
+    public static string ExtractValue(this string incoming)
     {
-        if (value.IsString())
+        if (incoming.IsString())
         {
-            int indexFirstQuote = value.IndexOf('\'');
-            int indexLastQuote = value.LastIndexOf('\'');
-
-            int length = indexLastQuote - indexFirstQuote - 1;
-            value = value.Substring(indexFirstQuote + 1, length);
+            return ExtractStringValue(incoming);
+        }
+        else
+        {
+            return incoming;
         }
 
-        return value;
+    }
+
+    private static string ExtractStringValue(string incoming)
+    {
+        int indexFirstQuote = incoming.IndexOf('\'');
+        int indexLastQuote = incoming.LastIndexOf('\'');
+
+        int startIndexString = indexFirstQuote + 1;
+        int lastIndexString = indexLastQuote - 1;
+
+        int stringLength = indexLastQuote - lastIndexString;
+        return incoming.Substring(startIndexString, stringLength);
     }
 
     public static string Sanitize(this string value)
