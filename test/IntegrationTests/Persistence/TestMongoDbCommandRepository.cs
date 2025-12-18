@@ -8,7 +8,7 @@ namespace IntegrationTests.Persistence;
 
 public class TestMongoDbCommandRepository
 {
-    private const string ConnectionStringCommandRepoMongo = "mongodb://localhost:27017/?connect=direct&replicaSet=rs0";
+    private const string ConnectionStringCommandRepoMongo = "mongodb://localhost:27017/users?connect=direct&replicaSet=rs0";
     private MongoDbCommandRepository _repository;
     private IMongoCollection<BsonDocument> _collection;
 

@@ -19,7 +19,7 @@ public class TestProjector
 {
     private const string ConnectionStringToStartRepoMySql = "Server=localhost;Port=13306;User=root;Password=;";
     private const string ConnectionStringQueryRepoMySql = "Server=localhost;Port=13306;Database=cqrs_read;User=root;Password=;";
-    private const string ConnectionStringCommandRepoMongo = "mongodb://localhost:27017/?connect=direct&replicaSet=rs0";
+    private const string ConnectionStringCommandRepoMongo = "mongodb://localhost:27017/users?connect=direct&replicaSet=rs0";
 
     [OneTimeSetUp]
     public async Task Set_DatabasesUp()
