@@ -13,8 +13,10 @@ public class MongoDbCommandRepository : ICommandRepository
 
     public MongoDbCommandRepository(string connectionString, ILogger<MongoDbCommandRepository> logger)
     {
-        MongoClient client = new(connectionString);
-        IMongoDatabase database = client.GetDatabase("users"); //cqrs_command
+        MongoUrl url = new MongoUrl(connectionString);
+        MongoClient client = new(url);
+        string databaseName = url.DatabaseName ?? throw new ArgumentException("Connection string does not contain database name");
+        IMongoDatabase database = client.GetDatabase(databaseName); //cqrs_command
         _collection = database.GetCollection<BsonDocument>("events")!;
         _logger = logger;
     }
