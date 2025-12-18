@@ -19,8 +19,8 @@ public static class MySqlExtractionExtensions
     public static string ExtractSign(this string incoming)
     {
         if (!incoming.IsString()) return incoming;
-        int startIndexStringForLength = incoming.IndexOf('\'');
 
+        int startIndexStringForLength = incoming.IndexOf('\'');
         return incoming.Substring(0, startIndexStringForLength);
     }
 
@@ -30,11 +30,8 @@ public static class MySqlExtractionExtensions
         {
             return ExtractStringValue(incoming);
         }
-        else
-        {
-            return incoming;
-        }
 
+        return incoming;
     }
 
     private static string ExtractStringValue(string incoming)
