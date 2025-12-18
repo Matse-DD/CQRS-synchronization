@@ -19,7 +19,7 @@ public class TestProjector
 {
     private const string ConnectionStringToStartRepoMySql = "Server=localhost;Port=13306;User=root;Password=;";
     private const string ConnectionStringQueryRepoMySql = "Server=localhost;Port=13306;Database=cqrs_read;User=root;Password=;";
-    private const string ConnectionStringCommandRepoMongo = "mongodb://localhost:27017/?connect=direct&replicaSet=rs0";
+    private const string ConnectionStringCommandRepoMongo = "mongodb://localhost:27017/users?connect=direct&replicaSet=rs0";
 
     [OneTimeSetUp]
     public async Task Set_DatabasesUp()
@@ -42,8 +42,9 @@ public class TestProjector
         await using MySqlCommand cmd = new MySqlCommand(cleanupSql, connectionMySql);
         await cmd.ExecuteNonQueryAsync();
 
-        MongoClient client = new MongoClient(ConnectionStringCommandRepoMongo);
-        IMongoDatabase? database = client.GetDatabase("users");
+        MongoUrl mongoUrl = new(ConnectionStringCommandRepoMongo);
+        MongoClient client = new MongoClient(mongoUrl);
+        IMongoDatabase? database = client.GetDatabase(mongoUrl.DatabaseName);
         IMongoCollection<BsonDocument>? collection = database.GetCollection<BsonDocument>("events");
 
         await collection.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
@@ -150,8 +151,9 @@ public class TestProjector
     private ICollection<string> AddEventToOutbox()
     {
         ICollection<string> events = new List<string>();
-        MongoClient client = new MongoClient(ConnectionStringCommandRepoMongo);
-        IMongoDatabase database = client.GetDatabase("users");
+        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoClient client = new MongoClient(url);
+        IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events")!;
 
         for (int i = 0; i < 5; i++)

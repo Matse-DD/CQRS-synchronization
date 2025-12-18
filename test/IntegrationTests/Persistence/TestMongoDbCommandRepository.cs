@@ -8,15 +8,16 @@ namespace IntegrationTests.Persistence;
 
 public class TestMongoDbCommandRepository
 {
-    private const string ConnectionStringCommandRepoMongo = "mongodb://localhost:27017/?connect=direct&replicaSet=rs0";
+    private const string ConnectionStringCommandRepoMongo = "mongodb://localhost:27017/users?connect=direct&replicaSet=rs0";
     private MongoDbCommandRepository _repository;
     private IMongoCollection<BsonDocument> _collection;
 
     [SetUp]
     public async Task SetUp()
     {
-        MongoClient client = new MongoClient(ConnectionStringCommandRepoMongo);
-        IMongoDatabase? database = client.GetDatabase("users");
+        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoClient client = new MongoClient(url);
+        IMongoDatabase? database = client.GetDatabase(url.DatabaseName);
         _collection = database.GetCollection<BsonDocument>("events");
 
         await _collection.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);

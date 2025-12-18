@@ -13,8 +13,10 @@ public class MongoDbObserver : IObserver
 
     public MongoDbObserver(string connectionString, ILogger<MongoDbObserver> logger)
     {
-        MongoClient client = new(connectionString);
-        IMongoDatabase? database = client.GetDatabase("users");
+        MongoUrl url = new(connectionString);
+        MongoClient client = new(url);
+        string databaseName = url.DatabaseName ?? throw new ArgumentException("Connection string does not contain database name");
+        IMongoDatabase? database = client.GetDatabase(databaseName);
         _collection = database.GetCollection<BsonDocument>("events")!;
         _logger = logger;
     }
