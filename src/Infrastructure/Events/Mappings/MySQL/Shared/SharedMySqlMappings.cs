@@ -9,13 +9,13 @@ public static class SharedMySqlMappings
     {
         if (!DoesConditionExist(condition)) return "True";
 
-        return string.Join(" AND ", condition!.Select(DetermineMySqlConditionCheck));
+        return string.Join(" AND ", condition!.Select(DetermineMySqlConditionPart));
     }
 
-    private static string DetermineMySqlConditionCheck(KeyValuePair<string, string> itemInCondition)
+    private static string DetermineMySqlConditionPart(KeyValuePair<string, string> conditionPart)
     {
-        string key = itemInCondition.Key;
-        string value = itemInCondition.Value.Trim();
+        string key = conditionPart.Key;
+        string value = conditionPart.Value.Trim();
         string sqlValue = value.DetermineMySqlValue();
 
         if (HasConditionSign(value))
