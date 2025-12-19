@@ -67,24 +67,6 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         return resultGuid;
     }
 
-    private static Guid GetLastEventIdFromResult(DbDataReader result)
-    {
-        Guid resultGuid;
-
-        int columnLastEventId = result.GetOrdinal("last_event_id");
-
-        if (result.IsDBNull(columnLastEventId))
-        {
-            resultGuid = Guid.Empty;
-        }
-        else
-        {
-            resultGuid = result.GetGuid(columnLastEventId);
-        }
-
-        return resultGuid;
-    }
-
     public async static Task CreateBasicStructureQueryDatabase(string queryDatabaseName, string connectionString, ILogger<MySqlQueryRepository> logger)
     {
         string commandCreateDatabase = $"CREATE DATABASE IF NOT EXISTS {queryDatabaseName};";
@@ -165,5 +147,17 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
     {
         logger.LogError(ex, "Transaction failed. Rolling back.");
         await transaction.RollbackAsync();
+    }
+
+    private static Guid GetLastEventIdFromResult(DbDataReader result)
+    {
+        int columnLastEventId = result.GetOrdinal("last_event_id");
+
+        if (result.IsDBNull(columnLastEventId))
+        {
+            return Guid.Empty;
+        }
+
+        return result.GetGuid(columnLastEventId);
     }
 }
