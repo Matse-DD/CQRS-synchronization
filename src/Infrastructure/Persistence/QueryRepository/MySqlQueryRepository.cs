@@ -3,7 +3,6 @@ using Infrastructure.Replay;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System.Data.Common;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.QueryRepository;
 
@@ -16,7 +15,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 
         try
         {
-            await ExecuteCommand(command, connection, transaction);
+            await ExecuteUpdateCommand(command, connection, transaction);
             await UpdateLastEventId(eventId, connection, transaction);
 
             await transaction.CommitAsync();
@@ -51,20 +50,36 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 
     public async Task<Guid> GetLastSuccessfulEventId()
     {
-        using MySqlConnection connection = new MySqlConnection(connectionString);
-        await connection.OpenAsync();
+        using MySqlConnection connection = await OpenMySqlConnection();
 
         Guid resultGuid = Guid.Empty;
 
         const string queryLastEventId = "SELECT last_event_id FROM last_info";
+
         using MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, connection);
-        using (DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync())
+        using DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync();
+        
+        if (await result.ReadAsync())
         {
-            if (await result.ReadAsync())
-            {
-                int columnLastEventId = result.GetOrdinal("last_event_id");
-                resultGuid = result.IsDBNull(columnLastEventId) ? Guid.Empty : result.GetGuid(columnLastEventId);
-            }
+            resultGuid = GetLastEventIdFromResult(result);
+        }
+
+        return resultGuid;
+    }
+
+    private static Guid GetLastEventIdFromResult(DbDataReader result)
+    {
+        Guid resultGuid;
+
+        int columnLastEventId = result.GetOrdinal("last_event_id");
+
+        if (result.IsDBNull(columnLastEventId))
+        {
+            resultGuid = Guid.Empty;
+        }
+        else
+        {
+            resultGuid = result.GetGuid(columnLastEventId);
         }
 
         return resultGuid;
@@ -110,7 +125,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         await cmdLastEventId.ExecuteNonQueryAsync();
     }
 
-    private async Task ExecuteCommand(string command, MySqlConnection connection, MySqlTransaction transaction)
+    private async Task ExecuteUpdateCommand(string command, MySqlConnection connection, MySqlTransaction transaction)
     {
         logger.LogInformation("Executing Update: {Command}", command);
 
