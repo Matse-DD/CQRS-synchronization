@@ -11,19 +11,6 @@ public class MockCommandRepository(ICollection<OutboxEvent> seededEvents) : ICom
         return Task.FromResult(_eventOutbox);
     }
 
-    public void MarkEventAsInProgress(Guid eventId)
-    {
-        for (int i = 0; i < _eventOutbox.Count; i++)
-        {
-            OutboxEvent eventEntry = _eventOutbox.ElementAt(i);
-            if (eventEntry.EventId == eventId.ToString())
-            {
-                string newEventItem = eventEntry.EventItem.Replace("\"status\":\"PENDING\"", "\"status\":\"INPROGRESS\"");
-                eventEntry = eventEntry with { EventItem = newEventItem };
-            }
-        }
-    }
-
     public Task<bool> RemoveEvent(Guid eventId)
     {
         _eventOutbox = _eventOutbox.Where(item => item.EventId != eventId.ToString()).ToList();

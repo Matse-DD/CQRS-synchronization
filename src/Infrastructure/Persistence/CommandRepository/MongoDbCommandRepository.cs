@@ -23,7 +23,7 @@ public class MongoDbCommandRepository : ICommandRepository
 
     public async Task<ICollection<OutboxEvent>> GetAllEvents()
     {
-        SortDefinition<BsonDocument>? sort = Builders<BsonDocument>.Sort.Ascending("_id");
+        SortDefinition<BsonDocument>? sort = Builders<BsonDocument>.Sort.Ascending("occurredAt");
         ICollection<BsonDocument> events = await _collection
             .Find(_ => true)
             .Sort(sort)

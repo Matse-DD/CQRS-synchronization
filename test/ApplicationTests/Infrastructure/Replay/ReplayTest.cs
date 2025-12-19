@@ -81,7 +81,8 @@ public class ReplayTest
 
         //ASSERT
         SleepTillReady(queryRepository, 30);
-        Assert.That(queryRepository.History.ElementAt(14), Is.EqualTo($"delete {seedingOutbox.ElementAt(0).EventId}"));
+
+        Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(0).eventId}"));
 
         Guid expectedFirstEventIdObserver = eventFactory.DetermineEvent(seedingObserver.ElementAt(0)).EventId;
         Assert.That(queryRepository.History.ElementAt(15), Is.EqualTo($"delete {expectedFirstEventIdObserver}"));
