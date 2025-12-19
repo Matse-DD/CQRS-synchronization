@@ -5,7 +5,7 @@ namespace Infrastructure.Events.Mappings.MySQL.Shared;
 
 public static class SharedMySqlMappings
 {
-    public static string MapWhereClause(IDictionary<string, string>? condition)
+    public static string MapWhere(IDictionary<string, string>? condition)
     {
         if (!DoesConditionExist(condition)) return "True";
 
