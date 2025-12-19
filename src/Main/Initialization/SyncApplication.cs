@@ -9,7 +9,7 @@ public class SyncApplication(Replayer replay, Recovery recover, IObserver observ
 {
     public async Task RunAsync(CancellationToken cancellationToken = default)
     {
-        recover.Recover(); // TODO kijken wat we juist gaan doen met recover & replay
+        //recover.Recover(); // TODO kijken wat we juist gaan doen met recover & replay
         replay.Replay();
         await observer.StartListening(projector.AddEvent, cancellationToken);
     }
