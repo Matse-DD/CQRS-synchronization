@@ -9,18 +9,21 @@ public static class SharedMySqlMappings
     {
         if (!DoesConditionExist(condition)) return "True";
 
-        return string.Join(" AND ", condition!.Select(conditionPair =>
+        return string.Join(" AND ", condition!.Select(DetermineMySqlConditionCheck));
+    }
+
+    private static string DetermineMySqlConditionCheck(KeyValuePair<string, string> itemInCondition)
+    {
+        string key = itemInCondition.Key;
+        string value = itemInCondition.Value.Trim();
+        string sqlValue = value.DetermineMySqlValue();
+
+        if (HasConditionSign(value))
         {
-            string key = conditionPair.Key;
-            string value = conditionPair.Value.Trim();
+            return $"{key}{sqlValue}";
+        }
 
-            if (HasConditionSign(value))
-            {
-                return $"{key}{value.DetermineMySqlValue()}";
-            }
-
-            return $"{key} = {value.DetermineMySqlValue()}";
-        }));
+        return $"{key} = {sqlValue}";
     }
 
     private static bool HasConditionSign(string value)
