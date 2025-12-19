@@ -31,31 +31,14 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 
     public async Task Clear()
     {
-        using MySqlConnection connection = new MySqlConnection(connectionString);
-        await connection.OpenAsync();
+        using MySqlConnection connection = await OpenMySqlConnection();
 
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
         try
         {
-            string tableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE()";
-            using MySqlCommand cmd = new MySqlCommand(tableQuery, connection);
-            using DbDataReader reader = await cmd.ExecuteReaderAsync();
+            ICollection<string> tables = await GetTablesFromDatabase(connection);
 
-            ICollection<string> tables = [];
-
-            while (await reader.ReadAsync())
-            {
-                tables.Add(reader.GetString(0));
-            }
-
-            reader.Close();
-
-            foreach (string tableName in tables)
-            {
-                string delete = $"DELETE FROM {tableName}";
-                using MySqlCommand cmdDelete = new MySqlCommand(delete, connection, transaction);
-                await cmdDelete.ExecuteNonQueryAsync();
-            }
+            await DeleteTablesFromDatabase(connection, transaction, tables);
 
             await transaction.CommitAsync();
             Console.WriteLine("Cleared repository tables");
@@ -110,6 +93,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         logger.LogInformation("Created {queryDatabaseName} database with empty.", queryDatabaseName);
         logger.LogInformation("Initialized 'last_info' table with empty GUID.");
     }
+
     private async Task<MySqlConnection> OpenMySqlConnection()
     {
         MySqlConnection connection = new MySqlConnection(connectionString);
@@ -134,5 +118,33 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 
         MySqlCommand cmdDataUpdate = new MySqlCommand(command, connection, transaction);
         await cmdDataUpdate.ExecuteNonQueryAsync();
+    }
+
+    private async Task<ICollection<string>> GetTablesFromDatabase(MySqlConnection connection)
+    {
+        string tableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE()";
+
+        using MySqlCommand cmd = new MySqlCommand(tableQuery, connection);
+        using DbDataReader reader = await cmd.ExecuteReaderAsync();
+
+        ICollection<string> tables = [];
+
+        while (await reader.ReadAsync())
+        {
+            tables.Add(reader.GetString(0));
+        }
+
+        return tables;
+    }
+
+    private static async Task DeleteTablesFromDatabase(MySqlConnection connection, MySqlTransaction transaction, ICollection<string> tables)
+    {
+        foreach (string tableName in tables)
+        {
+            string delete = $"DELETE FROM {tableName}";
+            using MySqlCommand cmdDelete = new MySqlCommand(delete, connection, transaction);
+
+            await cmdDelete.ExecuteNonQueryAsync();
+        }
     }
 }
