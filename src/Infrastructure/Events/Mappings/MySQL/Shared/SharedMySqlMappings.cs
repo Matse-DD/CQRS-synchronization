@@ -28,7 +28,7 @@ public static class SharedMySqlMappings
 
     private static bool HasConditionSign(string value)
     {
-        return value.StartsWith(">=") || value.StartsWith("<=") || value.StartsWith('>') || value.StartsWith('<') || value.StartsWith('=');
+        return value.StartsWith(">=") || value.StartsWith("<=") || value.StartsWith("<>") || value.StartsWith('>') || value.StartsWith('<') || value.StartsWith('=');
     }
 
     private static bool DoesConditionExist(IDictionary<string, string>? condition)
