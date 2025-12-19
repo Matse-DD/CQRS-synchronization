@@ -40,12 +40,12 @@ public class MySqlSchemaBuilder : ISchemaBuilder
 
     private string DetermineDataType(string key, object value)
     {
-        if (key.Contains("id")) return "VARCHAR(36)";
+        if (key.Contains("id")) return "VARCHAR(60)";
         if (value is not JsonElement jsonValue) return "VARCHAR(200)";
 
         return jsonValue.ValueKind switch
         {
-            JsonValueKind.String => "VARCHAR(100)",
+            JsonValueKind.String => "VARCHAR(255)",
             JsonValueKind.Number => "INT",
             JsonValueKind.True => "BOOL",
             JsonValueKind.False => "BOOL",
