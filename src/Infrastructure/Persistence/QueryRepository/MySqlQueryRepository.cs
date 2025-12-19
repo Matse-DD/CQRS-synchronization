@@ -11,22 +11,13 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 {
     public async Task Execute(string command, Guid eventId)
     {
-        using MySqlConnection connection = new MySqlConnection(connectionString);
-        await connection.OpenAsync();
-        string commandLastEventId = $@"REPLACE INTO last_info VALUES(1, '{eventId}')";
-
-        logger.LogInformation("Executing Update: {Command}", command);
-        logger.LogDebug("Updating LastEventId: {CommandLastEventId}", commandLastEventId);
+        using MySqlConnection connection = await OpenMySqlConnection();
 
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
-
         try
         {
-            using MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, connection, transaction);
-            using MySqlCommand cmdDataUpdate = new MySqlCommand(command, connection, transaction);
-
-            await cmdLastEventId.ExecuteNonQueryAsync();
-            await cmdDataUpdate.ExecuteNonQueryAsync();
+            await ExecuteCommand(command, connection, transaction);
+            await UpdateLastEventId(eventId, connection, transaction);
 
             await transaction.CommitAsync();
         }
@@ -118,5 +109,30 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 
         logger.LogInformation("Created {queryDatabaseName} database with empty.", queryDatabaseName);
         logger.LogInformation("Initialized 'last_info' table with empty GUID.");
+    }
+    private async Task<MySqlConnection> OpenMySqlConnection()
+    {
+        MySqlConnection connection = new MySqlConnection(connectionString);
+        await connection.OpenAsync();
+
+        return connection;
+    }
+
+    private async Task UpdateLastEventId(Guid eventId, MySqlConnection connection, MySqlTransaction transaction)
+    {
+        string commandLastEventId = $@"REPLACE INTO last_info VALUES(1, '{eventId}')";
+
+        logger.LogDebug("Updating LastEventId: {CommandLastEventId}", commandLastEventId);
+
+        MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, connection, transaction);
+        await cmdLastEventId.ExecuteNonQueryAsync();
+    }
+
+    private async Task ExecuteCommand(string command, MySqlConnection connection, MySqlTransaction transaction)
+    {
+        logger.LogInformation("Executing Update: {Command}", command);
+
+        MySqlCommand cmdDataUpdate = new MySqlCommand(command, connection, transaction);
+        await cmdDataUpdate.ExecuteNonQueryAsync();
     }
 }
