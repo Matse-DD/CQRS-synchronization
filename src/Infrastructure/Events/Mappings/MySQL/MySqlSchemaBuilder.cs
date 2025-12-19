@@ -9,16 +9,23 @@ public class MySqlSchemaBuilder : ISchemaBuilder
 {
     private readonly HashSet<string> alreadyCreatedTables = new HashSet<string>();
 
-    public async Task Map(IQueryRepository mySqlQueryRepository, InsertEvent insertEvent)
+    public async Task Create(IQueryRepository mySqlQueryRepository, InsertEvent insertEvent)
     {
         string aggregateName = insertEvent.AggregateName;
-        if (alreadyCreatedTables.Contains(aggregateName)) return;
 
-        string command = $"CREATE TABLE IF NOT EXISTS {aggregateName} ({DetermineFields(insertEvent.Properties)})";
+        if (DoesTableExists(aggregateName)) return;
+
+        string command = $"CREATE TABLE IF NOT EXISTS {aggregateName} ({MapFields(insertEvent.Properties)})";
+
         await mySqlQueryRepository.Execute(command, insertEvent.EventId);
     }
 
-    private string DetermineFields(IDictionary<string, object> properties)
+    private bool DoesTableExists(string aggregateName)
+    {
+        return alreadyCreatedTables.Contains(aggregateName);
+    }
+
+    private string MapFields(IDictionary<string, object> properties)
     {
         ICollection<string> resultArr = [];
         foreach (KeyValuePair<string, object> pair in properties)
@@ -28,7 +35,7 @@ public class MySqlSchemaBuilder : ISchemaBuilder
 
         resultArr.Add($"PRIMARY KEY (id)");
 
-        return string.Join(',', resultArr);
+        return string.Join(", ", resultArr);
     }
 
     private string DetermineDataType(string key, object value)
