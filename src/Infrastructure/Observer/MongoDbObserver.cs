@@ -27,25 +27,16 @@ public class MongoDbObserver : IObserver
     public async Task StartListening(Action<string> callback, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Observer starting to listen for changes...");
-
-        PipelineDefinition<ChangeStreamDocument<BsonDocument>, ChangeStreamDocument<BsonDocument>>? pipeline = new EmptyPipelineDefinition<ChangeStreamDocument<BsonDocument>>()
-            .Match("{operationType: { $in: ['insert'] }}");
-
-        ChangeStreamOptions options = new ChangeStreamOptions();
-        options.FullDocument = ChangeStreamFullDocumentOption.UpdateLookup;
-
+        
         try
         {
-            using IChangeStreamCursor<ChangeStreamDocument<BsonDocument>>? cursor = await _collection.WatchAsync(pipeline, options, cancellationToken);
+            using IChangeStreamCursor<ChangeStreamDocument<BsonDocument>>? cursor = await _collection.WatchAsync(
+                ConfigurePipeline(), 
+                ConfigureOptions(), 
+                cancellationToken
+            );
 
-            while (await cursor.MoveNextAsync(cancellationToken))
-            {
-                foreach (ChangeStreamDocument<BsonDocument>? change in cursor.Current)
-                {
-                    _logger.LogInformation("Change detected (Operation: {OperationType}). Processing...", change.OperationType);
-                    callback(change.FullDocument.SanitizeOccurredAt().ToJson());
-                }
-            }
+            await CursorLifeCycleAsync(callback, cursor, cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -55,6 +46,32 @@ public class MongoDbObserver : IObserver
         {
             _logger.LogError(ex, "Error in Observer occurred while listening for changes.");
             throw;
+        }
+    }
+
+    private static ChangeStreamOptions ConfigureOptions()
+    {
+        ChangeStreamOptions options = new ChangeStreamOptions();
+        options.FullDocument = ChangeStreamFullDocumentOption.UpdateLookup;
+
+        return options;
+    }
+
+    private static PipelineDefinition<ChangeStreamDocument<BsonDocument>, ChangeStreamDocument<BsonDocument>> ConfigurePipeline()
+    {
+        return new EmptyPipelineDefinition<ChangeStreamDocument<BsonDocument>>()
+            .Match("{operationType: { $in: ['insert'] }}");
+    }
+
+    private async Task CursorLifeCycleAsync(Action<string> callback, IChangeStreamCursor<ChangeStreamDocument<BsonDocument>> cursor, CancellationToken cancellationToken)
+    {
+        while (await cursor.MoveNextAsync(cancellationToken))
+        {
+            foreach (ChangeStreamDocument<BsonDocument>? change in cursor.Current)
+            {
+                _logger.LogInformation("Change detected (Operation: {OperationType}). Processing...", change.OperationType);
+                callback(change.FullDocument.SanitizeOccurredAt().ToJson());
+            }
         }
     }
 }
