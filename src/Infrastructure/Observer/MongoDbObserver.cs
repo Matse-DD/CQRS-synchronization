@@ -17,9 +17,9 @@ public class MongoDbObserver : IObserver
         MongoClient client = new(url);
 
         string databaseName = url.DatabaseName ?? throw new ArgumentException("Connection string does not contain database name");
-        
+
         IMongoDatabase? database = client.GetDatabase(databaseName);
-        
+
         _collection = database.GetCollection<BsonDocument>("events")!;
         _logger = logger;
     }
@@ -27,12 +27,12 @@ public class MongoDbObserver : IObserver
     public async Task StartListening(Action<string> callback, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Observer starting to listen for changes...");
-        
+
         try
         {
             using IChangeStreamCursor<ChangeStreamDocument<BsonDocument>>? cursor = await _collection.WatchAsync(
-                ConfigurePipeline(), 
-                ConfigureOptions(), 
+                ConfigurePipeline(),
+                ConfigureOptions(),
                 cancellationToken
             );
 

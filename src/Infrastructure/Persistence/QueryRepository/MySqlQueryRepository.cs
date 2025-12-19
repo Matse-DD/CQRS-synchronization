@@ -31,7 +31,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
     {
         using MySqlConnection connection = await OpenMySqlConnection();
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
-        
+
         try
         {
             ICollection<string> tables = await GetTablesFromDatabase(connection);
@@ -58,7 +58,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 
         using MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, connection);
         using DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync();
-        
+
         if (await result.ReadAsync())
         {
             resultGuid = GetLastEventIdFromResult(result);

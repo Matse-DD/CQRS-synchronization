@@ -7,10 +7,10 @@ public static class MySqlExtractionExtensions
     public static string DetermineMySqlValue(this string incoming)
     {
         if (!incoming.IsString()) return incoming;
-        
+
         string sign = incoming.ExtractSign();
         string value = incoming.ExtractValue();
-        
+
         value = value.Sanitize();
 
         return $"{sign}'{value}'";
@@ -42,7 +42,7 @@ public static class MySqlExtractionExtensions
         int startIndexStringValue = indexFirstQuote + 1;
         int lastIndexStringValue = indexLastQuote - 1;
 
-        int stringLength = lastIndexStringValue - indexFirstQuote ;
+        int stringLength = lastIndexStringValue - indexFirstQuote;
         return incoming.Substring(startIndexStringValue, stringLength);
     }
 

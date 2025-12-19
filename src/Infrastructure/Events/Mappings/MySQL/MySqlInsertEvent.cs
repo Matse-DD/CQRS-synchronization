@@ -23,7 +23,7 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
         IEnumerable<string> convertedValues = incomingValues.Select(ConvertValue);
         return string.Join(", ", convertedValues);
     }
-    
+
     private static string ConvertValue(object incomingValue)
     {
         if (incomingValue is not JsonElement value) return "NULL";
