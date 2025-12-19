@@ -64,7 +64,7 @@ public class Projector
 
             if (convertedEvent.EventType == EventType.INSERT)
             {
-                await _schemaBuilder.Map(_queryRepository, (InsertEvent)convertedEvent);
+                await _schemaBuilder.Create(_queryRepository, (InsertEvent) convertedEvent);
             }
 
             string commandForEvent = convertedEvent.GetCommand();
