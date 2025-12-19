@@ -33,7 +33,6 @@ public class MongoDbCommandRepository : ICommandRepository
         return outboxEvents;
     }
 
-
     public async Task<bool> RemoveEvent(Guid eventId)
     {
         FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Eq(
