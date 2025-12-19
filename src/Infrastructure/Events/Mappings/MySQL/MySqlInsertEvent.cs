@@ -10,7 +10,7 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
     public override string GetCommand()
     {
         return $"INSERT INTO {AggregateName} ({MapColumns(Properties.Keys)})\n" +
-               $"VALUES ({MapValuesClause(Properties.Values)})";
+               $"VALUES ({MapValues(Properties.Values)})";
     }
 
     private static string MapColumns(IEnumerable<string> keys)
@@ -18,15 +18,15 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
         return string.Join(", ", keys);
     }
 
-    private static string MapValuesClause(IEnumerable<object> incomingValues)
+    private static string MapValues(IEnumerable<object> incomingValues)
     {
         IEnumerable<string> convertedValues = incomingValues.Select(ConvertValue);
         return string.Join(", ", convertedValues);
-
-        static string ConvertValue(object incomingValue)
-        {
-            if (incomingValue is not JsonElement value) return "NULL";
-            return value.ToString().DetermineMySqlValue();
-        }
+    }
+    
+    private static string ConvertValue(object incomingValue)
+    {
+        if (incomingValue is not JsonElement value) return "NULL";
+        return value.ToString().DetermineMySqlValue();
     }
 }
