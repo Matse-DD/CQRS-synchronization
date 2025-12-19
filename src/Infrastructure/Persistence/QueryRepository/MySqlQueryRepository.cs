@@ -12,8 +12,8 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
     public async Task Execute(string command, Guid eventId)
     {
         using MySqlConnection connection = await OpenMySqlConnection();
-
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
+
         try
         {
             await ExecuteCommand(command, connection, transaction);
@@ -23,8 +23,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         }
         catch (DbException ex)
         {
-            logger.LogError(ex, "Transaction failed. Rolling back.");
-            await transaction.RollbackAsync();
+            await RollbackTransaction(transaction, ex);
             throw;
         }
     }
@@ -32,8 +31,8 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
     public async Task Clear()
     {
         using MySqlConnection connection = await OpenMySqlConnection();
-
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
+        
         try
         {
             ICollection<string> tables = await GetTablesFromDatabase(connection);
@@ -41,12 +40,11 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
             await DeleteTablesFromDatabase(connection, transaction, tables);
 
             await transaction.CommitAsync();
-            Console.WriteLine("Cleared repository tables");
+            logger.LogDebug("Cleared repository tables");
         }
-        catch (DbException e)
+        catch (DbException ex)
         {
-            Console.WriteLine($"Error during clear, rolling back: {e.Message}");
-            await transaction.RollbackAsync();
+            await RollbackTransaction(transaction, ex);
             throw;
         }
     }
@@ -146,5 +144,11 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 
             await cmdDelete.ExecuteNonQueryAsync();
         }
+    }
+
+    private async Task RollbackTransaction(MySqlTransaction transaction, DbException ex)
+    {
+        logger.LogError(ex, "Transaction failed. Rolling back.");
+        await transaction.RollbackAsync();
     }
 }
