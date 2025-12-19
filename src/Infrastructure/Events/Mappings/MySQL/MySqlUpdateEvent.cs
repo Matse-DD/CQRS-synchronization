@@ -15,6 +15,6 @@ public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent
 
     private static string MapSetClause(IDictionary<string, string> change)
     {
-        return string.Join(", ", change.Select(changePair => $"{changePair.Key} = {changePair.Value}"));
+        return string.Join(", ", change.Select(changePair => $"{changePair.Key} = {changePair.Value.DetermineMySqlValue()}"));
     }
 }
