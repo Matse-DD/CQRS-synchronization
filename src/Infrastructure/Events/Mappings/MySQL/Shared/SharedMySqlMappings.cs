@@ -33,6 +33,6 @@ public static class SharedMySqlMappings
 
     private static bool DoesConditionExist(IDictionary<string, string>? condition)
     {
-        return condition == null || !condition.Any();
+        return condition != null || condition!.Any();
     }
 }

@@ -42,7 +42,7 @@ public static class MySqlExtractionExtensions
         int startIndexStringValue = indexFirstQuote + 1;
         int lastIndexStringValue = indexLastQuote - 1;
 
-        int stringLength = indexLastQuote - lastIndexStringValue;
+        int stringLength = lastIndexStringValue - indexFirstQuote ;
         return incoming.Substring(startIndexStringValue, stringLength);
     }
 
