@@ -41,12 +41,11 @@ public class Projector
 
     public void AddEventsToFront(IEnumerable<string> newEvents)
     {
-        List<string> newEventsList = newEvents.ToList();
-        IList<string> eventList = [.. newEventsList, .. _eventQueue];
+        IList<string> eventList = [.. newEvents, .. _eventQueue];
 
         _eventQueue = new ConcurrentQueue<string>(eventList.Distinct());
 
-        _logger.LogInformation("Added {Count} events to the front of the queue.", newEventsList.Count());
+        _logger.LogInformation("Added {Count} events to the front of the queue.", newEvents.Count());
         _signalChannel.Writer.TryWrite(true);
     }
 
