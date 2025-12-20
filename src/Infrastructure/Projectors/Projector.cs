@@ -56,50 +56,6 @@ public class Projector
         _signalChannel.Writer.TryWrite(true);
     }
 
-    private async Task ProjectEvent(string eventToProject)
-    {
-        try
-        {
-            Event convertedEvent = _eventFactory.DetermineEvent(eventToProject);
-
-            if (convertedEvent.EventType == EventType.INSERT)
-            {
-                await _schemaBuilder.Create(_queryRepository, (InsertEvent)convertedEvent);
-            }
-
-            string commandForEvent = convertedEvent.GetCommand();
-            Guid eventId = convertedEvent.EventId;
-
-            _logger.LogDebug("Projecting Event {EventId}", eventId);
-
-            await _queryRepository.Execute(commandForEvent, eventId);
-            await _commandRepository.MarkAsDone(eventId);
-
-            _logger.LogInformation("Successfully projected Event {EventId}", eventId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error projecting event: {Message}", ex.Message);
-        }
-    }
-
-    private async Task ProcessEvents()
-    {
-        await foreach (bool _ in _signalChannel.Reader.ReadAllAsync())
-        {
-            if (_locked)
-            {
-                _logger.LogDebug("Projector is locked. Skipping processing cycle.");
-                continue;
-            }
-
-            while (!_locked && _eventQueue.TryDequeue(out string? currentEvent))
-            {
-                await ProjectEvent(currentEvent);
-            }
-        }
-    }
-
     public void Lock()
     {
         _locked = true;
@@ -111,5 +67,69 @@ public class Projector
         _locked = false;
         _logger.LogInformation("Projector UNLOCKED.");
         _signalChannel.Writer.TryWrite(true);
+    }
+
+    private async Task ProcessEvents()
+    {
+        await foreach (bool _ in _signalChannel.Reader.ReadAllAsync())
+        {
+            if (CanProcess())
+            {
+                await ProjectQueuedEvents();
+            }
+        }
+    }
+
+    private bool CanProcess()
+    {
+        if (_locked)
+        {
+            _logger.LogDebug("Projector is locked. Skipping processing cycle.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private async Task ProjectQueuedEvents()
+    {
+        while (!_locked && _eventQueue.TryDequeue(out string? currentEvent))
+        {
+            await ProjectEvent(currentEvent);
+        }
+    }
+
+    private async Task ProjectEvent(string eventToProject)
+    {
+        try
+        {
+            Event convertedEvent = _eventFactory.DetermineEvent(eventToProject);
+            await HandleSchema(convertedEvent);
+            await Project(convertedEvent);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error projecting event: {Message}", ex.Message);
+        }
+    }
+    private async Task HandleSchema(Event convertedEvent)
+    {
+        if (convertedEvent.EventType == EventType.INSERT)
+        {
+            await _schemaBuilder.Create(_queryRepository, (InsertEvent)convertedEvent);
+        }
+    }
+
+    private async Task Project(Event convertedEvent)
+    {
+        string commandForEvent = convertedEvent.GetCommand();
+        Guid eventId = convertedEvent.EventId;
+
+        _logger.LogDebug("Projecting Event {EventId}", eventId);
+
+        await _queryRepository.Execute(commandForEvent, eventId);
+        await _commandRepository.MarkAsDone(eventId);
+
+        _logger.LogInformation("Successfully projected Event {EventId}", eventId);
     }
 }
