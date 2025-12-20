@@ -9,10 +9,10 @@ public class Replayer(ICommandRepository commandRepository, IQueryRepository que
     public void Replay()
     {
         projector.Lock();
-        StartReplaying();
+        _ = StartReplaying();
     }
 
-    private async void StartReplaying()
+    private async Task StartReplaying()
     {
         try
         {
