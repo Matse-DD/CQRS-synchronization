@@ -74,7 +74,7 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
 
     private static bool IsAlreadyProcessed(Guid lastSuccessfulEventId, OutboxEvent outboxEvent)
     {
-        return outboxEvent.EventId.Equals(lastSuccessfulEventId) || outboxEvent.EventItem.Contains("\"status\" : \"DONE\"");
+        return outboxEvent.EventId.Equals(lastSuccessfulEventId.ToString()) || outboxEvent.EventItem.Contains("\"status\" : \"DONE\"");
     }
 
     private static bool IsLastEventIdSet(Guid lastSuccessfulEventId)
