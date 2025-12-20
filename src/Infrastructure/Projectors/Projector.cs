@@ -52,7 +52,7 @@ public class Projector
     public void AddEvent(string incomingEvent)
     {
         _eventQueue.Enqueue(incomingEvent);
-        _logger.LogDebug("Enqueued event: {EventSnippet}...", incomingEvent.Length > 50 ? incomingEvent[..50] : incomingEvent);
+        _logger.LogDebug("Enqueued event: {EventSnippet}...", incomingEvent);
         _signalChannel.Writer.TryWrite(true);
     }
 
