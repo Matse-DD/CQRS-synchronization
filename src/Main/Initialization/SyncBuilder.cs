@@ -24,11 +24,12 @@ public class SyncBuilder
     private readonly string _connectionStringQueryDatabase;
     private readonly string _queryDatabaseName;
 
-    public SyncBuilder(ILogger<SyncBuilder> logger)
+    public SyncBuilder()
     {
-        _logger = logger;
-        _logger.LogInformation("Initializing SyncBuilder...");
         IConfiguration configuration = CreateConfiguration();
+
+        _logger = CreateLogger(configuration) ?? throw new InvalidProgramException("No appsettings configuration found.");
+        _logger.LogInformation("Initializing SyncBuilder...");
 
         _services.AddSingleton(configuration);
 
@@ -55,6 +56,20 @@ public class SyncBuilder
         return configBuilder.Build();
     }
 
+    private ILogger<SyncBuilder>? CreateLogger(IConfiguration configuration)
+    {
+        using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+        {
+            builder.AddConsole();
+            builder.SetMinimumLevel(LogLevel.Information);
+        });
+
+        string url = GetSetting("SEQ_SERVER_URL", "Logger:DefaultUrl", configuration);
+        string apiKey = GetSetting("SEQ_API_KEY", "not in appsettings has to be provided by yourself", configuration);
+
+        return loggerFactory.AddSeq(url, apiKey).CreateLogger<SyncBuilder>();
+    }
+
     private string GetSetting(string envVar, string configPath, IConfiguration configuration)
     {
         string? value = Environment.GetEnvironmentVariable(envVar) ?? configuration[configPath];
@@ -64,21 +79,28 @@ public class SyncBuilder
             throw new InvalidOperationException($"Configuration '{envVar}' and '{configPath}' is missing expected atleast one.");
         }
 
+        return value;
+    }
+
+    private string GetSettingWithLogging(string envVar, string configPath, IConfiguration configuration)
+    {
+        string? value = GetSetting(envVar, configPath, configuration);
+
         _logger.LogInformation("Loaded configuration for {SettingName}", envVar);
         return value;
     }
 
     private (string connectionStringCommandDatabase, string connectionStringQueryDatabase) DetermineConnectionStrings(IConfiguration configuration)
     {
-        string connectionStringCommandDatabase = GetSetting("CONNECTION_STRING_COMMAND_DB", "CommandDatabase:ConnectionString", configuration);
-        string connectionStringQueryDatabase = GetSetting("CONNECTION_STRING_QUERY_DB", "QueryDatabase:ConnectionString", configuration);
+        string connectionStringCommandDatabase = GetSettingWithLogging("CONNECTION_STRING_COMMAND_DB", "CommandDatabase:ConnectionString", configuration);
+        string connectionStringQueryDatabase = GetSettingWithLogging("CONNECTION_STRING_QUERY_DB", "QueryDatabase:ConnectionString", configuration);
 
         return (connectionStringCommandDatabase, connectionStringQueryDatabase);
     }
 
     private string DetermineQueryDatabaseName(IConfiguration configuration)
     {
-        return GetSetting("QUERY_DATABASE_NAME", "QueryDatabase:QueryDatabaseName", configuration);
+        return GetSettingWithLogging("QUERY_DATABASE_NAME", "QueryDatabase:QueryDatabaseName", configuration);
     }
 
     public SyncBuilder AddRepositories()
