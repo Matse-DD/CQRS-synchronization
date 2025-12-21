@@ -6,11 +6,13 @@ namespace Infrastructure.Tools.DatabaseExtensions
     {
         public static BsonDocument SanitizeOccurredAt(this BsonDocument document)
         {
-            if (document.Contains("occuredAt") && document["occuredAt"].IsBsonDateTime)
+            if (document.Contains("occurredAt") && document["occurredAt"].IsBsonDateTime)
             {
-                string dateTime = document["occuredAt"].ToUniversalTime().ToString("o");
-                document["occuredAt"] = new BsonString(dateTime);
+                string dateTime = document["occurredAt"].ToUniversalTime().ToString("o");
+                document["occurredAt"] = new BsonString(dateTime);
             }
+
+            Console.WriteLine(document.ToString());
 
             return document;
         }

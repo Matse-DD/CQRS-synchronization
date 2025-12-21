@@ -65,7 +65,7 @@ public class SyncBuilder
         });
 
         string url = GetSetting("SEQ_SERVER_URL", "Logger:DefaultUrl", configuration);
-        string apiKey = GetSetting("SEQ_API_KEY", "not in appsettings has to be provided by yourself", configuration);
+        string apiKey = GetSetting("SEQ_API_KEY", "Logger:ApiKey", configuration);
 
         return loggerFactory.AddSeq(url, apiKey).CreateLogger<SyncBuilder>();
     }
