@@ -8,6 +8,6 @@ public class MySqlDeleteEvent(IntermediateEvent intermediateEvent) : DeleteEvent
 {
     public override string GetCommand()
     {
-        return $"DELETE FROM {AggregateName} WHERE {SharedMySqlMappings.MapWhereClause(Condition)}";
+        return $"DELETE FROM {AggregateName} WHERE {SharedMySqlMappings.MapWhere(Condition)}";
     }
 }

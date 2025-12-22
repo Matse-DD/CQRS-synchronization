@@ -1,3 +1,3 @@
 ﻿namespace Application.Contracts.Persistence;
 
-public record OutboxEvent(string eventId, string eventItem);
+public record OutboxEvent(string EventId, string EventItem);

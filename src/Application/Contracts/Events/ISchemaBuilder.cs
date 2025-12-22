@@ -4,5 +4,5 @@ namespace Application.Contracts.Events;
 
 public interface ISchemaBuilder
 {
-    public Task Map(IQueryRepository queryRepository, InsertEvent insertEvent);
+    public Task Create(IQueryRepository queryRepository, InsertEvent insertEvent);
 }

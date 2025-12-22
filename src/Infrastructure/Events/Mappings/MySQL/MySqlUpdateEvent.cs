@@ -9,12 +9,16 @@ public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent
     public override string GetCommand()
     {
         return $"UPDATE {AggregateName}\n" +
-               $"SET {MapSetClause(Change)}\n" +
-               $"WHERE {SharedMySqlMappings.MapWhereClause(Condition)}";
+               $"SET {MapSet(Change)}\n" +
+               $"WHERE {SharedMySqlMappings.MapWhere(Condition)}";
     }
 
-    private static string MapSetClause(IDictionary<string, string> change)
+    private static string MapSet(IDictionary<string, string> change)
     {
-        return string.Join(", ", change.Select(changePair => $"{changePair.Key} = {changePair.Value}"));
+        return string.Join(", ", change.Select(changePair =>
+            {
+                return $"{changePair.Key} = {changePair.Value.DetermineMySqlValue()}";
+            }
+        ));
     }
 }

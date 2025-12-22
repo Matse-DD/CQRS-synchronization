@@ -39,65 +39,21 @@ public class Projector
         _ = ProcessEvents();
     }
 
-    public void AddEventsToFront(IEnumerable<string> batchOfEvents)
+    public void AddEventsToFront(IEnumerable<string> newEvents)
     {
-        List<string> ofEvents = batchOfEvents.ToList();
-        IList<string> eventList = [.. ofEvents, .. _eventQueue];
+        IList<string> eventList = [.. newEvents, .. _eventQueue];
+
         _eventQueue = new ConcurrentQueue<string>(eventList.Distinct());
 
-        _logger.LogInformation("Added {Count} events to the front of the queue.", ofEvents.Count());
+        _logger.LogInformation("Added {Count} events to the front of the queue.", newEvents.Count());
         _signalChannel.Writer.TryWrite(true);
     }
 
     public void AddEvent(string incomingEvent)
     {
         _eventQueue.Enqueue(incomingEvent);
-        _logger.LogDebug("Enqueued event: {EventSnippet}...", incomingEvent.Length > 50 ? incomingEvent[..50] : incomingEvent);
+        _logger.LogDebug("Enqueued event: {EventSnippet}...", incomingEvent);
         _signalChannel.Writer.TryWrite(true);
-    }
-
-    private async Task ProjectEvent(string eventToProject)
-    {
-        try
-        {
-            Event convertedEvent = _eventFactory.DetermineEvent(eventToProject);
-
-            if (convertedEvent.EventType == EventType.INSERT)
-            {
-                await _schemaBuilder.Map(_queryRepository, (InsertEvent)convertedEvent);
-            }
-
-            string commandForEvent = convertedEvent.GetCommand();
-            Guid eventId = convertedEvent.EventId;
-
-            _logger.LogDebug("Projecting Event {EventId}", eventId);
-
-            await _queryRepository.Execute(commandForEvent, eventId);
-            await _commandRepository.MarkAsDone(eventId);
-
-            _logger.LogInformation("Successfully projected Event {EventId}", eventId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error projecting event: {Message}", ex.Message);
-        }
-    }
-
-    private async Task ProcessEvents()
-    {
-        await foreach (bool _ in _signalChannel.Reader.ReadAllAsync())
-        {
-            if (_locked)
-            {
-                _logger.LogDebug("Projector is locked. Skipping processing cycle.");
-                continue;
-            }
-
-            while (!_locked && _eventQueue.TryDequeue(out string? currentEvent))
-            {
-                await ProjectEvent(currentEvent);
-            }
-        }
     }
 
     public void Lock()
@@ -111,5 +67,69 @@ public class Projector
         _locked = false;
         _logger.LogInformation("Projector UNLOCKED.");
         _signalChannel.Writer.TryWrite(true);
+    }
+
+    private async Task ProcessEvents()
+    {
+        await foreach (bool _ in _signalChannel.Reader.ReadAllAsync())
+        {
+            if (CanProcess())
+            {
+                await ProjectQueuedEvents();
+            }
+        }
+    }
+
+    private bool CanProcess()
+    {
+        if (_locked)
+        {
+            _logger.LogDebug("Projector is locked. Skipping processing cycle.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private async Task ProjectQueuedEvents()
+    {
+        while (!_locked && _eventQueue.TryDequeue(out string? currentEvent))
+        {
+            await ProjectEvent(currentEvent);
+        }
+    }
+
+    private async Task ProjectEvent(string eventToProject)
+    {
+        try
+        {
+            Event convertedEvent = _eventFactory.DetermineEvent(eventToProject);
+            await HandleSchema(convertedEvent);
+            await Project(convertedEvent);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error projecting event: {Message}", ex.Message);
+        }
+    }
+    private async Task HandleSchema(Event convertedEvent)
+    {
+        if (convertedEvent.EventType == EventType.INSERT)
+        {
+            await _schemaBuilder.Create(_queryRepository, (InsertEvent)convertedEvent);
+        }
+    }
+
+    private async Task Project(Event convertedEvent)
+    {
+        string commandForEvent = convertedEvent.GetCommand();
+        Guid eventId = convertedEvent.EventId;
+
+        _logger.LogDebug("Projecting Event {EventId}", eventId);
+
+        await _queryRepository.Execute(commandForEvent, eventId);
+        await _commandRepository.MarkAsDone(eventId);
+
+        _logger.LogInformation("Successfully projected Event {EventId}", eventId);
     }
 }

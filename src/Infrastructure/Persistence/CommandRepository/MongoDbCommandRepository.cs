@@ -15,22 +15,20 @@ public class MongoDbCommandRepository : ICommandRepository
     {
         MongoUrl url = new MongoUrl(connectionString);
         MongoClient client = new(url);
+
         string databaseName = url.DatabaseName ?? throw new ArgumentException("Connection string does not contain database name");
-        IMongoDatabase database = client.GetDatabase(databaseName); //cqrs_command
+        IMongoDatabase database = client.GetDatabase(databaseName);
+
         _collection = database.GetCollection<BsonDocument>("events")!;
         _logger = logger;
     }
 
+
     public async Task<ICollection<OutboxEvent>> GetAllEvents()
     {
-        SortDefinition<BsonDocument>? sort = Builders<BsonDocument>.Sort.Ascending("occurredAt");
-        ICollection<BsonDocument> events = await _collection
-            .Find(_ => true)
-            .Sort(sort)
-            .ToListAsync();
+        ICollection<BsonDocument> events = await RequestEvents();
 
-        ICollection<OutboxEvent> outboxEvents = events.Select(d =>
-            new OutboxEvent(d.GetValue("id").AsString ?? string.Empty, d.SanitizeOccurredAt().ToJson() ?? string.Empty)).ToList();
+        ICollection<OutboxEvent> outboxEvents = events.Select(MapToOutboxEvent).ToList();
 
         return outboxEvents;
     }
@@ -48,7 +46,7 @@ public class MongoDbCommandRepository : ICommandRepository
             _logger.LogInformation("Removed event {EventId} from Outbox", eventId);
         }
 
-        return result is { IsAcknowledged: true, DeletedCount: > 0 };
+        return result.IsAcknowledged && result.DeletedCount > 0;
     }
 
     public async Task<bool> MarkAsDone(Guid eventId)
@@ -63,5 +61,25 @@ public class MongoDbCommandRepository : ICommandRepository
         }
 
         return result is { IsAcknowledged: true, ModifiedCount: > 0 };
+    }
+
+    private OutboxEvent MapToOutboxEvent(BsonDocument incomingEventItem)
+    {
+        string eventId = incomingEventItem.GetValue("id").AsString;
+        string eventItem = incomingEventItem.SanitizeOccurredAt().ToJson();
+
+        return new OutboxEvent(eventId ?? string.Empty, eventItem ?? string.Empty);
+    }
+
+    private async Task<ICollection<BsonDocument>> RequestEvents()
+    {
+        SortDefinition<BsonDocument>? sort = Builders<BsonDocument>.Sort.Ascending("occurredAt");
+
+        ICollection<BsonDocument> events = await _collection
+            .Find(_ => true)
+            .Sort(sort)
+            .ToListAsync();
+
+        return events;
     }
 }

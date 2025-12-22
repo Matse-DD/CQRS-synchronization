@@ -6,7 +6,7 @@ namespace ApplicationTests.Shared;
 
 public class MockSchemaBuilder : ISchemaBuilder
 {
-    public Task Map(IQueryRepository queryRepository, InsertEvent insertEvent)
+    public Task Create(IQueryRepository queryRepository, InsertEvent insertEvent)
     {
         return Task.CompletedTask;
     }

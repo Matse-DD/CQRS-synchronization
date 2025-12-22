@@ -3,7 +3,6 @@ using Infrastructure.Replay;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System.Data.Common;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Persistence.QueryRepository;
 
@@ -11,88 +10,58 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 {
     public async Task Execute(string command, Guid eventId)
     {
-        using MySqlConnection connection = new MySqlConnection(connectionString);
-        await connection.OpenAsync();
-        string commandLastEventId = $@"REPLACE INTO last_info VALUES(1, '{eventId}')";
-
-        logger.LogInformation("Executing Update: {Command}", command);
-        logger.LogDebug("Updating LastEventId: {CommandLastEventId}", commandLastEventId);
-
+        using MySqlConnection connection = await OpenMySqlConnection();
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
 
         try
         {
-            using MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, connection, transaction);
-            using MySqlCommand cmdDataUpdate = new MySqlCommand(command, connection, transaction);
-
-            await cmdLastEventId.ExecuteNonQueryAsync();
-            await cmdDataUpdate.ExecuteNonQueryAsync();
+            await ExecuteUpdateCommand(command, connection, transaction);
+            await UpdateLastEventId(eventId, connection, transaction);
 
             await transaction.CommitAsync();
         }
         catch (DbException ex)
         {
-            logger.LogError(ex, "Transaction failed. Rolling back.");
-            await transaction.RollbackAsync();
+            await RollbackTransaction(transaction, ex);
             throw;
         }
     }
 
     public async Task Clear()
     {
-        using MySqlConnection connection = new MySqlConnection(connectionString);
-        await connection.OpenAsync();
-
+        using MySqlConnection connection = await OpenMySqlConnection();
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
+
         try
         {
-            string tableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE()";
-            using MySqlCommand cmd = new MySqlCommand(tableQuery, connection);
-            using DbDataReader reader = await cmd.ExecuteReaderAsync();
+            ICollection<string> tables = await GetTablesFromDatabase(connection);
 
-            ICollection<string> tables = [];
-
-            while (await reader.ReadAsync())
-            {
-                tables.Add(reader.GetString(0));
-            }
-
-            reader.Close();
-
-            foreach (string tableName in tables)
-            {
-                string delete = $"DELETE FROM {tableName}";
-                using MySqlCommand cmdDelete = new MySqlCommand(delete, connection, transaction);
-                await cmdDelete.ExecuteNonQueryAsync();
-            }
+            await DeleteTablesFromDatabase(connection, transaction, tables);
 
             await transaction.CommitAsync();
-            Console.WriteLine("Cleared repository tables");
+            logger.LogDebug("Cleared repository tables");
         }
-        catch (DbException e)
+        catch (DbException ex)
         {
-            Console.WriteLine($"Error during clear, rolling back: {e.Message}");
-            await transaction.RollbackAsync();
+            await RollbackTransaction(transaction, ex);
             throw;
         }
     }
 
     public async Task<Guid> GetLastSuccessfulEventId()
     {
-        using MySqlConnection connection = new MySqlConnection(connectionString);
-        await connection.OpenAsync();
+        using MySqlConnection connection = await OpenMySqlConnection();
 
         Guid resultGuid = Guid.Empty;
 
         const string queryLastEventId = "SELECT last_event_id FROM last_info";
+
         using MySqlCommand cmdGetLastEventId = new MySqlCommand(queryLastEventId, connection);
-        using (DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync())
+        using DbDataReader result = await cmdGetLastEventId.ExecuteReaderAsync();
+
+        if (await result.ReadAsync())
         {
-            if (await result.ReadAsync())
-            {
-                int columnLastEventId = result.GetOrdinal("last_event_id");
-                resultGuid = result.IsDBNull(columnLastEventId) ? Guid.Empty : result.GetGuid(columnLastEventId);
-            }
+            resultGuid = GetLastEventIdFromResult(result);
         }
 
         return resultGuid;
@@ -118,5 +87,77 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 
         logger.LogInformation("Created {queryDatabaseName} database with empty.", queryDatabaseName);
         logger.LogInformation("Initialized 'last_info' table with empty GUID.");
+    }
+
+    private async Task<MySqlConnection> OpenMySqlConnection()
+    {
+        MySqlConnection connection = new MySqlConnection(connectionString);
+        await connection.OpenAsync();
+
+        return connection;
+    }
+
+    private async Task UpdateLastEventId(Guid eventId, MySqlConnection connection, MySqlTransaction transaction)
+    {
+        string commandLastEventId = $@"REPLACE INTO last_info VALUES(1, '{eventId}')";
+
+        logger.LogDebug("Updating LastEventId: {CommandLastEventId}", commandLastEventId);
+
+        MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, connection, transaction);
+        await cmdLastEventId.ExecuteNonQueryAsync();
+    }
+
+    private async Task ExecuteUpdateCommand(string command, MySqlConnection connection, MySqlTransaction transaction)
+    {
+        logger.LogInformation("Executing Update: {Command}", command);
+
+        MySqlCommand cmdDataUpdate = new MySqlCommand(command, connection, transaction);
+        await cmdDataUpdate.ExecuteNonQueryAsync();
+    }
+
+    private async Task<ICollection<string>> GetTablesFromDatabase(MySqlConnection connection)
+    {
+        string tableQuery = "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE()";
+
+        using MySqlCommand cmd = new MySqlCommand(tableQuery, connection);
+        using DbDataReader reader = await cmd.ExecuteReaderAsync();
+
+        ICollection<string> tables = [];
+
+        while (await reader.ReadAsync())
+        {
+            tables.Add(reader.GetString(0));
+        }
+
+        return tables;
+    }
+
+    private static async Task DeleteTablesFromDatabase(MySqlConnection connection, MySqlTransaction transaction, ICollection<string> tables)
+    {
+        foreach (string tableName in tables)
+        {
+            string delete = $"DELETE FROM {tableName}";
+            using MySqlCommand cmdDelete = new MySqlCommand(delete, connection, transaction);
+
+            await cmdDelete.ExecuteNonQueryAsync();
+        }
+    }
+
+    private async Task RollbackTransaction(MySqlTransaction transaction, DbException ex)
+    {
+        logger.LogError(ex, "Transaction failed. Rolling back.");
+        await transaction.RollbackAsync();
+    }
+
+    private static Guid GetLastEventIdFromResult(DbDataReader result)
+    {
+        int columnLastEventId = result.GetOrdinal("last_event_id");
+
+        if (result.IsDBNull(columnLastEventId))
+        {
+            return Guid.Empty;
+        }
+
+        return result.GetGuid(columnLastEventId);
     }
 }

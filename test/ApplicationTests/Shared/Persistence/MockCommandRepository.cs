@@ -13,17 +13,17 @@ public class MockCommandRepository(ICollection<OutboxEvent> seededEvents) : ICom
 
     public Task<bool> RemoveEvent(Guid eventId)
     {
-        _eventOutbox = _eventOutbox.Where(item => item.eventId != eventId.ToString()).ToList();
+        _eventOutbox = _eventOutbox.Where(item => item.EventId != eventId.ToString()).ToList();
         return Task.FromResult(true);
     }
 
     public Task<bool> MarkAsDone(Guid eventId)
     {
-        OutboxEvent? currentEvent = _eventOutbox.FirstOrDefault(e => e.eventId == eventId.ToString());
+        OutboxEvent? currentEvent = _eventOutbox.FirstOrDefault(e => e.EventId == eventId.ToString());
         if (currentEvent == null) return Task.FromResult(false);
 
-        string newEvent = currentEvent.eventItem.Replace("\"status\":\"PENDING\"", "\"status\":\"DONE\"");
-        currentEvent = currentEvent with { eventItem = newEvent };
+        string newEvent = currentEvent.EventItem.Replace("\"status\":\"PENDING\"", "\"status\":\"DONE\"");
+        currentEvent = currentEvent with { EventItem = newEvent };
         return Task.FromResult(true);
     }
 }
