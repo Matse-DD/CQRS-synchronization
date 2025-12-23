@@ -5,7 +5,7 @@ using Microsoft.OpenApi;
 
 using System.Net.Mime;
 
-namespace Howestprime.Movies.Infrastructure.WebApi;
+namespace Infrastructure.WebApi;
 
 public static class Routes
 {
