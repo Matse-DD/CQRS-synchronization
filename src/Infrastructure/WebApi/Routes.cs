@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Infrastructure.WebApi.Controllers;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi;
@@ -32,36 +33,31 @@ public static class Routes
     {
         var cqrsGroup = app.MapGroup("/api/cqrs")
             .WithTags("Events")
-            .WithDescription("Endpoints related to cqrs information")
-            .WithOpenApi();
+            .WithDescription("Endpoints related to cqrs information");
 
         cqrsGroup.MapGet("/", GetEventsByFiltersController.Invoke)
             .WithName("GetEventsByFilters")
             .WithDescription("Gets all events from the outbox based on the filters")
-            .WithMetadata(new ProducesAttribute(MediaTypeNames.Application.Json))
-            .WithOpenApi();
+            .WithMetadata(new ProducesAttribute(MediaTypeNames.Application.Json));
     }
 
     private static void MapCqrsReplayRoutes(WebApplication app)
     {
         var cqrsReplayGroup = app.MapGroup("/api/cqrs-replay")
             .WithTags("CqrsReplay")
-            .WithDescription("Endpoints related to replay management")
-            .WithOpenApi();
+            .WithDescription("Endpoints related to replay management");
 
-        cqrsReplayGroup.MapPost("/", ReplayTillEventController.Invoke)
+        cqrsReplayGroup.MapPost("/replay", ReplayTillEventController.Invoke)
             .WithName("ReplayTillEvent")
             .WithDescription("Replay till a certain eventid")
-            .WithMetadata(new ConsumesAttribute(MediaTypeNames.Application.Json))
-            .AddEndpointFilter<BodyValidatorFilter<ScheduleMovieEventBody>>()
-            .WithOpenApi();
+            .WithMetadata(new ConsumesAttribute(MediaTypeNames.Application.Json));
+        //.AddEndpointFilter<BodyValidatorFilter<ScheduleMovieEventBody>>();
 
         // TODO look of this is inside the correct group maybe place this in seperate group
-        cqrsReplayGroup.MapPost("/", TakeSnapshotController.Invoke)
+        cqrsReplayGroup.MapPost("/snapshot", TakeSnapshotController.Invoke)
             .WithName("TakeSnapshot")
             .WithDescription("Make a snapshot of the current state")
-            .WithMetadata(new ConsumesAttribute(MediaTypeNames.Application.Json))
-            .AddEndpointFilter<BodyValidatorFilter<ScheduleMovieEventBody>>()
-            .WithOpenApi();
+            .WithMetadata(new ConsumesAttribute(MediaTypeNames.Application.Json));
+            //.AddEndpointFilter<BodyValidatorFilter<ScheduleMovieEventBody>>();
     }
 }
