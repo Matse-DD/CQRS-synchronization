@@ -1,5 +1,7 @@
 ﻿using Application.Contracts.Events.EventOptions;
+using Application.Contracts.Persistence;
 using Application.WebApi;
+using Application.WebApi.Contracts.Ports;
 using Application.WebApi.Events;
 using Infrastructure.Replay;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,18 +13,19 @@ public static class UseCaseServices
     public static IServiceCollection AddUseCases(this IServiceCollection services)
     {
         return services.
-            AddGetEventsByFilters();
+            AddGetEventsByFiltersQuery();
     }
 
-    public static IServiceCollection AddGetEventsByFilters(this IServiceCollection services)
+    public static IServiceCollection AddGetEventsByFiltersQuery(this IServiceCollection services)
     {
-        return services.AddScoped<IUseCase<GetEventsByFilterInput, Task<IReadOnlyList<Event>>>>(
+        return services.AddScoped<IUseCase<GetEventsByFiltersInput, Task<IReadOnlyList<Event>>>>(
             ServiceProvider =>
             {
-                // TODO momentele is voor replay mechanisme we willen alle events opvragen welk ding weet hiervan de recovery
-                // mischien extraheren naar een aparte service
-                 //replayer = ServiceProvider.GetRequiredService<Replayer>();
-            });
+                IGetEventsByFiltersQuery allEventsQuery = ServiceProvider.GetRequiredService<IGetEventsByFiltersQuery>();
 
+                ICommandRepository commandRepository = ServiceProvider.GetRequiredService<ICommandRepository>();
+
+                return new GetEventsByFilters(allEventsQuery);
+            });
     }
 }

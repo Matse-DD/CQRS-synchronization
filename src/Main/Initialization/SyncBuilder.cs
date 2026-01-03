@@ -1,7 +1,11 @@
 using Application.Contracts.Events;
+using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
 using Application.Contracts.Observer;
 using Application.Contracts.Persistence;
+using Application.WebApi;
+using Application.WebApi.Contracts.Ports;
+using Application.WebApi.Events;
 using Infrastructure.Events.Mappings.MySQL;
 using Infrastructure.Observer;
 using Infrastructure.Persistence.CommandRepository;
@@ -9,9 +13,12 @@ using Infrastructure.Persistence.QueryRepository;
 using Infrastructure.Projectors;
 using Infrastructure.Recover;
 using Infrastructure.Replay;
+using Infrastructure.WebApi.Queries;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace Main.Initialization;
 
@@ -23,7 +30,7 @@ public class SyncBuilder
     private readonly string _connectionStringCommandDatabase;
     private readonly string _connectionStringQueryDatabase;
     private readonly string _queryDatabaseName;
-
+    
     public SyncBuilder()
     {
         IConfiguration configuration = CreateConfiguration();
@@ -42,6 +49,13 @@ public class SyncBuilder
         (_connectionStringCommandDatabase, _connectionStringQueryDatabase) = DetermineConnectionStrings(configuration);
 
         _queryDatabaseName = DetermineQueryDatabaseName(configuration);
+    }
+
+    public ServiceCollection GetServices()
+    {
+        ServiceCollection services = [.. _services];
+
+        return services;
     }
 
     private static IConfiguration CreateConfiguration()
@@ -162,5 +176,36 @@ public class SyncBuilder
         await MySqlQueryRepository.CreateBasicStructureQueryDatabase(_queryDatabaseName, _connectionStringQueryDatabase, provider.GetRequiredService<ILogger<MySqlQueryRepository>>());
 
         return provider.GetRequiredService<SyncApplication>();
+    }
+
+    public string QueryDatabaseName()
+    {
+        return _queryDatabaseName;
+    }
+
+    public string ConnectionString()
+    {
+        return _connectionStringQueryDatabase;
+    }
+
+    public SyncBuilder AddQueries()
+    {
+        // TODO CLEAN UP SEPERATE FILE TO ADD QUERIES?, ...
+        // ADD getEventsByFiltersQuery
+        _services.AddScoped<IGetEventsByFiltersQuery>(sp => new GetEventsByFiltersQuery(sp.GetRequiredService<ICommandRepository>(), sp.GetRequiredService<IEventFactory>()));
+        return this;
+    }
+
+    // TODO aparte file voor de usecases
+    public SyncBuilder AddUseCases()
+    {
+        _services
+            .AddScoped<IUseCase<GetEventsByFiltersInput, Task<IReadOnlyList<Event>>>>(ServiceProvider =>
+            {
+                IGetEventsByFiltersQuery getEventsByFiltersQuery = ServiceProvider.GetRequiredService<IGetEventsByFiltersQuery>();
+                return new GetEventsByFilters(getEventsByFiltersQuery);
+            });
+
+        return this;
     }
 }
