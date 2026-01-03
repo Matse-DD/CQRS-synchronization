@@ -3,5 +3,5 @@
 namespace Infrastructure.WebApi.Controllers.Responses;
 
 public sealed record GetEventsByFiltersResponse(
-    IEnumerable<Event> Data
+    IEnumerable<EventResponse> Data
 );

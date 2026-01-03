@@ -28,9 +28,19 @@ public class GetEventsByFiltersController
 
     private static GetEventsByFiltersResponse BuildResponse(IReadOnlyList<Event> cqrsEvents)
     {
-        return new GetEventsByFiltersResponse(cqrsEvents);
+        return new GetEventsByFiltersResponse(
+            cqrsEvents.Select(cqrsEvent => 
+                new EventResponse(
+                    cqrsEvent.EventId,
+                    cqrsEvent.OccuredAt,
+                    cqrsEvent.AggregateName,
+                    cqrsEvent.Status.ToString(),
+                    cqrsEvent.EventType.ToString(),
+                    cqrsEvent.GetCommand()
+                )
+            )
+        );
     }
-
 }
 
 public sealed record GetEventsByFiltersParameters
