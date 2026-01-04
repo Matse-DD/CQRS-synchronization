@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Infrastructure.WebApi.Controllers;
 
-public class GetEventsByFiltersController
+public sealed class GetEventsByFiltersController : IController
 {
     public static async Task<Results<Ok<GetEventsByFiltersResponse>, UnauthorizedHttpResult>> Invoke(
         [AsParameters] GetEventsByFiltersParameters parameters, 
