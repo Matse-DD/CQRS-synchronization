@@ -36,8 +36,8 @@ public static class Routes
 
         cqrsReplayGroup.MapPost("/replay", ReplayTillEventController.Invoke)
             .WithName("ReplayTillEvent")
-            .WithDescription("Replay till a certain eventid")
-            .WithMetadata(new ConsumesAttribute(MediaTypeNames.Application.Json));
+            .WithDescription("Replay till a certain eventid");
+        //.WithMetadata(new ConsumesAttribute(MediaTypeNames.Application.Json));
         //.AddEndpointFilter<BodyValidatorFilter<ScheduleMovieEventBody>>();
 
         // TODO look of this is inside the correct group maybe place this in seperate group
