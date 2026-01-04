@@ -20,6 +20,7 @@ SyncBuilder syncBuilder = new SyncBuilder()
     .AddObserver(); 
 
 WebApplicationBuilder webAppBuilder = WebApplication.CreateBuilder(args);
+webAppBuilder.Logging.ClearProviders();
 
 webAppBuilder.Services.AddSyncInfrastructure(syncBuilder);
 webAppBuilder.Services.AddQueries();
