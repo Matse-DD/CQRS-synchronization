@@ -2,5 +2,5 @@
 
 public interface IController
 {
-    public void Invoke();
+    public static Task Invoke;
 }
