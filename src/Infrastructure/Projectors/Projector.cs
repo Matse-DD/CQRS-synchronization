@@ -69,6 +69,11 @@ public class Projector
         _signalChannel.Writer.TryWrite(true);
     }
 
+    public void ClearQueue()
+    {
+        _eventQueue.Clear();
+    }
+
     private async Task ProcessEvents()
     {
         await foreach (bool _ in _signalChannel.Reader.ReadAllAsync())
