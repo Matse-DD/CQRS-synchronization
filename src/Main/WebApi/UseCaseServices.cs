@@ -1,8 +1,10 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Persistence;
+using Application.CoreSyncContracts.Replay;
 using Application.WebApi;
 using Application.WebApi.Contracts.Ports;
 using Application.WebApi.Events;
+using Application.WebApi.Replay;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Main.WebApi;
@@ -11,8 +13,9 @@ public static class UseCaseServices
 {
     public static IServiceCollection AddUseCases(this IServiceCollection services)
     {
-        return services.
-            AddUseCaseGetEventsByFiltersQuery();
+        return services
+            .AddUseCaseGetEventsByFiltersQuery()
+            .AddUseCaseReplayTillEvent();
     }
 
     public static IServiceCollection AddUseCaseGetEventsByFiltersQuery(this IServiceCollection services)
@@ -22,6 +25,16 @@ public static class UseCaseServices
             {
                 IGetEventsByFiltersQuery getEventsByFiltersQuery = ServiceProvider.GetRequiredService<IGetEventsByFiltersQuery>();
                 return new GetEventsByFilters(getEventsByFiltersQuery);
+            });
+    }
+
+    public static IServiceCollection AddUseCaseReplayTillEvent(this IServiceCollection services)
+    {
+        return services
+            .AddScoped<IUseCase<ReplayTillEventInput, Task>>(ServiceProvider =>
+            {
+                IReplay replayer = ServiceProvider.GetRequiredService<IReplay>();
+                return new ReplayTillEvent(replayer);
             });
     }
 }
