@@ -3,6 +3,7 @@ using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
 using Application.Contracts.Observer;
 using Application.Contracts.Persistence;
+using Application.CoreSyncContracts.Replay;
 using Application.WebApi;
 using Application.WebApi.Contracts.Ports;
 using Application.WebApi.Events;
@@ -155,7 +156,14 @@ public class SyncBuilder
     public SyncBuilder AddReplay()
     {
         _logger.LogInformation("Adding Replay...");
-        _services.AddSingleton<Replayer>();
+        _services.AddSingleton<IReplay>(sp => new Replayer(
+                sp.GetRequiredService<ICommandRepository>(),
+                sp.GetRequiredService<IQueryRepository>(),
+                sp.GetRequiredService<Projector>(),
+                sp.GetRequiredService<ILogger<IReplay>>()
+            )
+        );
+
         return this;
     }
 
