@@ -1,5 +1,6 @@
 ﻿using Application.Contracts.Persistence;
 using Application.CoreSyncContracts.Replay;
+using Application.Shared.Exceptions;
 using Infrastructure.Projectors;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
@@ -14,6 +15,7 @@ public class Replayer(ICommandRepository commandRepository, IQueryRepository que
         projector.Lock();
         _ = StartReplaying();
     }
+
     private async Task StartReplaying() // TODO dit zou ook mogelijks weg mogen
     {
         try
@@ -33,9 +35,9 @@ public class Replayer(ICommandRepository commandRepository, IQueryRepository que
     public async Task ReplayTillEvent(string eventId)
     {
         IEnumerable<OutboxEvent> outboxEvents = (await commandRepository.GetAllEvents());
-        OutboxEvent outboxEventToReplayTo = outboxEvents.First(outboxEvent => outboxEvent.EventId == eventId);
+        OutboxEvent? outboxEventToReplayTo = outboxEvents.FirstOrDefault(outboxEvent => outboxEvent.EventId == eventId) ?? throw new NotFoundException($"EventId {eventId} not found in events");
 
-        var timeToReplayTo = JsonDocument.Parse(outboxEventToReplayTo.EventItem).RootElement.GetProperty("occured_at").GetDateTime();
+        DateTime timeToReplayTo = JsonDocument.Parse(outboxEventToReplayTo.EventItem).RootElement.GetProperty("occured_at").GetDateTime();
 
         IEnumerable<OutboxEvent> outboxEventsToReplay = outboxEvents.Where(
             outboxEvent => JsonDocument.Parse(outboxEvent.EventItem).RootElement.GetProperty("occured_at").GetDateTime() <= timeToReplayTo
