@@ -1,11 +1,11 @@
 using Application.Contracts.Observer;
+using Application.CoreSyncContracts.Replay;
 using Infrastructure.Projectors;
 using Infrastructure.Recover;
-using Infrastructure.Replay;
 
 namespace Main.Initialization;
 
-public class SyncApplication(Replayer replay, Recovery recover, IObserver observer, Projector projector)
+public class SyncApplication(IReplay replay, Recovery recover, IObserver observer, Projector projector)
 {
     public async Task RunAsync(CancellationToken cancellationToken = default)
     {
