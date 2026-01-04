@@ -6,6 +6,7 @@ using Infrastructure.WebApi.Controllers.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.WebApi.Controllers;
 
@@ -23,12 +24,12 @@ public class ReplayTillEventController() : IController
         try
         {
             await replayTillEvent.Execute(input);
+            return TypedResults.Ok();
         }
         catch
         {
             return TypedResults.BadRequest();
         }
-        return TypedResults.Ok();
     }
 }
 

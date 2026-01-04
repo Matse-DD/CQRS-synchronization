@@ -6,6 +6,7 @@ using Application.WebApi.Contracts.Ports;
 using Application.WebApi.Events;
 using Application.WebApi.Replay;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Main.WebApi;
 
@@ -34,7 +35,9 @@ public static class UseCaseServices
             .AddScoped<IUseCase<ReplayTillEventInput, Task>>(ServiceProvider =>
             {
                 IReplay replayer = ServiceProvider.GetRequiredService<IReplay>();
-                return new ReplayTillEvent(replayer);
+                ILogger<ReplayTillEvent> logger = ServiceProvider.GetRequiredService<ILogger<ReplayTillEvent>>();
+
+                return new ReplayTillEvent(replayer, logger);
             });
     }
 }
