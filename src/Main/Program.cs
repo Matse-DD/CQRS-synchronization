@@ -17,7 +17,7 @@ SyncBuilder syncBuilder = new SyncBuilder()
     .AddProjector()
     .AddRecovery()
     .AddReplay()
-    .AddObserver(); 
+    .AddObserver();
 
 WebApplicationBuilder webAppBuilder = WebApplication.CreateBuilder(args);
 webAppBuilder.Logging.ClearProviders();
@@ -32,7 +32,7 @@ WebApplication webApp = webAppBuilder.Build();
 webApp.UseWebApiModules();
 
 await AdditionalServices.SetBasicDatabaseStructureUp(
-    syncBuilder, 
+    syncBuilder,
     webApp.Services.GetRequiredService<ILogger<MySqlQueryRepository>>()
 );
 

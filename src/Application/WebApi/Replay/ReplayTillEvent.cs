@@ -3,6 +3,7 @@ using Application.Shared.Exceptions;
 using Microsoft.Extensions.Logging;
 
 namespace Application.WebApi.Replay;
+
 public sealed record ReplayTillEventInput(string? EventId);
 
 public sealed class ReplayTillEvent(

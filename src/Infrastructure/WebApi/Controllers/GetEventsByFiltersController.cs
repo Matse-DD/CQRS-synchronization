@@ -12,8 +12,8 @@ namespace Infrastructure.WebApi.Controllers;
 public sealed class GetEventsByFiltersController : IController
 {
     public static async Task<Results<Ok<GetEventsByFiltersResponse>, UnauthorizedHttpResult>> Invoke(
-        [AsParameters] GetEventsByFiltersParameters parameters, 
-        [FromServices] IUseCase<GetEventsByFiltersInput, Task<IReadOnlyList<Event>>>  getEventsByFilters
+        [AsParameters] GetEventsByFiltersParameters parameters,
+        [FromServices] IUseCase<GetEventsByFiltersInput, Task<IReadOnlyList<Event>>> getEventsByFilters
     )
     {
         GetEventsByFiltersInput input = new(
@@ -22,14 +22,14 @@ public sealed class GetEventsByFiltersController : IController
             );
 
         IReadOnlyList<Event> cqrsEvents = await getEventsByFilters.Execute(input);
-        
+
         return TypedResults.Ok(BuildResponse(cqrsEvents));
     }
 
     private static GetEventsByFiltersResponse BuildResponse(IReadOnlyList<Event> cqrsEvents)
     {
         return new GetEventsByFiltersResponse(
-            cqrsEvents.Select(cqrsEvent => 
+            cqrsEvents.Select(cqrsEvent =>
                 new EventResponse(
                     cqrsEvent.EventId,
                     cqrsEvent.OccuredAt,
@@ -47,5 +47,5 @@ public sealed record GetEventsByFiltersParameters
 {
     public required string? Status { get; init; }
     public required DateTime? BeforeTime { get; init; }
-}   
-    
+}
+

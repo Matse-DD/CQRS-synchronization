@@ -32,7 +32,7 @@ public class SyncBuilder
     private readonly string _connectionStringCommandDatabase;
     private readonly string _connectionStringQueryDatabase;
     private readonly string _queryDatabaseName;
-    
+
     public SyncBuilder()
     {
         IConfiguration configuration = CreateConfiguration();
@@ -156,11 +156,11 @@ public class SyncBuilder
     public SyncBuilder AddReplay()
     {
         _logger.LogInformation("Adding Replay...");
-        _services.AddSingleton<IReplayer>(sp => new Replayer(
+        _services.AddSingleton<IReplay>(sp => new Replayer(
                 sp.GetRequiredService<ICommandRepository>(),
                 sp.GetRequiredService<IQueryRepository>(),
                 sp.GetRequiredService<Projector>(),
-                sp.GetRequiredService<ILogger<IReplayer>>()
+                sp.GetRequiredService<ILogger<IReplay>>()
             )
         );
 

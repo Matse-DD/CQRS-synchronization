@@ -43,7 +43,7 @@ public static class WebApiModules
         app.UseSwaggerUI(options =>
         {
             options.SwaggerEndpoint("/openapi/v1.json", "v1");
-        }); 
+        });
 
         app.UseHttpsRedirection();
 
@@ -55,16 +55,16 @@ public static class WebApiModules
 
     private static OpenApiInfo GetOpenApiInfo()
     {
-         return new OpenApiInfo
-          {
-              Version = "v1",
-              Title = "Movies API",
-              Description = "A simple API to manage movies and movie events.",
-              Contact = new OpenApiContact
-              {
-                  Name = "Matse De Deyn | Lander Debeir | Pratik Lohani | Youri Haentjens",
-                  Email = "matse.de.deyn@student.howest.be"
-              }
-          };
+        return new OpenApiInfo
+        {
+            Version = "v1",
+            Title = "Movies API",
+            Description = "A simple API to manage movies and movie events.",
+            Contact = new OpenApiContact
+            {
+                Name = "Matse De Deyn | Lander Debeir | Pratik Lohani | Youri Haentjens",
+                Email = "matse.de.deyn@student.howest.be"
+            }
+        };
     }
 }

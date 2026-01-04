@@ -45,6 +45,6 @@ public static class Routes
             .WithName("TakeSnapshot")
             .WithDescription("Make a snapshot of the current state")
             .WithMetadata(new ConsumesAttribute(MediaTypeNames.Application.Json));
-            //.AddEndpointFilter<BodyValidatorFilter<ScheduleMovieEventBody>>();
+        //.AddEndpointFilter<BodyValidatorFilter<ScheduleMovieEventBody>>();
     }
 }
