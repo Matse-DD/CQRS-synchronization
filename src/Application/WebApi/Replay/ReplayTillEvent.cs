@@ -1,5 +1,4 @@
-﻿using Application.Contracts.Persistence;
-using Application.CoreSyncContracts.Replay;
+﻿using Application.CoreSyncContracts.Replay;
 using Application.Shared.Exceptions;
 using Microsoft.Extensions.Logging;
 
@@ -7,7 +6,7 @@ namespace Application.WebApi.Replay;
 public sealed record ReplayTillEventInput(string? EventId);
 
 public sealed class ReplayTillEvent(
-    IReplay replayer,
+    IReplayer replayer,
     ILogger<ReplayTillEvent> logger
 ) : IUseCase<ReplayTillEventInput, Task>
 {

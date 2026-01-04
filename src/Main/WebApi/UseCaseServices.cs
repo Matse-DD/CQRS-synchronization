@@ -34,7 +34,7 @@ public static class UseCaseServices
         return services
             .AddScoped<IUseCase<ReplayTillEventInput, Task>>(ServiceProvider =>
             {
-                IReplay replayer = ServiceProvider.GetRequiredService<IReplay>();
+                IReplayer replayer = ServiceProvider.GetRequiredService<IReplayer>();
                 ILogger<ReplayTillEvent> logger = ServiceProvider.GetRequiredService<ILogger<ReplayTillEvent>>();
 
                 return new ReplayTillEvent(replayer, logger);

@@ -8,7 +8,7 @@ using System.Text.Json;
 
 namespace Infrastructure.Replay;
 
-public class Replayer(ICommandRepository commandRepository, IQueryRepository queryRepository, Projector projector, ILogger<IReplay> logger) : IReplay
+public class Replayer(ICommandRepository commandRepository, IQueryRepository queryRepository, Projector projector, ILogger<IReplayer> logger) : IReplayer
 {
     public void Replay() // TODO dit zal mogelijks weg mogen
     {

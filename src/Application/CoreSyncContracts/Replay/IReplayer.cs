@@ -1,6 +1,6 @@
 ﻿namespace Application.CoreSyncContracts.Replay;
 
-public interface IReplay
+public interface IReplayer
 {
     public Task ReplayTillEvent(string eventId);
 }

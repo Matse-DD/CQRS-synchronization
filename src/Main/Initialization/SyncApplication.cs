@@ -5,7 +5,7 @@ using Infrastructure.Recover;
 
 namespace Main.Initialization;
 
-public class SyncApplication(IReplay replay, Recovery recover, IObserver observer, Projector projector)
+public class SyncApplication(IReplayer replay, Recovery recover, IObserver observer, Projector projector)
 {
     public async Task RunAsync(CancellationToken cancellationToken = default)
     {
