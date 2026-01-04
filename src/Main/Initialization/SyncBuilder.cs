@@ -14,6 +14,7 @@ using Infrastructure.Projectors;
 using Infrastructure.Recover;
 using Infrastructure.Replay;
 using Infrastructure.WebApi.Queries;
+using Main.WebApi;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -186,26 +187,5 @@ public class SyncBuilder
     public string ConnectionString()
     {
         return _connectionStringQueryDatabase;
-    }
-
-    public SyncBuilder AddQueries()
-    {
-        // TODO CLEAN UP SEPERATE FILE TO ADD QUERIES?, ...
-        // ADD getEventsByFiltersQuery
-        _services.AddScoped<IGetEventsByFiltersQuery>(sp => new GetEventsByFiltersQuery(sp.GetRequiredService<ICommandRepository>(), sp.GetRequiredService<IEventFactory>()));
-        return this;
-    }
-
-    // TODO aparte file voor de usecases
-    public SyncBuilder AddUseCases()
-    {
-        _services
-            .AddScoped<IUseCase<GetEventsByFiltersInput, Task<IReadOnlyList<Event>>>>(ServiceProvider =>
-            {
-                IGetEventsByFiltersQuery getEventsByFiltersQuery = ServiceProvider.GetRequiredService<IGetEventsByFiltersQuery>();
-                return new GetEventsByFilters(getEventsByFiltersQuery);
-            });
-
-        return this;
     }
 }

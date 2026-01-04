@@ -21,6 +21,6 @@ public static class CqrsEventExpressions
                 && cqrsEvent.OccuredAt <= beforeTime;
         }
 
-        throw new InvalidEnumArgumentException();
+        return cqrsEvent => false;
     }
 }
