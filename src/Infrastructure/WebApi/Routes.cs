@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.OpenApi;
 
 using System.Net.Mime;
 
@@ -10,18 +9,6 @@ namespace Infrastructure.WebApi;
 
 public static class Routes
 {
-    public static OpenApiInfo OpenApiInfo { get; } = new OpenApiInfo
-    {
-        Version = "v1",
-        Title = "Movies API",
-        Description = "A simple API to manage movies and movie events.",
-        Contact = new OpenApiContact
-        {
-            Name = "Matse De Deyn | Lander Debeir | Pratik Lohani | Youri Haentjens",
-            Email = "matse.de.deyn@student.howest.be"
-        }
-    };
-
     public static WebApplication MapRoutes(this WebApplication app)
     {
         MapCqrsRoutes(app);
