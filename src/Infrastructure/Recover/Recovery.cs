@@ -1,7 +1,9 @@
-﻿using Application.Contracts.Persistence;
+﻿using Application.Contracts.Events.Enums;
+using Application.Contracts.Persistence;
 using Infrastructure.Projectors;
 using Microsoft.Extensions.Logging;
 using SharpCompress.Common;
+using System.Text.Json;
 
 namespace Infrastructure.Recover;
 
@@ -75,8 +77,15 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
     }
 
     private static bool IsEventPending(OutboxEvent outboxEvent) {
-        return outboxEvent.EventItem.Contains("\"status\" : \"PENDING\"") ||
-               outboxEvent.EventItem.Contains("\"status\": \"PENDING\""); ;
+        using JsonDocument eventDoc = JsonDocument.Parse(outboxEvent.EventItem);
+        JsonElement eventAsJson = eventDoc.RootElement;
+
+        if (eventAsJson.TryGetProperty("status", out JsonElement statusElement))
+        {
+            return statusElement.GetString()?.Equals(Status.PENDING.ToString()) ?? false;
+        }
+
+        return false;
     }
 
     private static bool IsLastEventIdSet(Guid lastSuccessfulEventId)
