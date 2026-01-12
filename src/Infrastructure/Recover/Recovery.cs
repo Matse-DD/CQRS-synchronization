@@ -60,17 +60,22 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         return await queryRepository.GetLastSuccessfulEventId();
     }
 
-    private IEnumerable<OutboxEvent> DetermineEventsToRecover(IEnumerable<OutboxEvent> outboxEvents, Guid? lastSuccessfulEventId)
+    private IEnumerable<OutboxEvent> DetermineEventsToRecover(IEnumerable<OutboxEvent> outboxEvents, Guid lastSuccessfulEventId)
     {
-        return outboxEvents.Where(outboxEvent => {
-            return HasToBeProcessed(lastSuccessfulEventId, outboxEvent); });
+        return outboxEvents.Where(outboxEvent => HasToBeProcessed(lastSuccessfulEventId, outboxEvent));
     }
 
-    private static bool HasToBeProcessed(Guid? lastSuccessfulEventId, OutboxEvent outboxEvent)
+    private static bool HasToBeProcessed(Guid lastSuccessfulEventId, OutboxEvent outboxEvent)
     {
-        if (lastSuccessfulEventId == null) return outboxEvent.EventItem.Contains("\"status\" : \"PENDING\"");
+        if (!IsLastEventIdSet(lastSuccessfulEventId)) return IsEventPending(outboxEvent);
 
-        return !outboxEvent.EventId.Equals(lastSuccessfulEventId.ToString()) && outboxEvent.EventItem.Contains("\"status\" : \"PENDING\"");
+        if (!Guid.TryParse(outboxEvent.EventId, out var currentEventId)) return false;
+
+        return !outboxEvent.EventId.Equals(lastSuccessfulEventId.ToString()) && IsEventPending(outboxEvent);
+    }
+
+    private static bool IsEventPending(OutboxEvent outboxEvent) {
+        return outboxEvent.EventItem.Contains("\"status\" : \"PENDING\"");
     }
 
     private static bool IsLastEventIdSet(Guid lastSuccessfulEventId)
