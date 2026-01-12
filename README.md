@@ -21,6 +21,18 @@ services:
     
     query-db:
         #query db configuration
+    
+    seq:
+      image: datalust/seq
+      container_name: seq
+      restart: always
+      volumes
+        - #data storage configuration
+      env_file: .seq.env
+      ports:
+        - #configure ports
+      networks
+        - #network name
 
     cqrs-sync:
         image: cqrs-sync:latest
