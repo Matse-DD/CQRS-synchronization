@@ -39,23 +39,16 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
 
     private async Task<IEnumerable<string>> GetEventsToRecover()
     {
-        IEnumerable<OutboxEvent> outboxEvents = await GetPendingEventsFromOutbox();
+        IEnumerable<OutboxEvent> outboxEvents = await GetAllEventsFromOutbox();
         Guid lastSuccessfulEventId = await GetLastSuccessfulEventId();
 
-        if (IsLastEventIdSet(lastSuccessfulEventId))
-        {
-            logger.LogInformation("Found last checkpoint: {EventId}. Filtering outbox...", lastSuccessfulEventId);
-            outboxEvents = DetermineEventsToRecover(outboxEvents, lastSuccessfulEventId);
-        }
-        else
-        {
-            logger.LogInformation("No checkpoint found. Replaying all events.");
-        }
+        logger.LogInformation("Found last checkpoint: {EventId}. Filtering outbox to get PENDING events...", lastSuccessfulEventId);
+        outboxEvents = DetermineEventsToRecover(outboxEvents, lastSuccessfulEventId);
 
         return ExtractEvents(outboxEvents);
     }
 
-    private async Task<IEnumerable<OutboxEvent>> GetPendingEventsFromOutbox()
+    private async Task<IEnumerable<OutboxEvent>> GetAllEventsFromOutbox()
     {
         logger.LogInformation("Fetching all events from Command Repository...");
         return await commandRepository.GetAllEvents();
@@ -67,14 +60,17 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         return await queryRepository.GetLastSuccessfulEventId();
     }
 
-    private IEnumerable<OutboxEvent> DetermineEventsToRecover(IEnumerable<OutboxEvent> outboxEvents, Guid lastSuccessfulEventId)
+    private IEnumerable<OutboxEvent> DetermineEventsToRecover(IEnumerable<OutboxEvent> outboxEvents, Guid? lastSuccessfulEventId)
     {
-        return outboxEvents.Where(outboxEvent => !IsAlreadyProcessed(lastSuccessfulEventId, outboxEvent));
+        return outboxEvents.Where(outboxEvent => {
+            return HasToBeProcessed(lastSuccessfulEventId, outboxEvent); });
     }
 
-    private static bool IsAlreadyProcessed(Guid lastSuccessfulEventId, OutboxEvent outboxEvent)
+    private static bool HasToBeProcessed(Guid? lastSuccessfulEventId, OutboxEvent outboxEvent)
     {
-        return outboxEvent.EventId.Equals(lastSuccessfulEventId.ToString()) || outboxEvent.EventItem.Contains("\"status\" : \"DONE\"");
+        if (lastSuccessfulEventId == null) return outboxEvent.EventItem.Contains("\"status\" : \"PENDING\"");
+
+        return !outboxEvent.EventId.Equals(lastSuccessfulEventId.ToString()) && outboxEvent.EventItem.Contains("\"status\" : \"PENDING\"");
     }
 
     private static bool IsLastEventIdSet(Guid lastSuccessfulEventId)
