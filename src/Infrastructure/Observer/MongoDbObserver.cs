@@ -79,7 +79,7 @@ public class MongoDbObserver : IObserver
     }
 
     private async Task ProcessChange(Action<string> callback, BsonDocument changedValue)
-    {  
+    {
         if (ShouldBeProcessed(changedValue))
         {
             callback(changedValue.SanitizeOccurredAt().ToJson());

@@ -76,7 +76,8 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         return !outboxEvent.EventId.Equals(lastSuccessfulEventId.ToString()) && IsEventPending(outboxEvent);
     }
 
-    private static bool IsEventPending(OutboxEvent outboxEvent) {
+    private static bool IsEventPending(OutboxEvent outboxEvent)
+    {
         using JsonDocument eventDoc = JsonDocument.Parse(outboxEvent.EventItem);
         JsonElement eventAsJson = eventDoc.RootElement;
 
