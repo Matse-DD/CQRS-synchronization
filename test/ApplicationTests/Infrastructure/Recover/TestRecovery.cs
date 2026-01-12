@@ -5,8 +5,6 @@ using ApplicationTests.Shared.Persistence;
 using Infrastructure.Projectors;
 using Infrastructure.Recover;
 using Microsoft.Extensions.Logging.Abstractions;
-using NUnit.Framework.Legacy;
-using System.Collections.Concurrent;
 
 namespace ApplicationTests.Infrastructure.Recover;
 
@@ -81,13 +79,6 @@ public class TestRecovery
         // Assert
         SleepTillReady(queryRepository);
 
-        Console.WriteLine(queryRepository.History.Count);
-        Console.WriteLine($"in seeding outbox zodus recover {seedingOutbox.ElementAt(0)}");
-        Console.WriteLine($"in observer zodus observer {seedingObserver.ElementAt(0)}");
-
-        Console.WriteLine(queryRepository.History.ElementAt(0));
-        Console.WriteLine(queryRepository.History.ElementAt(15));
-
         Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(0).EventId}"));
 
         Guid expectedFirstEventIdObserver = eventFactory.DetermineEvent(seedingObserver.ElementAt(0)).EventId;
@@ -130,8 +121,6 @@ public class TestRecovery
             LastSuccessfulEventId = new Guid(seedingOutbox.ElementAt(0).EventId)
         };
 
-        Console.WriteLine($"last uscces {seedingOutbox.ElementAt(0).EventId}");
-
         MockEventFactory eventFactory = new MockEventFactory();
         MockSchemaBuilder mockSchemaBuilder = new MockSchemaBuilder();
 
@@ -144,9 +133,6 @@ public class TestRecovery
 
         // Assert
         SleepTillReady(queryRepository);
-
-        Console.WriteLine(queryRepository.History.ElementAt(0));
-        Console.WriteLine(queryRepository.History.ElementAt(1));
 
         Assert.That(seedingOutbox.ElementAt(0).EventId, Is.Not.EqualTo(queryRepository.History.ElementAt(0)));
         Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(1).EventId}"));
