@@ -12,8 +12,6 @@ namespace Infrastructure.Tools.DatabaseExtensions
                 document["occurredAt"] = new BsonString(dateTime);
             }
 
-            Console.WriteLine(document.ToString());
-
             return document;
         }
     }
