@@ -21,6 +21,18 @@ services:
     
     query-db:
         #query db configuration
+    
+    seq:
+      image: datalust/seq
+      container_name: seq
+      restart: always
+      volumes
+        - #data storage configuration
+      env_file: .seq.env
+      ports:
+        - #configure ports
+      networks
+        - #network name
 
     cqrs-sync:
         image: cqrs-sync:latest
@@ -34,6 +46,24 @@ services:
 
 If the environment variables are correcly set, the service will automatically connect to the two databases and update the query database when necessary.
 
+### How to get SEQ api key
+In order to monitor the logs, the seq framework is provided in the docker compose. However the API key will still need to be provided. This section explains how you can obtain it.
+
+First, you will need to compose the containers. Then you visit the seq application (the link to the application can be found in docker).
+
+When you launch the application you will arrive on this screen.
+![SEQ dashboard](./images_readme/seq5.png)
+
+From there you will need to click on the icon in the top right corner. This will open a menu in which you will need to select "API keys"(the circled option)
+![SEQ submenu](./images_readme/seq1.png)
+
+You will arrive on this screen:
+![SEQ api keys](./images_readme/seq2.png)
+Click on the add API key button and fill in the following form:
+![SEQ API key form](./images_readme/seq3.png)
+Just give it a title and set the minimum level to Information and click Save changes.
+
+You will get a  pop-up showing the api key, which you need to copy and put in the env files
 ## Configuration
 
 A short explanation of the necessary environment variables:
