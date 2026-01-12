@@ -156,11 +156,11 @@ public class SyncBuilder
     public SyncBuilder AddReplay()
     {
         _logger.LogInformation("Adding Replay...");
-        _services.AddSingleton<IReplay>(sp => new Replayer(
+        _services.AddSingleton<IReplayer>(sp => new Replayer(
                 sp.GetRequiredService<ICommandRepository>(),
                 sp.GetRequiredService<IQueryRepository>(),
                 sp.GetRequiredService<Projector>(),
-                sp.GetRequiredService<ILogger<IReplay>>()
+                sp.GetRequiredService<ILogger<IReplayer>>()
             )
         );
 
