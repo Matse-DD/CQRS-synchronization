@@ -75,7 +75,8 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
     }
 
     private static bool IsEventPending(OutboxEvent outboxEvent) {
-        return outboxEvent.EventItem.Contains("\"status\" : \"PENDING\"");
+        return outboxEvent.EventItem.Contains("\"status\" : \"PENDING\"") ||
+               outboxEvent.EventItem.Contains("\"status\": \"PENDING\""); ;
     }
 
     private static bool IsLastEventIdSet(Guid lastSuccessfulEventId)
