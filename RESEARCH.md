@@ -416,7 +416,7 @@ CQRS:
 - https://www.cncf.io/blog/2020/08/13/49940/
 - https://eventuate.io/docs/manual/eventuate-tram/latest/distributed-data-management.html
 
-CQRS synhronisatie: 
+CQRS synchronisatie: 
 - https://ricofritzsche.me/cqrs-event-sourcing-projections/ 
 - https://en.wikipedia.org/wiki/Change_data_capture
 - https://www.mongodb.com/docs/manual/changestreams/
