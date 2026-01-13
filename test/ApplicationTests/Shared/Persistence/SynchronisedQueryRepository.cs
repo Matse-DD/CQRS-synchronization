@@ -10,11 +10,11 @@ public class SynchronizedQueryRepository(int expectedCount) : IQueryRepository
 
     public IReadOnlyList<string> History => _history;
 
-    public Task Execute(string command, Guid eventId)
+    public Task Execute(object command, Guid eventId) // TODO PAS OP STRING COMMAND
     {
         lock (_history)
         {
-            _history.Add(command);
+            _history.Add((string) command); // TODO PAS OP EXPCILIT CAST DIT IS ENKEL VOOR TEST TE KUNNEN PROBEREN
 
             if (_history.Count >= expectedCount)
             {
