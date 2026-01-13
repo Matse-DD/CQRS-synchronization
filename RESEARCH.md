@@ -463,4 +463,3 @@ Axon Framework:
 - https://medium.com/fively/axon-framework-explaining-the-power-of-event-driven-architecture-208b30f5f737 
 - https://medium.com/axoniq/demystifying-tracking-event-processors-in-axon-framework-1917c2f16e59 
 - https://javadoc.io/doc/org.axonframework/axon-core/3.3.6/org/axonframework/eventhandling/TrackingEventProcessor.html 
-
