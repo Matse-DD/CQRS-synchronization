@@ -133,4 +133,46 @@ public class TestMongoDbEventOperations
             Is.EquivalentTo(new[] { "INSERT", "UPDATE", "DELETE" }));
     }
 
+    [Test]
+    public async Task RemoveEvent_Should_Only_Delete_Specified_Event()
+    {
+        // Arrange
+        Guid eventId1 = Guid.NewGuid();
+        Guid eventId2 = Guid.NewGuid();
+
+        await _collection.InsertManyAsync(new[]
+        {
+            BsonDocument.Parse($@"
+            {{
+                ""id"": ""{eventId1}"",
+                ""occurredAt"": ""{DateTime.UtcNow:O}"",
+                ""aggregateName"": ""TestAgg"",
+                ""status"": ""PENDING"",
+                ""eventType"": ""INSERT"",
+                ""payload"": {{}}
+            }}"),
+            BsonDocument.Parse($@"
+            {{
+                ""id"": ""{eventId2}"",
+                ""occurredAt"": ""{DateTime.UtcNow:O}"",
+                ""aggregateName"": ""TestAgg"",
+                ""status"": ""PENDING"",
+                ""eventType"": ""INSERT"",
+                ""payload"": {{}}
+            }}")
+        });
+
+        // Act
+        bool wasDeleted = await _repository.RemoveEvent(eventId1);
+
+        // Assert
+        Assert.That(wasDeleted, Is.True);
+
+        List<BsonDocument> remainingEvents = await _collection.Find(new BsonDocument()).ToListAsync();
+        Assert.Multiple(() =>
+        {
+            Assert.That(remainingEvents, Has.Count.EqualTo(1));
+            Assert.That(remainingEvents[0]["id"].AsString, Is.EqualTo(eventId2.ToString()));
+        });
+    }
 }
