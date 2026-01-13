@@ -1,7 +1,9 @@
-﻿using Application.Contracts.Persistence;
+﻿using Application.Contracts.Events.Enums;
+using Application.Contracts.Persistence;
 using Infrastructure.Projectors;
 using Microsoft.Extensions.Logging;
 using SharpCompress.Common;
+using System.Text.Json;
 
 namespace Infrastructure.Recover;
 
@@ -39,23 +41,16 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
 
     private async Task<IEnumerable<string>> GetEventsToRecover()
     {
-        IEnumerable<OutboxEvent> outboxEvents = await GetPendingEventsFromOutbox();
+        IEnumerable<OutboxEvent> outboxEvents = await GetAllEventsFromOutbox();
         Guid lastSuccessfulEventId = await GetLastSuccessfulEventId();
 
-        if (IsLastEventIdSet(lastSuccessfulEventId))
-        {
-            logger.LogInformation("Found last checkpoint: {EventId}. Filtering outbox...", lastSuccessfulEventId);
-            outboxEvents = DetermineEventsToRecover(outboxEvents, lastSuccessfulEventId);
-        }
-        else
-        {
-            logger.LogInformation("No checkpoint found. Replaying all events.");
-        }
+        logger.LogInformation("Found last checkpoint: {EventId}. Filtering outbox to get PENDING events...", lastSuccessfulEventId);
+        outboxEvents = DetermineEventsToRecover(outboxEvents, lastSuccessfulEventId);
 
         return ExtractEvents(outboxEvents);
     }
 
-    private async Task<IEnumerable<OutboxEvent>> GetPendingEventsFromOutbox()
+    private async Task<IEnumerable<OutboxEvent>> GetAllEventsFromOutbox()
     {
         logger.LogInformation("Fetching all events from Command Repository...");
         return await commandRepository.GetAllEvents();
@@ -69,12 +64,29 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
 
     private IEnumerable<OutboxEvent> DetermineEventsToRecover(IEnumerable<OutboxEvent> outboxEvents, Guid lastSuccessfulEventId)
     {
-        return outboxEvents.Where(outboxEvent => !IsAlreadyProcessed(lastSuccessfulEventId, outboxEvent));
+        return outboxEvents.Where(outboxEvent => HasToBeProcessed(lastSuccessfulEventId, outboxEvent));
     }
 
-    private static bool IsAlreadyProcessed(Guid lastSuccessfulEventId, OutboxEvent outboxEvent)
+    private static bool HasToBeProcessed(Guid lastSuccessfulEventId, OutboxEvent outboxEvent)
     {
-        return outboxEvent.EventId.Equals(lastSuccessfulEventId.ToString()) || outboxEvent.EventItem.Contains("\"status\" : \"DONE\"");
+        if (!IsLastEventIdSet(lastSuccessfulEventId)) return IsEventPending(outboxEvent);
+
+        if (!Guid.TryParse(outboxEvent.EventId, out var currentEventId)) return false;
+
+        return !outboxEvent.EventId.Equals(lastSuccessfulEventId.ToString()) && IsEventPending(outboxEvent);
+    }
+
+    private static bool IsEventPending(OutboxEvent outboxEvent)
+    {
+        using JsonDocument eventDoc = JsonDocument.Parse(outboxEvent.EventItem);
+        JsonElement eventAsJson = eventDoc.RootElement;
+
+        if (eventAsJson.TryGetProperty("status", out JsonElement statusElement))
+        {
+            return statusElement.GetString()?.Equals(Status.PENDING.ToString()) ?? false;
+        }
+
+        return false;
     }
 
     private static bool IsLastEventIdSet(Guid lastSuccessfulEventId)
