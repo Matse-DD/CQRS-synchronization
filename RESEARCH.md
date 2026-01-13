@@ -377,8 +377,8 @@ Verder zal de pipeline er als volgt uitzien:
 Er is gekozen voor het gebruik van containers, omdat containers ervoor zorgen dat de CQRS-implementatie op verschillende platformen kan worden opgezet en gebruikt. Ook zorgen containers ervoor dat de implementatie gemakkelijk verdeeld kan worden en dat we er zeker van zijn dat als onze container werkt, dit ook het geval zal zijn bij de andere containers. Verder is het ook aangegeven in de opdracht dat er gebruik moet worden gemaakt van containers.
 
 ##### Release checklist
-- [ ] CQRS-implementatie dat gemakkelijk te configureren valt
-- [ ] Demo applicatie dat de CQRS-implementatie gebruikt en aangeeft dat het werkt alsook hoe het kan worden gebruikt.
+- [ ] CQRS-implementatie die gemakkelijk te configureren valt
+- [ ] Demo applicatie die de CQRS-implementatie gebruikt en aangeeft dat het werkt alsook hoe het kan worden gebruikt.
 - [ ] Slagen van de verschillende pipelines
 
 ## Plan & Milestones 
