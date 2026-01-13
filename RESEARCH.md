@@ -230,13 +230,13 @@ Deze oplossing maakt gebruik van een message broker en polling. Je kan een messa
 
 De direct projector is geen goede optie aangezien het bij een mogelijk falen van de databank niet zal kunnen recoveren.
 
-De messagebroker is de meest schaalbare optie, maar is zeer complex om te implementeren, verder kan je niet zonder extra complexiteit garanderen dat een event uitgevoert is op de query databank.
+De messagebroker is de meest schaalbare optie, maar is zeer complex om te implementeren; verder kan je niet zonder extra complexiteit garanderen dat een event uitgevoerd is op de query databank.
 
 De outbox is stabiel en betrouwbaar en is ook de enige manier die zonder veel moeite kan garanderen of een event wel uitgevoerd is of niet.
 
 ### Uitkomst
 
-Uiteindelijk is er gekozen voor de volgende technologieën & architectuur opties. C# als programmeertaal, Change Stream als CDC (data veranderingen waarnemen) en voor outbox om de CQRS-synchronisatie te regelen. Dit met enkele veranderingen om exactly-once processing te verkrijgen.
+Uiteindelijk is er gekozen voor de volgende technologieën & architectuur opties: C# als programmeertaal, Change Stream als CDC (data veranderingen waarnemen) en Outbox om de CQRS-synchronisatie te regelen. Dit mits enkele veranderingen om exactly-once processing te verkrijgen.
 
 Wat het volgende schema maakt:
 ![Foto gekozen architectuur combinatie outbox + change stream](./images_research/outbox_change_stream_sync.png)
