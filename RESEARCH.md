@@ -174,7 +174,7 @@ Deze methode zal de veranderingen waarnemen door steeds naar de transactie logs 
 
 #### Trigger-Based
 
-Deze optie maakt gebruik van databank triggers om veranderingen te zien. Indien er iets veranderd in de databank zal dan een stukje code worden getriggerd en veranderingen aangeven.
+Deze optie maakt gebruik van databanktriggers om veranderingen te zien. Indien er iets verandert in de databank, zal dan een stukje code worden getriggerd en veranderingen aangeven.
 
 #### Query-Based
 
