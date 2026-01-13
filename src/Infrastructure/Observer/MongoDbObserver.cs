@@ -1,4 +1,5 @@
-﻿using Application.Contracts.Observer;
+﻿using Application.Contracts.Events.Enums;
+using Application.Contracts.Observer;
 using Infrastructure.Tools.DatabaseExtensions;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
@@ -69,9 +70,29 @@ public class MongoDbObserver : IObserver
         {
             foreach (ChangeStreamDocument<BsonDocument>? change in cursor.Current)
             {
+                BsonDocument changedValue = change.FullDocument;
+
                 _logger.LogInformation("Change detected (Operation: {OperationType}). Processing...", change.OperationType);
-                callback(change.FullDocument.SanitizeOccurredAt().ToJson());
+                await ProcessChange(callback, changedValue);
             }
         }
+    }
+
+    private async Task ProcessChange(Action<string> callback, BsonDocument changedValue)
+    {
+        if (ShouldBeProcessed(changedValue))
+        {
+            callback(changedValue.SanitizeOccurredAt().ToJson());
+        }
+    }
+
+    private static bool ShouldBeProcessed(BsonDocument incoming)
+    {
+        if (incoming.TryGetElement("status", out var element))
+        {
+            return element.Value.AsString == Status.PENDING.ToString();
+        }
+
+        return false;
     }
 }

@@ -5,7 +5,6 @@ using ApplicationTests.Shared.Persistence;
 using Infrastructure.Projectors;
 using Infrastructure.Recover;
 using Microsoft.Extensions.Logging.Abstractions;
-using NUnit.Framework.Legacy;
 
 namespace ApplicationTests.Infrastructure.Recover;
 
@@ -83,6 +82,7 @@ public class TestRecovery
         Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(0).EventId}"));
 
         Guid expectedFirstEventIdObserver = eventFactory.DetermineEvent(seedingObserver.ElementAt(0)).EventId;
+
         Assert.That(queryRepository.History.ElementAt(15), Is.EqualTo($"delete {expectedFirstEventIdObserver}"));
     }
 
@@ -133,9 +133,6 @@ public class TestRecovery
 
         // Assert
         SleepTillReady(queryRepository);
-
-        Console.WriteLine(queryRepository.History.ElementAt(0));
-        Console.WriteLine(queryRepository.History.ElementAt(1));
 
         Assert.That(seedingOutbox.ElementAt(0).EventId, Is.Not.EqualTo(queryRepository.History.ElementAt(0)));
         Assert.That(queryRepository.History.ElementAt(0), Is.EqualTo($"delete {seedingOutbox.ElementAt(1).EventId}"));
