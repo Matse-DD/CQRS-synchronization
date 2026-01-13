@@ -73,4 +73,14 @@ public class TestMongoDbEventOperations
         // Assert
         Assert.That(wasMarked, Is.False);
     }
+    
+    [Test]
+    public async Task GetAllEvents_Should_Return_Empty_Collection_When_No_Events_Exist()
+    {
+        // Act
+        ICollection<OutboxEvent> result = await _repository.GetAllEvents();
+
+        // Assert
+        Assert.That(result, Is.Empty);
+    }
 }
