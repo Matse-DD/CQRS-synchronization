@@ -40,4 +40,21 @@ public class TestMySqlConcurrency
         await cmd.ExecuteNonQueryAsync();
     }
 
+    [Test]
+    public async Task Multiple_Repositories_Should_Share_Same_LastEventId()
+    {
+        // Arrange
+        MySqlQueryRepository repo1 = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        MySqlQueryRepository repo2 = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+
+        Guid testEventId = Guid.NewGuid();
+
+        // Act
+        await repo1.Execute("INSERT INTO TestTableConcurrency (value_col) VALUES ('test')", testEventId);
+
+        // Assert
+        Guid lastEventIdFromRepo2 = await repo2.GetLastSuccessfulEventId();
+        Assert.That(lastEventIdFromRepo2, Is.EqualTo(testEventId));
+    }
+
 }
