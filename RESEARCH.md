@@ -2,8 +2,8 @@
 
 ## Define your research objective
 
-- Wat probleem lossen we op?
-  - Synchronisatie tussen 2 databanken zonder dat er data verlies optreedt voor CQRS-doeleinden.
+- Welk probleem lossen we op?
+  - Synchronisatie tussen 2 databanken zonder dat er dataverlies optreedt voor CQRS-doeleinden.
 - Wie zijn de gebruikers?
   - Developers dat gebruik willen maken van CQRS (Command Query Responsibility Segregation)
 - Hoe weten we of het werkt?
