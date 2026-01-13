@@ -23,4 +23,12 @@ public class TestMongoDbEventOperations
         await _collection.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
 
         _repository = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
-    }}
+    }
+    [TearDown]
+    public async Task TearDown()
+    {
+        await _collection.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
+    }
+
+    }
+    
