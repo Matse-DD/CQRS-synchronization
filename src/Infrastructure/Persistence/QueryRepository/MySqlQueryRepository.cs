@@ -8,7 +8,7 @@ namespace Infrastructure.Persistence.QueryRepository;
 
 public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRepository> logger) : IQueryRepository
 {
-    public async Task Execute(string command, Guid eventId)
+    public async Task Execute(object command, Guid eventId)
     {
         using MySqlConnection connection = await OpenMySqlConnection();
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
@@ -112,6 +112,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         logger.LogInformation("Executing Update: {Command}", command);
 
         MySqlCommand cmdDataUpdate = new MySqlCommand(command, connection, transaction);
+        cmdDataUpdate.Parameters.Add("@")
         await cmdDataUpdate.ExecuteNonQueryAsync();
     }
 
