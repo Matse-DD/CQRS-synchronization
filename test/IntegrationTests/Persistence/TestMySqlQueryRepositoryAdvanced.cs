@@ -15,5 +15,17 @@ public class TestMySqlQueryRepositoryAdvanced
         const string connectionNoDb = "Server=localhost;Port=13306;User=root;Password=;";
         await using MySqlConnection connection = new MySqlConnection(connectionNoDb);
         await connection.OpenAsync();
+
+        const string setupSql = @"
+            CREATE DATABASE IF NOT EXISTS cqrs_read; 
+            USE cqrs_read; 
+            CREATE TABLE IF NOT EXISTS last_info (id INT AUTO_INCREMENT PRIMARY KEY, last_event_id CHAR(36));
+            CREATE TABLE IF NOT EXISTS Products (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(100), price DECIMAL(10,2));
+            CREATE TABLE IF NOT EXISTS Orders (id INT AUTO_INCREMENT PRIMARY KEY, product_id INT, quantity INT);
+            TRUNCATE TABLE last_info;
+            INSERT IGNORE INTO last_info (id, last_event_id) VALUES (1, NULL);";
+
+        await using MySqlCommand cmd = new MySqlCommand(setupSql, connection);
+        await cmd.ExecuteNonQueryAsync();
     }
 }
