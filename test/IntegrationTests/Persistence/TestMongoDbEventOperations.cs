@@ -83,4 +83,45 @@ public class TestMongoDbEventOperations
         // Assert
         Assert.That(result, Is.Empty);
     }
+    
+    [Test]
+    public async Task GetAllEvents_Should_Handle_Multiple_Event_Types()
+    {
+        // Arrange
+        DateTime baseTime = DateTime.UtcNow;
+        List<BsonDocument> events =
+        [
+            BsonDocument.Parse($@"
+            {{
+                ""id"": ""{Guid.NewGuid()}"",
+                ""occurredAt"": ""{baseTime:O}"",
+                ""aggregateName"": ""Product"",
+                ""status"": ""PENDING"",
+                ""eventType"": ""INSERT"",
+                ""payload"": {{ ""name"": ""Product1"" }}
+            }}"),
+
+            BsonDocument.Parse($@"
+            {{
+                ""id"": ""{Guid.NewGuid()}"",
+                ""occurredAt"": ""{baseTime.AddSeconds(1):O}"",
+                ""aggregateName"": ""Product"",
+                ""status"": ""PENDING"",
+                ""eventType"": ""UPDATE"",
+                ""payload"": {{ ""change"": {{ ""price"": ""100"" }}, ""condition"": {{ ""id"": ""1"" }} }}
+            }}"),
+
+            BsonDocument.Parse($@"
+            {{
+                ""id"": ""{Guid.NewGuid()}"",
+                ""occurredAt"": ""{baseTime.AddSeconds(2):O}"",
+                ""aggregateName"": ""Product"",
+                ""status"": ""DONE"",
+                ""eventType"": ""DELETE"",
+                ""payload"": {{ ""condition"": {{ ""id"": ""2"" }} }}
+            }}")
+        ];
+
+        await _collection.InsertManyAsync(events);
+
 }
