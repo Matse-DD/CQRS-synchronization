@@ -395,14 +395,14 @@ In parallel met deze milestones zal er natuurlijk ook gewerkt worden aan de bach
 
 ## Alternatives considered
 - Java → Documentatie van C# is iets beter
-- TypeScript → Lose typing tijdens runtime
+- TypeScript → Loose typing tijdens runtime
 - Systeemtalen → Zeer complex
 
 - Message Broker → Meer complexiteit
 - Direct Projection → Geen recovery mechanisme
 
 - Query-Based CDC → Een hoge latentie 
-- Log-Based CDC → Change stream was net iets beter doordat er mongodb word gebruikt
+- Log-Based CDC → Change stream was net iets beter doordat er MongoDB wordt gebruikt
 - Trigger-Based CDC → Te hoge impact om de databank
 
 ## Bronnen
