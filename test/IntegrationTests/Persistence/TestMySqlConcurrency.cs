@@ -27,7 +27,7 @@ public class TestMySqlConcurrency
         await using MySqlCommand cmd = new MySqlCommand(setupSql, connection);
         await cmd.ExecuteNonQueryAsync();
     }
-    
+
     [SetUp]
     public async Task SetUp()
     {
@@ -122,5 +122,32 @@ public class TestMySqlConcurrency
 
         // Assert
         Assert.That(lastEventId, Is.EqualTo(Guid.Empty));
+    }
+
+    [Test]
+    public async Task Execute_Should_Handle_Multiple_Statements()
+    {
+        // Arrange
+        MySqlQueryRepository repository = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        Guid eventId = Guid.NewGuid();
+
+        // Act
+        await repository.Execute(@"
+            INSERT INTO TestTableConcurrency (value_col) VALUES ('first');
+            INSERT INTO TestTableConcurrency (value_col) VALUES ('second');
+            INSERT INTO TestTableConcurrency (value_col) VALUES ('third');
+        ", eventId);
+
+        // Assert
+        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await connection.OpenAsync();
+        await using MySqlCommand cmd = new MySqlCommand("SELECT COUNT(*) FROM TestTableConcurrency", connection);
+        long count = (long)(await cmd.ExecuteScalarAsync())!;
+        
+        Assert.That(count, Is.EqualTo(3));
+
+
+        Guid storedEventId = await repository.GetLastSuccessfulEventId();
+        Assert.That(storedEventId, Is.EqualTo(eventId));
     }
 }
