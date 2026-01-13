@@ -178,11 +178,11 @@ Deze optie maakt gebruik van databanktriggers om veranderingen te zien. Indien e
 
 #### Query-Based
 
-Deze methode zal de databank regelmatig aanvragen en kijken of de current state gelijk is met de vorige state dat het heeft binnen gevraagd. De verschillende veranderingen worden dan gezien.
+Deze methode zal de databank regelmatig aanvragen en kijken of de current state gelijk is met de vorige state die het heeft binnengevraagd. De verschillende veranderingen worden dan gezien.
 
 #### Change Stream
 
-Deze optie is ingebouwd in MongoDB en is dus mongoDB specifiek. MongoDB zal steeds naar iedereen dat het horen wil sturen wat er veranderd is aan de databank. Hier kan dan op worden gesubscribed.
+Deze optie is ingebouwd in MongoDB en is dus MongoDB specifiek. MongoDB zal steeds naar iedereen die het horen wil sturen wat er veranderd is aan de databank. Hier kan dan op worden gesubscribed.
 
 #### Conclusie 
 |               | Schaalbaarheid | Impact    | Latentie  | Volledigheid |
