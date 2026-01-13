@@ -192,7 +192,7 @@ Deze optie is ingebouwd in MongoDB en is dus MongoDB specifiek. MongoDB zal stee
 | Query-based   | Minder goed    | Gemiddeld | Hoog      | Laag         |
 | Change stream | Zeer goed      | Zeer laag | Zeer laag | Volledig     |
 
-Er is gekozen voor de change stream optie voor de volgende reden. Change stream heeft bijna dezelfde voordelen als log-based, maar scoort beter op latentie dit komt doordat er niet moet worden gepolled (constant vragen of er iets nieuw is). Verder zal er gedurende het project gewerkt worden met mongoDb zoals beschreven in de projectbeschrijving. Indien we toch een andere command databank zouden willen gebruiken is de overstap niet groot naar een andere CDC-optie. Het enige wat de CDC uiteindelijk moet doen is aangeven wat er veranderd is in de databank.
+Er is gekozen voor de change stream optie voor de volgende reden. Change stream heeft bijna dezelfde voordelen als log-based, maar scoort beter op latentie; dit komt doordat er niet moet worden gepolled (constant vragen of er iets nieuw is). Verder zal er gedurende het project gewerkt worden met MongoDB zoals beschreven in de projectbeschrijving. Indien we toch een andere command databank zouden willen gebruiken is de overstap niet groot naar een andere CDC-optie. Het enige wat de CDC uiteindelijk moet doen, is aangeven wat er veranderd is in de databank.
 
 ### CQRS Synchronisatie mogelijkheden
 
