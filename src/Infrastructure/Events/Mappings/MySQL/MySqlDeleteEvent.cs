@@ -11,17 +11,17 @@ public class MySqlDeleteEvent(IntermediateEvent intermediateEvent) : DeleteEvent
 {
     public override PersistenceCommandInfo GetCommandInfo()
     {
-        (string ParameterizedWhere, Dictionary<string, string> ParameterDict) parameterizedWhere = MapParameterizedWhere(Condition); //TODO vragen of iedereen dit leesbaar vind
+        (string ParameterizedWhere, Dictionary<string, object> ParameterDict) parameterizedWhere = MapParameterizedWhere(Condition); //TODO vragen of iedereen dit leesbaar vind
 
         string command = $"DELETE FROM {AggregateName.Sanitize()} WHERE {parameterizedWhere.ParameterizedWhere}";
 
         return new PersistenceCommandInfo(command, parameterizedWhere.ParameterDict);
     }
 
-    private static (string, Dictionary<string, string>) MapParameterizedWhere(Dictionary<string, string> condition)
+    private static (string, Dictionary<string, object>) MapParameterizedWhere(Dictionary<string, string> condition)
     {
         ICollection<string> parameterizedWhere = new List<string>();
-        Dictionary<string, string> parametersWithValue = new Dictionary<string, string>();
+        Dictionary<string, object> parametersWithValue = new Dictionary<string, object>();
 
         foreach (KeyValuePair<string, string> keyValuePair in condition)
         {

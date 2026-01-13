@@ -13,9 +13,7 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
         string command = $"INSERT INTO {AggregateName} ({MapColumns(Properties.Keys)})\n" +
                          $"VALUES ({MapValues(Properties.Keys)})";
 
-        Dictionary<string, string> parameterizedDict = BuildParamDict(Properties);
-
-        return new PersistenceCommandInfo(command, parameterizedDict);
+        return new PersistenceCommandInfo(command, BuildParamDict(Properties));
     }
 
     private static string MapColumns(IEnumerable<string> keys)
@@ -29,9 +27,9 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
         return string.Join(", ", parameters);
     }
 
-    private static Dictionary<string, string> BuildParamDict(Dictionary<string, object> properties)
+    private static Dictionary<string, object> BuildParamDict(Dictionary<string, object> properties)
     {
-        Dictionary<string, string> parameters = new Dictionary<string, string>();
+        Dictionary<string, object> parameters = new Dictionary<string, object>();
 
         foreach (KeyValuePair<string, object> keyValuePair in properties)
         {
@@ -41,7 +39,7 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
         return parameters;
     }
 
-    private static string ConvertValue(object incomingValue)
+    private static object ConvertValue(object incomingValue)
     {
         if (incomingValue is not JsonElement value) return "NULL";
         return value.ToString().ExtractValue();
