@@ -28,6 +28,7 @@ public class TestMySqlQueryRepositoryAdvanced
         await using MySqlCommand cmd = new MySqlCommand(setupSql, connection);
         await cmd.ExecuteNonQueryAsync();
     }
+    
     [SetUp]
     public async Task SetUp()
     {
@@ -42,6 +43,7 @@ public class TestMySqlQueryRepositoryAdvanced
             TRUNCATE TABLE Orders;", connection);
         await cmd.ExecuteNonQueryAsync();
     }
+
     [Test]
     public async Task Execute_Should_Handle_Complex_Insert_Statements()
     {
@@ -64,6 +66,7 @@ public class TestMySqlQueryRepositoryAdvanced
         Guid storedId = await _repository.GetLastSuccessfulEventId();
         Assert.That(storedId, Is.EqualTo(eventId));
     }
+
     [Test]
     public async Task Execute_Should_Handle_Update_Statements()
     {
@@ -89,5 +92,37 @@ public class TestMySqlQueryRepositoryAdvanced
             "SELECT price FROM Products WHERE name = 'Test'", verifyConn);
         decimal price = (decimal)(await verifyCmd.ExecuteScalarAsync())!;
         Assert.That(price, Is.EqualTo(75.00m));
+    }
+
+    [Test]
+    public async Task Execute_Should_Handle_Delete_Statements()
+    {
+        // Arrange
+        await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
+        {
+            await connection.OpenAsync();
+            await using MySqlCommand insertCmd = new MySqlCommand(
+                "INSERT INTO Products (name, price) VALUES ('ToDelete', 100.00), ('ToKeep', 200.00)", 
+                connection);
+            await insertCmd.ExecuteNonQueryAsync();
+        }
+
+        Guid eventId = Guid.NewGuid();
+        string command = "DELETE FROM Products WHERE name = 'ToDelete'";
+
+        // Act
+        await _repository.Execute(command, eventId);
+
+        // Assert
+        await using MySqlConnection verifyConn = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await verifyConn.OpenAsync();
+        await using MySqlCommand verifyCmd = new MySqlCommand("SELECT COUNT(*) FROM Products", verifyConn);
+        long count = (long)(await verifyCmd.ExecuteScalarAsync())!;
+        Assert.That(count, Is.EqualTo(1));
+
+        await using MySqlCommand nameCmd = new MySqlCommand(
+            "SELECT name FROM Products", verifyConn);
+        string name = (string)(await nameCmd.ExecuteScalarAsync())!;
+        Assert.That(name, Is.EqualTo("ToKeep"));
     }
 }
