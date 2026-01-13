@@ -51,9 +51,9 @@ Product owner:
 
 ### CQRS Concept
 
-CQRS ook gekend als Command Query Responsibility Segregation is op het hoogste niveau niet meer dan het opsplitsen van hoe je commands (acties) en queries (opvragen van gegevens) uitvoert op een databanken. Deze opsplitsing gebeurt al op een architetureel niveau waardoor je een aparte service zal hebben voor de queries & commands.
+CQRS, ook gekend als Command Query Responsibility Segregation, is op het hoogste niveau niet meer dan het opsplitsen van hoe je commands (acties) en queries (opvragen van gegevens) uitvoert op een databank. Deze opsplitsing gebeurt al op een architectureel niveau, waardoor je een aparte service zal hebben voor de queries & commands.
 
-In dit project wordt er nog een stap verder gegaan en is de databank waar de commands op worden uitgevoerd een andere databank dan deze waar er wordt van gelezen.
+In dit project wordt er nog een stap verder gegaan en is de databank waar de commands op worden uitgevoerd een andere databank dan die waar er van wordt gelezen.
 
 - https://www.geeksforgeeks.org/system-design/cqrs-command-query-responsibility-segregation/
 - https://cqrs.wordpress.com/about/
