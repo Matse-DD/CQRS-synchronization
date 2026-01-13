@@ -1,12 +1,13 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
+using Infrastructure.Persistence;
 
 namespace ApplicationTests.Shared.Events.Mappings;
 
 public class MockInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent(intermediateEvent)
 {
-    public override string GetCommand()
+    public override PersistenceCommandInfo GetCommandInfo()
     {
-        return $"insert {EventId.ToString()}";
+        return new($"insert {EventId.ToString()}");
     }
 }

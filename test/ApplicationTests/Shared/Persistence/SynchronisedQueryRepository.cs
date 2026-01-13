@@ -1,4 +1,5 @@
 using Application.Contracts.Persistence;
+using Infrastructure.Persistence;
 
 namespace ApplicationTests.Shared.Persistence;
 
@@ -10,11 +11,11 @@ public class SynchronizedQueryRepository(int expectedCount) : IQueryRepository
 
     public IReadOnlyList<string> History => _history;
 
-    public Task Execute(object command, Guid eventId) // TODO PAS OP STRING COMMAND
+    public Task Execute(PersistenceCommandInfo commandInfo, Guid eventId)
     {
         lock (_history)
         {
-            _history.Add((string) command); // TODO PAS OP EXPCILIT CAST DIT IS ENKEL VOOR TEST TE KUNNEN PROBEREN
+            _history.Add(commandInfo.PureCommand);
 
             if (_history.Count >= expectedCount)
             {

@@ -1,3 +1,4 @@
+using Infrastructure.Persistence;
 using Infrastructure.Persistence.QueryRepository;
 using Microsoft.Extensions.Logging.Abstractions;
 using MySql.Data.MySqlClient;
@@ -58,7 +59,7 @@ public class TestMySqlQueryRepository
         string command = "INSERT INTO TestTable (name) VALUES ('IntegrationTest')";
 
         // Act
-        await _repository.Execute(command, eventId);
+        await _repository.Execute(new PersistenceCommandInfo(command), eventId);
 
         // Assert
         Guid storedId = await _repository.GetLastSuccessfulEventId();
@@ -77,9 +78,10 @@ public class TestMySqlQueryRepository
         // Arrange
         Guid eventId = Guid.NewGuid();
         const string invalidCommand = "INSERT INTO NonExistentTable (name) VALUES ('Fail')";
+        PersistenceCommandInfo commandInfo = new PersistenceCommandInfo(invalidCommand);
 
         // Act & Assert
-        Assert.ThrowsAsync<MySqlException>(async () => await _repository.Execute(invalidCommand, eventId));
+        Assert.ThrowsAsync<MySqlException>(async () => await _repository.Execute(commandInfo, eventId));
         Guid storedId = await _repository.GetLastSuccessfulEventId();
         Assert.That(storedId, Is.EqualTo(Guid.Empty));
     }

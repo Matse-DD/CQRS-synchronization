@@ -41,7 +41,7 @@ public class TestProjector
                 ");
         }
 
-        ICollection<string> expectedCommands = deleteEvents.Select(eventItem => mockEventFactory.DetermineEvent(eventItem).GetCommand()).ToList();
+        ICollection<string> expectedCommands = deleteEvents.Select(eventItem => mockEventFactory.DetermineEvent(eventItem).GetCommandInfo().PureCommand).ToList();
 
         // Act
         foreach (string eventItem in deleteEvents)

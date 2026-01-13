@@ -1,4 +1,5 @@
 ﻿using Application.Contracts.Persistence;
+using Infrastructure.Persistence;
 
 namespace ApplicationTests.Shared.Persistence;
 
@@ -7,19 +8,17 @@ public class MockQueryRepository : IQueryRepository
     public ICollection<string> History { get; private set; } = [];
     public Guid LastSuccessfulEventId { get; set; }
 
-    public Task Execute(object command, Guid eventId)
+    public Task Execute(PersistenceCommandInfo commandinfo, Guid eventId)
     {
-        if(command is string stringCommand)
-        {
-            string lowerCommand = stringCommand.ToLower();
+        string stringCommand = commandinfo.PureCommand;
+        string lowerCommand = stringCommand.ToLower();
 
-            if (lowerCommand.Contains("update") || lowerCommand.Contains("delete") || lowerCommand.Contains("insert"))
-            {
-                History.Add(stringCommand);
-                LastSuccessfulEventId = eventId;
-            }
-            return Task.CompletedTask;
+        if (lowerCommand.Contains("update") || lowerCommand.Contains("delete") || lowerCommand.Contains("insert"))
+        {
+            History.Add(stringCommand);
+            LastSuccessfulEventId = eventId;
         }
+        return Task.CompletedTask;
 
         throw new ArgumentException("Command type not supported");
     }
