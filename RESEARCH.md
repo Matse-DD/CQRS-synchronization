@@ -308,9 +308,9 @@ De change stream stelt het ook mogelijk om het volledige aangepaste veld te zien
 
 #### Nu rest de vraag natuurlijk werkt dit ook in een container?
 
-Dit werkt ook in een container. In deze POC is er gekozen voor Docker, de aanpassingen om dit te laten werken voor een container zijn:
+Dit werkt ook in een container. In deze POC is er gekozen voor Docker; de aanpassingen om dit te laten werken voor een container zijn:
 
-Het aangeven aan de container dat het zal gebruikt worden als een replica-set [Replica set documentation](https://www.mongodb.com/docs/manual/reference/method/rs.initiate/) voor de rest zal de code er hetzelfde uitzien als in bovenstaande voorbeeld.
+Het aangeven aan de container dat het zal gebruikt worden als een replica-set [Replica set documentation](https://www.mongodb.com/docs/manual/reference/method/rs.initiate/). Voor de rest zal de code er hetzelfde uitzien als in bovenstaand voorbeeld.
 
 [Volledige code change stream in container](https://github.com/Or3nges/POC-mongoDB-change-streams-in-docker)
 
