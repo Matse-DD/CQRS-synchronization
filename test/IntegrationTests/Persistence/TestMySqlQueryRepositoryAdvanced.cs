@@ -191,5 +191,24 @@ public class TestMySqlQueryRepositoryAdvanced
         long count = (long)(await verifyCmd.ExecuteScalarAsync())!;
         Assert.That(count, Is.EqualTo(2));
     }
+    
+    [Test]
+    public async Task Execute_Should_Handle_Special_Characters_In_Data()
+    {
+        // Arrange
+        Guid eventId = Guid.NewGuid();
+        string command = "INSERT INTO Products (name, price) VALUES ('Product with \"quotes\" and ''apostrophes''', 99.99)";
+
+        // Act
+        await _repository.Execute(command, eventId);
+
+        // Assert
+        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await connection.OpenAsync();
+        await using MySqlCommand verifyCmd = new MySqlCommand(
+            "SELECT name FROM Products", connection);
+        string name = (string)(await verifyCmd.ExecuteScalarAsync())!;
+        Assert.That(name, Does.Contain("quotes"));
+    }
 
 }
