@@ -111,4 +111,16 @@ public class TestMySqlConcurrency
         Assert.That(storedEventId, Is.EqualTo(Guid.Empty));
     }
 
+    [Test]
+    public async Task GetLastSuccessfulEventId_Should_Return_Empty_When_No_Events_Processed()
+    {
+        // Arrange
+        MySqlQueryRepository repository = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+
+        // Act
+        Guid lastEventId = await repository.GetLastSuccessfulEventId();
+
+        // Assert
+        Assert.That(lastEventId, Is.EqualTo(Guid.Empty));
+    }
 }
