@@ -216,7 +216,7 @@ Verder is dit atomisch doordat er gebruik wordt gemaakt van de databank transact
 
 #### Message/Event Broker
 
-Deze oplossing maakt gebruik van een message broker en polling. Je kan een message broker zo worden geconfigureerd dat deze de verschillende events persistent bijhoudt, wat dus wilt zeggen dat de events niet verloren zal gaan indien de messagebroker uitvalt. Er is eigenlijk geen gemakkelijke manier om het dual-write problem op te lossen. Tenzij je gebruik zou maken van een outbox hiervoor.
+Deze oplossing maakt gebruik van een message broker en polling. Je kan een message broker zo configureren dat deze de verschillende events persistent bijhoudt, wat dus wil zeggen dat de events niet verloren zullen gaan indien de messagebroker uitvalt. Er is eigenlijk geen gemakkelijke manier om het dual-write problem op te lossen. Tenzij je gebruik zou maken van een outbox hiervoor.
 
 ![Foto van broker architectuur](images_research/broker_synchronisation.png)
 
