@@ -57,4 +57,35 @@ public class TestMySqlConcurrency
         Assert.That(lastEventIdFromRepo2, Is.EqualTo(testEventId));
     }
 
+    [Test]
+    public async Task Concurrent_Executions_Should_Track_Latest_EventId()
+    {
+        // Arrange
+        MySqlQueryRepository repository = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        
+        List<Task> tasks = new();
+        List<Guid> eventIds = new();
+
+        // Act
+        for (int i = 0; i < 5; i++)
+        {
+            Guid eventId = Guid.NewGuid();
+            eventIds.Add(eventId);
+            tasks.Add(repository.Execute($"INSERT INTO TestTableConcurrency (value_col) VALUES ('value{i}')", eventId));
+        }
+
+        await Task.WhenAll(tasks);
+
+        // Assert
+        Guid finalEventId = await repository.GetLastSuccessfulEventId();
+        Assert.That(eventIds, Contains.Item(finalEventId));
+
+        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await connection.OpenAsync();
+        await using MySqlCommand cmd = new MySqlCommand("SELECT COUNT(*) FROM TestTableConcurrency", connection);
+        long count = (long)(await cmd.ExecuteScalarAsync())!;
+        
+        Assert.That(count, Is.EqualTo(5));
+    }
+
 }
