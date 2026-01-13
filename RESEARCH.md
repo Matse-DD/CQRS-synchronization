@@ -166,7 +166,7 @@ We hebben rekening gehouden met deze punten en daarom hebben we uiteindelijk gek
 
 ### CDC Mogelijkheden
 
-Ook gekend als Change Data Capture dit is een design pattern dat gebruikt wordt om veranderingen waar te nemen in een databank. Er zijn verschillende mogelijkheden hieronder enkele opties.
+Ook gekend als Change Data Capture; dit is een design pattern dat gebruikt wordt om veranderingen waar te nemen in een databank. Er zijn verschillende mogelijkheden; hieronder enkele opties.
 
 #### Log-Based
 
