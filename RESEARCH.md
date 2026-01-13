@@ -36,11 +36,11 @@ Developer:
 - Als een developer wil ik databanken gemakkelijk opnieuw kunnen synchroniseren indien er een inconsistentie is, zodat de databanken gelijk lopen wat betreft data.
 - Als een developer wil ik dat indien er bepaalde commands onbedoeld dubbel worden uitgezonden, deze niet dubbel worden uitgevoerd (idempotent), zodat mijn data niet inconsistent wordt.
 - Als een developer wil ik dat indien de command databank onbereikbaar is, ik nog steeds informatie kan opvragen, zodat het opvragen van gegevens geen impact ondervindt.
-- Als een developer wil ik dat indien er een onderdeel van de synchronisatie faalt er geen data verlies optreed zodat ik er zeker van kan zijn dat mijn data tussen de 2 databanken gelijk is.
-- Als een developer wil ik dat het verkeer van queries & commands verdeeld is over de databanken zodat er bij veel verkeer geen impact is.
-- Als een developer wil ik gemakkelijk een container opbouwen van het CQRS-systeem zodat deze gemakkelijk te integreren valt.
-- Als een developer wil ik een demo-applicatie dat de synchronisatie flow aantoont zodat ik er zeker van ben dat het CQRS-systeem werkt.
-- Als een developer wil ik dat events die niet verwerkt kunnen worden, apart worden gezet (Dead Letter Queue) zodat ik deze kan analyseren en later opnieuw kan 'replayen' zonder de rest van de queue te blokkeren zodat de events verder kunnen gaan zonder problemen. (Could Have)
+- Als een developer wil ik dat indien er een onderdeel van de synchronisatie faalt, er geen dataverlies optreedt, zodat ik er zeker van kan zijn dat mijn data tussen de 2 databanken gelijk is.
+- Als een developer wil ik dat het verkeer van queries & commands verdeeld is over de databanken, zodat er bij veel verkeer geen impact is.
+- Als een developer wil ik gemakkelijk een container opbouwen van het CQRS-systeem, zodat deze gemakkelijk te integreren valt.
+- Als een developer wil ik een demo-applicatie die de synchronisatie flow aantoont, zodat ik er zeker van ben dat het CQRS-systeem werkt.
+- Als een developer wil ik dat events die niet verwerkt kunnen worden, apart worden gezet (Dead Letter Queue), zodat ik deze kan analyseren en later opnieuw kan 'replayen' zonder de rest van de queue te blokkeren, zodat de events verder kunnen gaan zonder problemen. (Could Have)
 
 Product owner:
 
