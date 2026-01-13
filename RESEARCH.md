@@ -206,11 +206,11 @@ Een direct projection is echter geen optimale oplossing: het biedt geen mogelijk
 
 #### Outbox
 
-Deze architectuur slaat de verschillende events op in een table/collectie in de databank. Vervolgens kan dan gekeken worden naar de outbox voor de verschillende evenementen. Wanneer er een verandering optreedt, wordt deze doorgegeven aan een projector, die de aanpassing toepast op de query databank.
+Deze architectuur slaat de verschillende events op in een tabel/collectie in de databank. Vervolgens kan dan gekeken worden naar de outbox voor de verschillende evenementen. Wanneer er een verandering optreedt, wordt deze doorgegeven aan een projector, die de aanpassing toepast op de query databank.
 
 Recovery is mogelijk door het laatste geslaagde event bij te houden. Op basis van dit event kan je bepalen wat het volgende event is dat aanwezig is in de outbox. 
 
-Verder is dit atomisch door dat er gebruik wordt gemaakt van de databank transacties. En omdat de projection kan zeggen tegen de outbox dat een event gelukt is of niet. Dit zorgt ervoor dat er geen Dual-write problem is.
+Verder is dit atomisch doordat er gebruik wordt gemaakt van de databank transacties. En omdat de projection kan zeggen tegen de outbox dat een event gelukt is of niet. Dit zorgt ervoor dat er geen Dual-write problem is.
 
 ![Foto van outbox architectuur](images_research/outbox_synchronisation.png)
 
