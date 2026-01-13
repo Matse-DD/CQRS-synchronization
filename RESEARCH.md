@@ -114,10 +114,10 @@ De verschillende events worden in deze oplossing ook opgeslagen in een Event Sto
 Functionele requirements:
 
 - Gegarandeerd idempotente updates (geen duplicate events)
-- Heropstart/replay mechanisme om mogelijke inconsitenties op te vangen
-- Write & read operaties maken gebruik van andere databank en zijn loosly-coupled (niet van elkaar afhankelijk)
+- Heropstart/replay mechanisme om mogelijke inconsistenties op te vangen
+- Write & read operaties maken gebruik van andere databank en zijn loosely coupled (niet van elkaar afhankelijk)
 - Demo applicatie voor de synchronisatie flow te demonstreren in een echte app.
-- Een docker container voor de syncronisatie flow & demo applicatie
+- Een container voor de synchronisatie flow & demo applicatie
 
 Niet functionele requirements:
 
