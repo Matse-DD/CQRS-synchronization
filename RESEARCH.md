@@ -355,7 +355,7 @@ if (retries === 0) {
 
 ### Repo setup
 
-De volgende repos zullen aanwezig zijn. group-05-CQRS-synchronization & group-05-CQRS-demo-applicatie (effectieve naam demo ligt nog niet vast). In de synchronization repo zal de implementatie van het CQRS-systeem worden gemaakt terwijl de demo repo het CQRS-systeem zal implementeren om te kunnen demonstreren dat de flow/CQRS-implementatie werkt. Elke repo zal een README.md bevatten met een verdere uitleg over de repo. Hoe deze te gebruiken valt, extra uitleg, bugs en dergelijke.
+De volgende repos zullen aanwezig zijn: group-05-CQRS-synchronization & group-05-CQRS-demo-applicatie (effectieve naam demo ligt nog niet vast). In de synchronization repo zal de implementatie van het CQRS-systeem worden gemaakt, terwijl de demo repo het CQRS-systeem zal implementeren om te kunnen demonstreren dat de flow/CQRS-implementatie werkt. Elke repo zal een README.md bevatten met een verdere uitleg over de repo: hoe deze te gebruiken valt, extra uitleg, bugs en dergelijke.
 
 ### Licentie
 
