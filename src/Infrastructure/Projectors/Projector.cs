@@ -122,7 +122,7 @@ public class Projector
 
     private async Task Project(Event convertedEvent)
     {
-        string commandForEvent = convertedEvent.GetCommand();
+        object commandForEvent = convertedEvent.GetCommand();
         Guid eventId = convertedEvent.EventId;
 
         _logger.LogDebug("Projecting Event {EventId}", eventId);

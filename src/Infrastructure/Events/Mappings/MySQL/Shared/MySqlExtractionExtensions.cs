@@ -4,7 +4,7 @@ namespace Infrastructure.Events.Mappings.MySQL.Shared;
 
 public static class MySqlExtractionExtensions
 {
-    public static string DetermineMySqlValue(this string incoming)
+    public static string DetermineMySqlValue(this string incoming)// TODO REIMPLEMENT WHEN CORRECTED
     {
         if (!incoming.IsString()) return incoming;
 
@@ -13,7 +13,7 @@ public static class MySqlExtractionExtensions
 
         value = value.Sanitize();
 
-        return $"{sign}'{value}'";
+        return $"{sign} {value}";
     }
 
     public static string ExtractSign(this string incoming)
@@ -21,7 +21,8 @@ public static class MySqlExtractionExtensions
         if (!incoming.IsString()) return incoming;
 
         int startIndexStringForLength = incoming.IndexOf('\'');
-        return incoming.Substring(0, startIndexStringForLength);
+
+        return incoming.Substring(0, startIndexStringForLength);        
     }
 
     public static string ExtractValue(this string incoming)
