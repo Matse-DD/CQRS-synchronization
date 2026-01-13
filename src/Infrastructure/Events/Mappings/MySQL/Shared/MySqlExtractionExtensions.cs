@@ -13,7 +13,7 @@ public static class MySqlExtractionExtensions
 
         value = value.Sanitize();
 
-        return $"{sign} {value}";
+        return $"{sign}{value}";
     }
 
     public static string ExtractSign(this string incoming)
@@ -44,6 +44,7 @@ public static class MySqlExtractionExtensions
         int lastIndexStringValue = indexLastQuote - 1;
 
         int stringLength = lastIndexStringValue - indexFirstQuote;
+
         return incoming.Substring(startIndexStringValue, stringLength);
     }
 
