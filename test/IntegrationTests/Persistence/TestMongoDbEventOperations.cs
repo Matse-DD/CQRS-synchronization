@@ -124,4 +124,13 @@ public class TestMongoDbEventOperations
 
         await _collection.InsertManyAsync(events);
 
+        // Act
+        ICollection<OutboxEvent> result = await _repository.GetAllEvents();
+
+        // Assert
+        Assert.That(result, Has.Count.EqualTo(3));
+        Assert.That(result.Select(e => BsonDocument.Parse(e.EventItem)["eventType"].AsString), 
+            Is.EquivalentTo(new[] { "INSERT", "UPDATE", "DELETE" }));
+    }
+
 }
