@@ -191,7 +191,7 @@ public class TestMySqlQueryRepositoryAdvanced
         long count = (long)(await verifyCmd.ExecuteScalarAsync())!;
         Assert.That(count, Is.EqualTo(2));
     }
-    
+
     [Test]
     public async Task Execute_Should_Handle_Special_Characters_In_Data()
     {
@@ -211,4 +211,18 @@ public class TestMySqlQueryRepositoryAdvanced
         Assert.That(name, Does.Contain("quotes"));
     }
 
+    [Test]
+    public async Task GetLastSuccessfulEventId_Should_Persist_Across_Repository_Instances()
+    {
+        // Arrange
+        Guid eventId = Guid.NewGuid();
+        await _repository.Execute("INSERT INTO Products (name, price) VALUES ('Test', 10.00)", eventId);
+
+        // Act
+        MySqlQueryRepository newRepository = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        Guid retrievedId = await newRepository.GetLastSuccessfulEventId();
+
+        // Assert
+        Assert.That(retrievedId, Is.EqualTo(eventId));
+    }
 }
