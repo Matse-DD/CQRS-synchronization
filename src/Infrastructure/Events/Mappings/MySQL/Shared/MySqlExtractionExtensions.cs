@@ -4,14 +4,14 @@ namespace Infrastructure.Events.Mappings.MySQL.Shared;
 
 public static class MySqlExtractionExtensions
 {
-    public static string DetermineMySqlValue(this string incoming)
+    public static string DetermineMySqlValue(this string incoming) //TODO mogelijks niet meer nodig
     {
         if (!incoming.IsString()) return incoming;
 
         string sign = incoming.ExtractSign();
-        string value = incoming.ExtractValue();
+        object value = incoming.ExtractValue();
 
-        value = value.Sanitize();
+        //value = value.Sanitize(); //TODO enkel mij properties
 
         return $"{sign}{value}";
     }
@@ -25,11 +25,16 @@ public static class MySqlExtractionExtensions
         return incoming.Substring(0, startIndexStringForLength);
     }
 
-    public static string ExtractValue(this string incoming)
+    public static object ExtractValue(this string incoming)
     {
         if (incoming.IsString())
         {
             return ExtractStringValue(incoming);
+        }
+
+        if (incoming.ToUpper() == "TRUE" || incoming.ToUpper() == "FALSE")
+        {
+            return incoming == "true" ? 1 : 0;
         }
 
         return incoming;
@@ -50,7 +55,7 @@ public static class MySqlExtractionExtensions
 
     public static string Sanitize(this string value)
     {
-        // TODO some sanitization
+        // TODO some sanitization bij properties
         return value;
     }
 
