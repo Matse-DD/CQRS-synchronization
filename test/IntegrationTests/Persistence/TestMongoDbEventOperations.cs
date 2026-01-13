@@ -129,7 +129,7 @@ public class TestMongoDbEventOperations
 
         // Assert
         Assert.That(result, Has.Count.EqualTo(3));
-        Assert.That(result.Select(e => BsonDocument.Parse(e.EventItem)["eventType"].AsString), 
+        Assert.That(result.Select(e => BsonDocument.Parse(e.EventItem)["eventType"].AsString),
             Is.EquivalentTo(new[] { "INSERT", "UPDATE", "DELETE" }));
     }
 

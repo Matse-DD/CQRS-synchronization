@@ -102,7 +102,7 @@ public class TestMySqlQueryRepositoryAdvanced
         {
             await connection.OpenAsync();
             await using MySqlCommand insertCmd = new MySqlCommand(
-                "INSERT INTO Products (name, price) VALUES ('ToDelete', 100.00), ('ToKeep', 200.00)", 
+                "INSERT INTO Products (name, price) VALUES ('ToDelete', 100.00), ('ToKeep', 200.00)",
                 connection);
             await insertCmd.ExecuteNonQueryAsync();
         }
@@ -161,7 +161,7 @@ public class TestMySqlQueryRepositoryAdvanced
         await using MySqlCommand verifyCmd = new MySqlCommand(
             "SELECT price FROM Products WHERE id = 1", verifyConn);
         decimal? price = (decimal?)(await verifyCmd.ExecuteScalarAsync());
-        
+
         Assert.That(price, Is.EqualTo(50.00m));
 
         Guid storedId = await _repository.GetLastSuccessfulEventId();

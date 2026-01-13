@@ -62,7 +62,7 @@ public class TestMySqlConcurrency
     {
         // Arrange
         MySqlQueryRepository repository = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
-        
+
         List<Task> tasks = new();
         List<Guid> eventIds = new();
 
@@ -84,7 +84,7 @@ public class TestMySqlConcurrency
         await connection.OpenAsync();
         await using MySqlCommand cmd = new MySqlCommand("SELECT COUNT(*) FROM TestTableConcurrency", connection);
         long count = (long)(await cmd.ExecuteScalarAsync())!;
-        
+
         Assert.That(count, Is.EqualTo(5));
     }
 
@@ -143,7 +143,7 @@ public class TestMySqlConcurrency
         await connection.OpenAsync();
         await using MySqlCommand cmd = new MySqlCommand("SELECT COUNT(*) FROM TestTableConcurrency", connection);
         long count = (long)(await cmd.ExecuteScalarAsync())!;
-        
+
         Assert.That(count, Is.EqualTo(3));
 
 
