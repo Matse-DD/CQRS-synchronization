@@ -97,7 +97,7 @@ Dit is het principe van het opslaan van verschillende events en deze events toe 
 
 ### Debezium (https://debezium.io/)
 
-Deze oplossing kijkt naar veranderingen in de command databank met behulp van polling eenmaal een verandering wordt opgemerkt en vertaalt naar events. Vervolgens worden deze events op een message broker (kafka) gepusht. Waar dan naar geluisterd kan worden door verschillende processen deze zullen dit event dan ontvangen. Onder deze processen zal dan een process zijn dat de ontvangen messages omzet naar de juiste commands en deze uitvoeren op de query databank.
+Deze oplossing kijkt naar veranderingen in de command databank met behulp van polling. Eenmaal een verandering wordt opgemerkt, wordt deze vertaalt naar events. Vervolgens worden deze events op een message broker (Kafka) gepusht, waar dan naar geluisterd kan worden door verschillende processen die dit event dan zullen ontvangen. Onder deze processen zal dan een proces zijn dat de ontvangen messages omzet naar de juiste commands en deze uitvoert op de query databank.
 
 ### Axon Framework door Axoniq (https://www.axoniq.io/framework)
 
