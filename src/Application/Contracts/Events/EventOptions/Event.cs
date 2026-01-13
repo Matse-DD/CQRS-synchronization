@@ -11,7 +11,7 @@ public abstract class Event(IntermediateEvent intermediateEvent)
     public Status Status { get; init; } = intermediateEvent.Status;
     public EventType EventType { get; init; } = intermediateEvent.EventType;
 
-    public abstract string GetCommand();
+    public abstract object GetCommand(); //TODO fix object this should be something better
 
     public override bool Equals(object? obj)
     {
