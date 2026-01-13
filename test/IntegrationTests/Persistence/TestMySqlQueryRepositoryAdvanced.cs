@@ -125,7 +125,7 @@ public class TestMySqlQueryRepositoryAdvanced
         string name = (string)(await nameCmd.ExecuteScalarAsync())!;
         Assert.That(name, Is.EqualTo("ToKeep"));
     }
-    
+
     [Test]
     public async Task Execute_Should_Maintain_Transaction_Atomicity()
     {
@@ -224,5 +224,24 @@ public class TestMySqlQueryRepositoryAdvanced
 
         // Assert
         Assert.That(retrievedId, Is.EqualTo(eventId));
+    }
+
+    [Test]
+    public async Task Execute_Should_Handle_NULL_Values()
+    {
+        // Arrange
+        Guid eventId = Guid.NewGuid();
+        string command = "INSERT INTO Products (name, price) VALUES ('NullTest', NULL)";
+
+        // Act
+        await _repository.Execute(command, eventId);
+
+        // Assert
+        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await connection.OpenAsync();
+        await using MySqlCommand verifyCmd = new MySqlCommand(
+            "SELECT price FROM Products WHERE name = 'NullTest'", connection);
+        object? price = await verifyCmd.ExecuteScalarAsync();
+        Assert.That(price, Is.EqualTo(DBNull.Value));
     }
 }
