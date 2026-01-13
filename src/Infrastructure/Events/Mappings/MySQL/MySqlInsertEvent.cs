@@ -1,20 +1,21 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
 using Infrastructure.Events.Mappings.MySQL.Shared;
+using Infrastructure.Persistence;
 using System.Text.Json;
 
 namespace Infrastructure.Events.Mappings.MySQL;
 
 public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent(intermediateEvent)
 {
-    public override object GetCommand()
+    public override PersistenceCommandInfo GetCommandInfo()
     {
         string command = $"INSERT INTO {AggregateName} ({MapColumns(Properties.Keys)})\n" +
                          $"VALUES ({MapValues(Properties.Keys)})";
 
         Dictionary<string, string> parameterizedDict = BuildParamDict(Properties);
 
-        return (command, parameterizedDict);
+        return new PersistenceCommandInfo(command, parameterizedDict);
     }
 
     private static string MapColumns(IEnumerable<string> keys)
@@ -43,6 +44,6 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
     private static string ConvertValue(object incomingValue)
     {
         if (incomingValue is not JsonElement value) return "NULL";
-        return value.ToString().DetermineMySqlValue();
+        return value.ToString().ExtractValue();
     }
 }

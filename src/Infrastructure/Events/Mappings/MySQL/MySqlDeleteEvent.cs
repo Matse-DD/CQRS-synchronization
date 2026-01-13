@@ -2,24 +2,25 @@
 using Application.Contracts.Events.Factory;
 using Google.Protobuf.WellKnownTypes;
 using Infrastructure.Events.Mappings.MySQL.Shared;
+using Infrastructure.Persistence;
 using MySql.Data.MySqlClient;
 
 namespace Infrastructure.Events.Mappings.MySQL;
 
 public class MySqlDeleteEvent(IntermediateEvent intermediateEvent) : DeleteEvent(intermediateEvent)
 {
-    public override object GetCommand()
+    public override PersistenceCommandInfo GetCommandInfo()
     {
-        (string, Dictionary<string, string>) parameterizedWhere = MapParameterizedWhere(Condition);
+        (string ParameterizedWhere, Dictionary<string, string> ParameterDict) parameterizedWhere = MapParameterizedWhere(Condition); //TODO vragen of iedereen dit leesbaar vind
 
-        string command = $"DELETE FROM {AggregateName.Sanitize()} WHERE {parameterizedWhere.Item1}";
+        string command = $"DELETE FROM {AggregateName.Sanitize()} WHERE {parameterizedWhere.ParameterizedWhere}";
 
-        return (command, parameterizedWhere.Item2);
+        return new PersistenceCommandInfo(command, parameterizedWhere.ParameterDict);
     }
 
     private static (string, Dictionary<string, string>) MapParameterizedWhere(Dictionary<string, string> condition)
     {
-        ICollection<string> parameterizedWhereConditions = new List<string>();
+        ICollection<string> parameterizedWhere = new List<string>();
         Dictionary<string, string> parametersWithValue = new Dictionary<string, string>();
 
         foreach (KeyValuePair<string, string> keyValuePair in condition)
@@ -30,19 +31,17 @@ public class MySqlDeleteEvent(IntermediateEvent intermediateEvent) : DeleteEvent
 
             if (HasConditionSign(sign))
             {
-                parameterizedWhereConditions.Add($"{onProperty} {sign} {parameterizedValue}");
+                parameterizedWhere.Add($"{onProperty} {sign} {parameterizedValue}");
             }
             else
             {
-                parameterizedWhereConditions.Add($"{onProperty} = {parameterizedValue}");
+                parameterizedWhere.Add($"{onProperty} = {parameterizedValue}");
             }
-
-            Console.WriteLine(keyValuePair.Value.ExtractValue());
 
             parametersWithValue.Add(parameterizedValue, keyValuePair.Value.ExtractValue());
         }
 
-        return (string.Join(" AND ", parameterizedWhereConditions), parametersWithValue);
+        return (string.Join(" AND ", parameterizedWhere), parametersWithValue);
     }
 
     private static bool HasConditionSign(string sign)
