@@ -88,4 +88,27 @@ public class TestMySqlConcurrency
         Assert.That(count, Is.EqualTo(5));
     }
 
+    [Test]
+    public async Task Execute_Should_Be_Atomic_With_EventId_Update()
+    {
+        // Arrange
+        MySqlQueryRepository repository = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        Guid eventId = Guid.NewGuid();
+
+        // Act
+        try
+        {
+            await repository.Execute("INVALID SQL SYNTAX", eventId);
+            Assert.Fail("Should have thrown exception");
+        }
+        catch (MySqlException)
+        {
+            // Expected exception
+        }
+
+        // Assert
+        Guid storedEventId = await repository.GetLastSuccessfulEventId();
+        Assert.That(storedEventId, Is.EqualTo(Guid.Empty));
+    }
+
 }
