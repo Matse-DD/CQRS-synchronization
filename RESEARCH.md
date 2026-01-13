@@ -244,7 +244,7 @@ Wat het volgende schema maakt:
 ## Run small Proofs of Concept (PoCs)
 
 ### Change Stream met MongoDB in Dotnet
-Dit codevoorbeeld toont hoe je subscribed op een change stream in dotnet. Als je kan zien is dit redelijk simpel. Je maakt een cursor object aan via de `Watch()` methode (`WatchAsync()` voor async applicaties). De informatie voor dit codevoorbeeld is verkregen via de [MongoDB docs](https://www.mongodb.com/docs/drivers/csharp/current/logging-and-monitoring/change-streams/)
+Dit codevoorbeeld toont hoe je subscribed op een change stream in Dotnet. Zoals je kan zien is dit redelijk simpel. Je maakt een cursor object aan via de `Watch()` methode (`WatchAsync()` voor async applicaties). De informatie voor dit codevoorbeeld is verkregen via de [MongoDB docs](https://www.mongodb.com/docs/drivers/csharp/current/logging-and-monitoring/change-streams/)
 
 [Volledige code change stream](https://github.com/LanderDebeir/ChangestreamTryout)
 
