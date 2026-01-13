@@ -121,7 +121,7 @@ Functionele requirements:
 
 Niet functionele requirements:
 
-- Betrouwbaar → geen data verlies, ...
+- Betrouwbaar → geen dataverlies, ...
 - Performantie → synchronisatie binnen enkele seconden
 - Testbaarheid → meer dan 80% test coverage
 - Observeerbaar → logs & metrics van de status
