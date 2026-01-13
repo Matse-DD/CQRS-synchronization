@@ -8,22 +8,14 @@ namespace Infrastructure.Persistence.QueryRepository;
 
 public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRepository> logger) : IQueryRepository
 {
-    public async Task Execute(object command, Guid eventId)
+    public async Task Execute(PersistenceCommandInfo commandInfo, Guid eventId)
     {
-        if (command.GetType().Equals(typeof(string)))
-        {
-            await ExecuteString(command.ToString(), eventId);
-            return;
-        }
-
-        (string, Dictionary<string, string>) incomingCommand = ((string, Dictionary<string, string>))command;
-
         using MySqlConnection connection = await OpenMySqlConnection();
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
 
         try
         {
-            await ExecuteCommand(incomingCommand, connection, transaction);
+            await ExecuteCommand(commandInfo, connection, transaction);
             await UpdateLastEventId(eventId, connection, transaction);
 
             await transaction.CommitAsync();
@@ -105,6 +97,24 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         return connection;
     }
 
+    private async Task ExecuteCommand(PersistenceCommandInfo commandInfo, MySqlConnection connection, MySqlTransaction transaction)
+    {
+        logger.LogInformation("Executing Update: {Command}", commandInfo.PureCommand);
+
+        MySqlCommand cmdDataUpdate = new MySqlCommand(commandInfo.PureCommand, connection, transaction);
+
+        if (commandInfo.Parameters != null)
+        {
+            // TODO MAP PARAMETERS METHOD
+            foreach (KeyValuePair<string, string> keyValuePair in commandInfo.Parameters)
+            {
+                cmdDataUpdate.Parameters.AddWithValue(keyValuePair.Key, keyValuePair.Value);
+            }
+        }
+
+        await cmdDataUpdate.ExecuteNonQueryAsync();
+    }
+
     private async Task UpdateLastEventId(Guid eventId, MySqlConnection connection, MySqlTransaction transaction)
     {
         string commandLastEventId = $@"REPLACE INTO last_info VALUES(1, '{eventId}')";
@@ -113,20 +123,6 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 
         MySqlCommand cmdLastEventId = new MySqlCommand(commandLastEventId, connection, transaction);
         await cmdLastEventId.ExecuteNonQueryAsync();
-    }
-
-    private async Task ExecuteCommand((string, Dictionary<string, string>) command, MySqlConnection connection, MySqlTransaction transaction)
-    {
-        logger.LogInformation("Executing Update: {Command}", command);
-
-        MySqlCommand cmdDataUpdate = new MySqlCommand(command.Item1, connection, transaction);
-
-        foreach (KeyValuePair<string, string> keyValuePair in command.Item2)
-        {
-            cmdDataUpdate.Parameters.AddWithValue(keyValuePair.Key, keyValuePair.Value);
-        }
-
-        await cmdDataUpdate.ExecuteNonQueryAsync();
     }
 
     private async Task<ICollection<string>> GetTablesFromDatabase(MySqlConnection connection)

@@ -1,8 +1,10 @@
-﻿namespace Application.Contracts.Persistence;
+﻿using Infrastructure.Persistence;
+
+namespace Application.Contracts.Persistence;
 
 public interface IQueryRepository
 {
     Task<Guid> GetLastSuccessfulEventId();
-    Task Execute(object command, Guid eventId);
+    Task Execute(PersistenceCommandInfo command, Guid eventId);
     Task Clear();
 }
