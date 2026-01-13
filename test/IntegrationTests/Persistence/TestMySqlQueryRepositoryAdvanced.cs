@@ -28,7 +28,7 @@ public class TestMySqlQueryRepositoryAdvanced
         await using MySqlCommand cmd = new MySqlCommand(setupSql, connection);
         await cmd.ExecuteNonQueryAsync();
     }
-    
+
     [SetUp]
     public async Task SetUp()
     {
@@ -125,4 +125,47 @@ public class TestMySqlQueryRepositoryAdvanced
         string name = (string)(await nameCmd.ExecuteScalarAsync())!;
         Assert.That(name, Is.EqualTo("ToKeep"));
     }
+    
+    [Test]
+    public async Task Execute_Should_Maintain_Transaction_Atomicity()
+    {
+        // Arrange
+        await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
+        {
+            await connection.OpenAsync();
+            await using MySqlCommand insertCmd = new MySqlCommand(
+                "INSERT INTO Products (id, name, price) VALUES (1, 'Product1', 50.00)", connection);
+            await insertCmd.ExecuteNonQueryAsync();
+        }
+
+        Guid eventId = Guid.NewGuid();
+        // Should fail due to invalid SQL syntax
+        string command = @"
+            UPDATE Products SET price = 100.00 WHERE id = 1;
+            INVALID SQL SYNTAX HERE;";
+
+        // Act & Assert
+        try
+        {
+            await _repository.Execute(command, eventId);
+            Assert.Fail("Should have thrown exception due to invalid SQL");
+        }
+        catch (MySqlException)
+        {
+            // Expected to fail due to syntax error
+        }
+
+        // Verify the Products table was not updated (transaction rolled back)
+        await using MySqlConnection verifyConn = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await verifyConn.OpenAsync();
+        await using MySqlCommand verifyCmd = new MySqlCommand(
+            "SELECT price FROM Products WHERE id = 1", verifyConn);
+        decimal? price = (decimal?)(await verifyCmd.ExecuteScalarAsync());
+        
+        Assert.That(price, Is.EqualTo(50.00m));
+
+        Guid storedId = await _repository.GetLastSuccessfulEventId();
+        Assert.That(storedId, Is.EqualTo(Guid.Empty));
+    }
+
 }
