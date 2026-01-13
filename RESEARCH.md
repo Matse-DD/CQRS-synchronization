@@ -374,7 +374,7 @@ Verder zal de pipeline er als volgt uitzien:
 - Maken van container 
 
 #### Release strategy
-Er is gekozen voor het gebruik van containers omdat containers ervoor zorgen dat de CQRS-implementatie op verschillende platformen kan worden opgezet en gebruikt. Ook zorgen containers ervoor dat de implementatie gemakkelijk kan verdeeld worden en dat we er zeker van zijn dat als onze container werkt dit ook het geval zal zijn bij de andere containers. Verder is het ook aangegeven in de opdracht dat er gebruik moet worden gemaakt van containers.
+Er is gekozen voor het gebruik van containers, omdat containers ervoor zorgen dat de CQRS-implementatie op verschillende platformen kan worden opgezet en gebruikt. Ook zorgen containers ervoor dat de implementatie gemakkelijk verdeeld kan worden en dat we er zeker van zijn dat als onze container werkt, dit ook het geval zal zijn bij de andere containers. Verder is het ook aangegeven in de opdracht dat er gebruik moet worden gemaakt van containers.
 
 ##### Release checklist
 - [ ] CQRS-implementatie dat gemakkelijk te configureren valt
