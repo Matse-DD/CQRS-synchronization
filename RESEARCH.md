@@ -75,7 +75,7 @@ Een projector zet het event of de verandering in data om naar een correct comman
 
 ### Command Databank
 
-Op de command databank worden enkel de commands van de gebruiker uitgevoerd. Dit wilt zeggen dat indien de gebruiker informatie wilt aanpassen deze databank zal worden gebruikt.
+Op de command databank worden enkel de commands van de gebruiker uitgevoerd. Dit wil zeggen dat indien de gebruiker informatie wil aanpassen, deze databank zal worden gebruikt.
 
 - https://www.sciencedirect.com/topics/computer-science/database-command 
 
