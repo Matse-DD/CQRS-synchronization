@@ -5,10 +5,10 @@
 - Welk probleem lossen we op?
   - Synchronisatie tussen 2 databanken zonder dat er dataverlies optreedt voor CQRS-doeleinden.
 - Wie zijn de gebruikers?
-  - Developers dat gebruik willen maken van CQRS (Command Query Responsibility Segregation)
+  - Developers die gebruik willen maken van CQRS (Command Query Responsibility Segregation)
 - Hoe weten we of het werkt?
   - Indien we een write doen naar de command databank en deze veranderingen zichtbaar worden in de query databank.
-- Wat is in de scope wat is er buiten
+- Wat valt binnen de scope en wat erbuiten?
   - Binnen
     - Synchronisatie
       - Geen dataverlies
