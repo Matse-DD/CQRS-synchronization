@@ -10,12 +10,20 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 {
     public async Task Execute(object command, Guid eventId)
     {
+        if (command.GetType().Equals(typeof(string)))
+        {
+            await ExecuteString(command.ToString(), eventId);
+            return;
+        }
+
+        (string, Dictionary<string, string>) incomingCommand = ((string, Dictionary<string, string>)) command;
+
         using MySqlConnection connection = await OpenMySqlConnection();
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
 
         try
         {
-            await ExecuteCommand(command, connection, transaction);
+            await ExecuteCommand(incomingCommand, connection, transaction);
             await UpdateLastEventId(eventId, connection, transaction);
 
             await transaction.CommitAsync();
@@ -107,12 +115,17 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         await cmdLastEventId.ExecuteNonQueryAsync();
     }
 
-    private async Task ExecuteCommand(string command, MySqlConnection connection, MySqlTransaction transaction)
+    private async Task ExecuteCommand((string, Dictionary<string, string>) command, MySqlConnection connection, MySqlTransaction transaction)
     {
         logger.LogInformation("Executing Update: {Command}", command);
 
-        MySqlCommand cmdDataUpdate = new MySqlCommand(command, connection, transaction);
-        cmdDataUpdate.Parameters.Add("@")
+        MySqlCommand cmdDataUpdate = new MySqlCommand(command.Item1, connection, transaction);
+
+        foreach(KeyValuePair<string, string> keyValuePair in command.Item2) 
+        {
+            cmdDataUpdate.Parameters.AddWithValue(keyValuePair.Key, keyValuePair.Value);
+        }
+
         await cmdDataUpdate.ExecuteNonQueryAsync();
     }
 
@@ -160,5 +173,33 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         }
 
         return result.GetGuid(columnLastEventId);
+    }
+
+    public async Task ExecuteString(string command, Guid eventId)
+    {
+        using MySqlConnection connection = await OpenMySqlConnection();
+        using MySqlTransaction transaction = await connection.BeginTransactionAsync();
+
+        try
+        {
+            await ExecuteStringCommand(command, connection, transaction);
+            await UpdateLastEventId(eventId, connection, transaction);
+
+            await transaction.CommitAsync();
+        }
+        catch (DbException ex)
+        {
+            await RollbackTransaction(transaction, ex);
+            throw;
+        }
+    }
+
+    private async Task ExecuteStringCommand(string command, MySqlConnection connection, MySqlTransaction transaction)
+    {
+        logger.LogInformation("Executing Update: {Command}", command);
+
+        MySqlCommand cmdDataUpdate = new MySqlCommand(command, connection, transaction);
+
+        await cmdDataUpdate.ExecuteNonQueryAsync();
     }
 }

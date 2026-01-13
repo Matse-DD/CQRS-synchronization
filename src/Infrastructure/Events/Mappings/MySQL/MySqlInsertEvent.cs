@@ -7,10 +7,14 @@ namespace Infrastructure.Events.Mappings.MySQL;
 
 public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent(intermediateEvent)
 {
-    public override string GetCommand()
+    public override object GetCommand()
     {
-        return $"INSERT INTO {AggregateName} ({MapColumns(Properties.Keys)})\n" +
-               $"VALUES ({MapValues(Properties.Values)})";
+        string command = $"INSERT INTO {AggregateName} ({MapColumns(Properties.Keys)})\n" +
+                         $"VALUES ({MapValues(Properties.Keys)})";
+
+        Dictionary<string, string> parameterizedDict = BuildParamDict(Properties);
+
+        return (command, parameterizedDict);
     }
 
     private static string MapColumns(IEnumerable<string> keys)
@@ -18,10 +22,22 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
         return string.Join(", ", keys);
     }
 
-    private static string MapValues(IEnumerable<object> incomingValues)
+    private static string MapValues(IEnumerable<object> incomingParameters)
     {
-        IEnumerable<string> convertedValues = incomingValues.Select(ConvertValue);
-        return string.Join(", ", convertedValues);
+        IEnumerable<string> parameters = incomingParameters.Select(parameter => $"@{parameter}");
+        return string.Join(", ", parameters);
+    }
+
+    private static Dictionary<string, string> BuildParamDict(Dictionary<string, object> properties)
+    {
+        Dictionary<string, string> parameters = new Dictionary<string, string>();
+
+        foreach(KeyValuePair<string, object> keyValuePair in properties)
+        {
+            parameters.Add($"@{keyValuePair.Key}", ConvertValue(keyValuePair.Value));
+        }
+
+        return parameters;
     }
 
     private static string ConvertValue(object incomingValue)
