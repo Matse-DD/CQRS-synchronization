@@ -22,7 +22,7 @@ public static class MySqlExtractionExtensions
 
         int startIndexStringForLength = incoming.IndexOf('\'');
 
-        return incoming.Substring(0, startIndexStringForLength);        
+        return incoming.Substring(0, startIndexStringForLength);
     }
 
     public static string ExtractValue(this string incoming)

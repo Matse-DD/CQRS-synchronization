@@ -32,7 +32,7 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
     {
         Dictionary<string, string> parameters = new Dictionary<string, string>();
 
-        foreach(KeyValuePair<string, object> keyValuePair in properties)
+        foreach (KeyValuePair<string, object> keyValuePair in properties)
         {
             parameters.Add($"@{keyValuePair.Key}", ConvertValue(keyValuePair.Value));
         }

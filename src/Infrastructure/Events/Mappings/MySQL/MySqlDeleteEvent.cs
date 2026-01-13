@@ -22,7 +22,7 @@ public class MySqlDeleteEvent(IntermediateEvent intermediateEvent) : DeleteEvent
         ICollection<string> parameterizedWhereConditions = new List<string>();
         Dictionary<string, string> parametersWithValue = new Dictionary<string, string>();
 
-        foreach(KeyValuePair<string, string> keyValuePair in condition)
+        foreach (KeyValuePair<string, string> keyValuePair in condition)
         {
             string onProperty = keyValuePair.Key;
             string sign = keyValuePair.Value.ExtractSign();

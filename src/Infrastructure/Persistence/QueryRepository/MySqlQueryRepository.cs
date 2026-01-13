@@ -16,7 +16,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
             return;
         }
 
-        (string, Dictionary<string, string>) incomingCommand = ((string, Dictionary<string, string>)) command;
+        (string, Dictionary<string, string>) incomingCommand = ((string, Dictionary<string, string>))command;
 
         using MySqlConnection connection = await OpenMySqlConnection();
         using MySqlTransaction transaction = await connection.BeginTransactionAsync();
@@ -121,7 +121,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 
         MySqlCommand cmdDataUpdate = new MySqlCommand(command.Item1, connection, transaction);
 
-        foreach(KeyValuePair<string, string> keyValuePair in command.Item2) 
+        foreach (KeyValuePair<string, string> keyValuePair in command.Item2)
         {
             cmdDataUpdate.Parameters.AddWithValue(keyValuePair.Key, keyValuePair.Value);
         }
