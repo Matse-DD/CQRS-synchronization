@@ -65,7 +65,7 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
 
     private static IEnumerable<OutboxEvent> DetermineEventsToRecover(IEnumerable<OutboxEvent> outboxEvents, Guid lastSuccessfulEventId)
     {
-        return outboxEvents.Where(outboxEvent => { Console.WriteLine($"aaaaaaaaaaaaaaaah {HasToBeProcessed(lastSuccessfulEventId, outboxEvent)}"); return HasToBeProcessed(lastSuccessfulEventId, outboxEvent); });
+        return outboxEvents.Where(outboxEvent => HasToBeProcessed(lastSuccessfulEventId, outboxEvent));
     }
 
     private static bool HasToBeProcessed(Guid lastSuccessfulEventId, OutboxEvent outboxEvent)
@@ -82,7 +82,6 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
 
         if (eventAsJson.TryGetProperty("status", out JsonElement statusElement))
         {
-            Console.WriteLine($"de status {statusElement.GetString()?.Equals(Status.PENDING.ToString()) ?? false}");
             return statusElement.GetString()?.Equals(Status.PENDING.ToString()) ?? false;
         }
 
