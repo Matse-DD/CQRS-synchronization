@@ -27,4 +27,17 @@ public class TestMySqlConcurrency
         await using MySqlCommand cmd = new MySqlCommand(setupSql, connection);
         await cmd.ExecuteNonQueryAsync();
     }
+    
+    [SetUp]
+    public async Task SetUp()
+    {
+        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await connection.OpenAsync();
+
+        await using MySqlCommand cmd = new MySqlCommand(@"
+            UPDATE last_info SET last_event_id = NULL WHERE id = 1; 
+            TRUNCATE TABLE TestTableConcurrency;", connection);
+        await cmd.ExecuteNonQueryAsync();
+    }
+
 }
