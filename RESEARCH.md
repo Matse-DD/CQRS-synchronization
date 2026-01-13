@@ -23,9 +23,9 @@
 
 ## Identify stakeholders and use cases
 
-De stakeholders zullen vooral developers zijn alsook de product owner.
+De stakeholders zullen vooral developers zijn, alsook de product owner.
 
-De belangrijkste use case is "Als een developer wil ik databanken gemakkelijk kunnen syncroniseren zodat ik een aparte query en command databank kan hebben".
+De belangrijkste use case is: "Als een developer wil ik databanken gemakkelijk kunnen synchroniseren, zodat ik een aparte query en command databank kan hebben".
 
 Andere use cases:
 
