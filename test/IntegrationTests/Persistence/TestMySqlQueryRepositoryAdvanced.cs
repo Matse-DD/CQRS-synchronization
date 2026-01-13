@@ -168,4 +168,28 @@ public class TestMySqlQueryRepositoryAdvanced
         Assert.That(storedId, Is.EqualTo(Guid.Empty));
     }
 
+    [Test]
+    public async Task Execute_Should_Handle_Sequential_Events_Correctly()
+    {
+        // Arrange
+        Guid eventId1 = Guid.NewGuid();
+        Guid eventId2 = Guid.NewGuid();
+        Guid eventId3 = Guid.NewGuid();
+
+        // Act
+        await _repository.Execute("INSERT INTO Products (name, price) VALUES ('Product1', 10.00)", eventId1);
+        await _repository.Execute("INSERT INTO Products (name, price) VALUES ('Product2', 20.00)", eventId2);
+        await _repository.Execute("UPDATE Products SET price = 15.00 WHERE name = 'Product1'", eventId3);
+
+        // Assert
+        Guid lastEventId = await _repository.GetLastSuccessfulEventId();
+        Assert.That(lastEventId, Is.EqualTo(eventId3));
+
+        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await connection.OpenAsync();
+        await using MySqlCommand verifyCmd = new MySqlCommand("SELECT COUNT(*) FROM Products", connection);
+        long count = (long)(await verifyCmd.ExecuteScalarAsync())!;
+        Assert.That(count, Is.EqualTo(2));
+    }
+
 }
