@@ -133,7 +133,7 @@ Niet functionele requirements:
 
 ### Acceptance checkpoint
 
-De MVP is een demo-applicatie dat gebruik maakt van CQRS met onze synchronisatie implementatie tussen een mongoDb (command databank) en mysql (query databank) dit met een hoge betrouwbaarheid en snelheid dit voor simpele INSERT, UPDATE, DELETE commands.
+De MVP is een demo-applicatie die gebruik maakt van CQRS met onze synchronisatie implementatie tussen een MongoDB (command databank) en MySQL (query databank), dit met een hoge betrouwbaarheid en snelheid voor simpele INSERT, UPDATE, DELETE commands.
 
 De CQRS-implementatie moet voldoen aan volgende pipeline onderdelen:
 - 80% test coverage
