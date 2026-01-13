@@ -156,11 +156,11 @@ De CQRS-implementatie moet voldoen aan volgende pipeline onderdelen:
 #### Conclusie
 We hebben onze keuze gemaakt op basis van de typering, documentatie en complexiteit tegenover performantie.
 
-Een sterke typering is het meest gewenst voor onze use case dit omdat je verschillende events zal binnen krijgen en er zal moeten bepaald worden wat hier in zit. Indien hier iets fout in gebeurd willen we hier het liefst een error van krijgen en niet dat het programma verder gaat zonder problemen.
+Een sterke typering is het meest gewenst voor onze use case, dit omdat je verschillende events zal binnenkrijgen en er zal moeten bepaald worden wat hier in zit. Indien hier iets fout in gebeurt, willen we hier het liefst een error van krijgen en niet dat het programma verder gaat zonder problemen.
 
-De documentatie moet gemakkelijk te navigeren zijn en duidelijk uit leggen wat bepaalde methodes doen. 
+De documentatie moet gemakkelijk te navigeren zijn en duidelijk uitleggen wat bepaalde methodes doen. 
 
-De complexiteit tegenover performantie we willen niet te complex gaan waardoor we plots zeer veel zelf zullen moeten doen, maar de performantie moet nog steeds goed blijven.
+De complexiteit tegenover performantie: we willen niet te complex gaan waardoor we plots zeer veel zelf zullen moeten doen, maar de performantie moet nog steeds goed blijven.
 
 We hebben rekening gehouden met deze punten en daarom hebben we uiteindelijk gekozen voor C#. Deze taal heeft een goede documentatie, een sterke typering en de complexiteit tegenover performantie is zeer goed.
 
