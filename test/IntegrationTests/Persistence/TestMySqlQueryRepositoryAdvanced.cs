@@ -42,4 +42,26 @@ public class TestMySqlQueryRepositoryAdvanced
             TRUNCATE TABLE Orders;", connection);
         await cmd.ExecuteNonQueryAsync();
     }
+    [Test]
+    public async Task Execute_Should_Handle_Complex_Insert_Statements()
+    {
+        // Arrange
+        Guid eventId = Guid.NewGuid();
+        string command = @"INSERT INTO Products (name, price) 
+                          VALUES ('Test Product', 99.99), 
+                                 ('Another Product', 149.99)";
+
+        // Act
+        await _repository.Execute(command, eventId);
+
+        // Assert
+        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await connection.OpenAsync();
+        await using MySqlCommand verifyCmd = new MySqlCommand("SELECT COUNT(*) FROM Products", connection);
+        long count = (long)(await verifyCmd.ExecuteScalarAsync())!;
+        Assert.That(count, Is.EqualTo(2));
+
+        Guid storedId = await _repository.GetLastSuccessfulEventId();
+        Assert.That(storedId, Is.EqualTo(eventId));
+    }
 }
