@@ -15,7 +15,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 
         try
         {
-            await ExecuteUpdateCommand(command, connection, transaction);
+            await ExecuteCommand(command, connection, transaction);
             await UpdateLastEventId(eventId, connection, transaction);
 
             await transaction.CommitAsync();
@@ -107,7 +107,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         await cmdLastEventId.ExecuteNonQueryAsync();
     }
 
-    private async Task ExecuteUpdateCommand(string command, MySqlConnection connection, MySqlTransaction transaction)
+    private async Task ExecuteCommand(string command, MySqlConnection connection, MySqlTransaction transaction)
     {
         logger.LogInformation("Executing Update: {Command}", command);
 
