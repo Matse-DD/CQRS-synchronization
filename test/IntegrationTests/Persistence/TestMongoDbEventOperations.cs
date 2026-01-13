@@ -175,4 +175,30 @@ public class TestMongoDbEventOperations
             Assert.That(remainingEvents[0]["id"].AsString, Is.EqualTo(eventId2.ToString()));
         });
     }
+    
+    [Test]
+    public async Task Events_Should_Be_Persisted_Across_Repository_Instances()
+    {
+        // Arrange
+        Guid eventId = Guid.NewGuid();
+        BsonDocument doc = BsonDocument.Parse($@"
+            {{
+                ""id"": ""{eventId}"",
+                ""occurredAt"": ""{DateTime.UtcNow:O}"",
+                ""aggregateName"": ""TestAgg"",
+                ""status"": ""PENDING"",
+                ""eventType"": ""INSERT"",
+                ""payload"": {{}}
+            }}");
+
+        await _collection.InsertOneAsync(doc);
+
+        // Act - Create new repository instance
+        MongoDbCommandRepository newRepository = new(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
+        ICollection<OutboxEvent> events = await newRepository.GetAllEvents();
+
+        // Assert
+        Assert.That(events, Has.Count.EqualTo(1));
+        Assert.That(events.First().EventId, Is.EqualTo(eventId.ToString()));
+    }
 }
