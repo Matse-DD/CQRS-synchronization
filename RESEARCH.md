@@ -81,7 +81,7 @@ Op de command databank worden enkel de commands van de gebruiker uitgevoerd. Dit
 
 ### Query Databank
 
-De query databank wordt enkel gebruikt om queries uit te voeren dit wilt dus zeggen dat indien de gebruiker informatie wilt opvragen deze databank zal worden gebruikt.
+De query databank wordt enkel gebruikt om queries uit te voeren; dit wil dus zeggen dat indien de gebruiker informatie wil opvragen, deze databank zal worden gebruikt.
 
 - https://www.techtarget.com/searchdatamanagement/definition/query 
 
