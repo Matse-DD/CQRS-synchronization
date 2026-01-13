@@ -64,4 +64,30 @@ public class TestMySqlQueryRepositoryAdvanced
         Guid storedId = await _repository.GetLastSuccessfulEventId();
         Assert.That(storedId, Is.EqualTo(eventId));
     }
+    [Test]
+    public async Task Execute_Should_Handle_Update_Statements()
+    {
+        // Arrange
+        await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
+        {
+            await connection.OpenAsync();
+            await using MySqlCommand insertCmd = new MySqlCommand(
+                "INSERT INTO Products (name, price) VALUES ('Test', 50.00)", connection);
+            await insertCmd.ExecuteNonQueryAsync();
+        }
+
+        Guid eventId = Guid.NewGuid();
+        string command = "UPDATE Products SET price = 75.00 WHERE name = 'Test'";
+
+        // Act
+        await _repository.Execute(command, eventId);
+
+        // Assert
+        await using MySqlConnection verifyConn = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await verifyConn.OpenAsync();
+        await using MySqlCommand verifyCmd = new MySqlCommand(
+            "SELECT price FROM Products WHERE name = 'Test'", verifyConn);
+        decimal price = (decimal)(await verifyCmd.ExecuteScalarAsync())!;
+        Assert.That(price, Is.EqualTo(75.00m));
+    }
 }
