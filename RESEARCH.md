@@ -107,7 +107,7 @@ De query databank wordt aangepast door met projecties van de events naar een cor
 
 ### Revo Framework (https://docs.revoframework.net/)
 
-De verschillende events worden in deze oplossing ook opgeslagen in een Event Store en op een event bus gezet. De nieuwe events komen via de event bus in een async event queue terecht waarna eventlisteners de projectors op de hoogte brengen. Deze projectors zetten de events dan opnieuw om naar commands voor de query databank. Door de event store kan gemiste events worden afgehandeld bij heropstart.
+De verschillende events worden in deze oplossing ook opgeslagen in een Event Store en op een event bus gezet. De nieuwe events komen via de event bus in een async event queue terecht, waarna event listeners de projectors op de hoogte brengen. Deze projectors zetten de events dan opnieuw om naar commands voor de query databank. Door de event store kunnen gemiste events worden afgehandeld bij heropstart.
 
 ## Define requirements
 
