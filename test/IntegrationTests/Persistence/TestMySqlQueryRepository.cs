@@ -20,7 +20,8 @@ public class TestMySqlQueryRepository
             CREATE DATABASE IF NOT EXISTS cqrs_read; 
             USE cqrs_read; 
             CREATE TABLE IF NOT EXISTS last_info (id INT AUTO_INCREMENT PRIMARY KEY, last_event_id CHAR(36));
-            CREATE TABLE IF NOT EXISTS TestTable (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50));
+            DROP TABLE IF EXISTS TestTable;
+            CREATE TABLE TestTable (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(50));
             TRUNCATE TABLE last_info;
             INSERT IGNORE INTO last_info (id, last_event_id) VALUES (1, NULL);";
 
