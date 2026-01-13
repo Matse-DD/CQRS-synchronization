@@ -69,7 +69,7 @@ Zoals vermeld kan je dus gaan voor aparte databanken voor CQRS. De moeilijkheid 
 
 ### Projector
 
-Een projector zet het evenement of de verandering in data om naar een correct command, zodat de query databank correct kan worden geüpdatet
+Een projector zet het event of de verandering in data om naar een correct command, zodat de query databank correct kan worden geüpdatet.
 
 - https://event-driven.io/en/projections_and_read_models_in_event_driven_architecture/
 
