@@ -31,11 +31,11 @@ Andere use cases:
 
 Developer: 
 
-- Als een developer wil ik een performant product afleveren zodat de gebruikers geen hinder ondervinden van wat er allemaal gebeurd achter hun rug.
-- Als een developer wil ik databanken kunnen synchroniseren zonder problemen zodat ik zonder problemen CQRS kan toepassen over 2 databanken.
-- Als een developer wil ik databanken gemakkelijk terug synchronseren indien er een inconsistentie is zodat de databanken gelijk lopen wat betreft data.
-- Als een developer wil ik dat indien er bepaalde commands onbedoeld dubbel worden uitgezonden deze niet dubbel worden uitgevoerd (idempotent) zodat mijn data niet inconsistent wordt.
-- Als een developer wil ik dat indien de command databank onbereikbaar is ik nog steeds informatie kan opvragen zodat het opvragen van gegevens geen impact ondervind.
+- Als een developer wil ik een performant product afleveren, zodat de gebruikers geen hinder ondervinden van wat er allemaal gebeurt achter de schermen.
+- Als een developer wil ik databanken kunnen synchroniseren zonder problemen, zodat ik zonder problemen CQRS kan toepassen over 2 databanken.
+- Als een developer wil ik databanken gemakkelijk opnieuw kunnen synchroniseren indien er een inconsistentie is, zodat de databanken gelijk lopen wat betreft data.
+- Als een developer wil ik dat indien er bepaalde commands onbedoeld dubbel worden uitgezonden, deze niet dubbel worden uitgevoerd (idempotent), zodat mijn data niet inconsistent wordt.
+- Als een developer wil ik dat indien de command databank onbereikbaar is, ik nog steeds informatie kan opvragen, zodat het opvragen van gegevens geen impact ondervindt.
 - Als een developer wil ik dat indien er een onderdeel van de synchronisatie faalt er geen data verlies optreed zodat ik er zeker van kan zijn dat mijn data tussen de 2 databanken gelijk is.
 - Als een developer wil ik dat het verkeer van queries & commands verdeeld is over de databanken zodat er bij veel verkeer geen impact is.
 - Als een developer wil ik gemakkelijk een container opbouwen van het CQRS-systeem zodat deze gemakkelijk te integreren valt.
