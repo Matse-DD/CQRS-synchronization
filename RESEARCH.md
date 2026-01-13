@@ -386,8 +386,8 @@ Er is gekozen voor het gebruik van containers, omdat containers ervoor zorgen da
 | # | Milestone                   | Duratie       | Beschrijving                                                                                                                                  |
 |---|-----------------------------|---------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
 | 1 | Onderzoek                   | 24/11 - 30/11 | Probleemanalyse, technologievergelijking, requirements definiëren en architectuur vastleggen.                                                 |
-| 2 | Op start Core implementatie | 01/12 - 07/12 | Opzetten development omgeving (projectstructuur, CI/CD pipelines, ...) en start implementatie.                                                |
-| 3 | Core Implentatie            | 08/12 - 21/12 | Verder bouwen van de Sync Service, Outbox implementatie en de koppeling tussen MongoDB en MySQL alsook de demo applicatie voor de flow (MVP). |
+| 2 | Opstart Core implementatie  | 01/12 - 07/12 | Opzetten development omgeving (projectstructuur, CI/CD pipelines, ...) en start implementatie.                                                |
+| 3 | Core Implementatie          | 08/12 - 21/12 | Verder bouwen van de Sync Service, Outbox implementatie en de koppeling tussen MongoDB en MySQL alsook de demo applicatie voor de flow (MVP). |
 | 4 | Code Finalisatie            | 22/12 - 09/01 | Verder uitwerken, extra features, bugfixing, refactoring van CQRS implementatie & demo applicatie.                                            |
 | 5 | Thesis Finalisatie          | 10/01 - 18/01 | Afronden van de scriptie, documentatie en formuleren van conclusies.                                                                          |
 
