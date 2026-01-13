@@ -365,7 +365,7 @@ https://choosealicense.com/licenses/
 
 ### CI/CD basics (test coverage, pipeline, main niet pushen (repo rules), ...)
 #### Repo Regels
-Het zal niet mogelijk zijn om naar main te pushen. Elke verandering moet dus verlopen via een branch dat vervolgens gemerged kan worden indien 2 teamleden de code hebben nagekeken en accepteren.
+Het zal niet mogelijk zijn om naar main te pushen. Elke verandering moet dus verlopen via een branch die vervolgens gemerged kan worden indien 2 teamleden de code hebben nagekeken en accepteren.
 
 #### Pipeline
 Verder zal de pipeline er als volgt uit zien:
