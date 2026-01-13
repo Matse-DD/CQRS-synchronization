@@ -63,4 +63,14 @@ public class TestMongoDbEventOperations
             Assert.That(updatedDoc["status"].AsString, Is.EqualTo("DONE"));
         });
     }
+
+    [Test]
+    public async Task MarkAsDone_Should_Return_False_When_Event_Does_Not_Exist()
+    {
+        // Act
+        bool wasMarked = await _repository.MarkAsDone(Guid.NewGuid());
+
+        // Assert
+        Assert.That(wasMarked, Is.False);
+    }
 }
