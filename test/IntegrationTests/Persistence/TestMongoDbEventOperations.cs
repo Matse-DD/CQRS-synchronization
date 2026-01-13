@@ -24,11 +24,43 @@ public class TestMongoDbEventOperations
 
         _repository = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
     }
+
     [TearDown]
     public async Task TearDown()
     {
         await _collection.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
     }
 
+    [Test]
+    public async Task MarkAsDone_Should_Update_Event_Status_To_DONE()
+    {
+        // Arrange
+        Guid eventId = Guid.NewGuid();
+        BsonDocument doc = BsonDocument.Parse($@"
+            {{
+                ""id"": ""{eventId}"",
+                ""occurredAt"": ""{DateTime.UtcNow:O}"",
+                ""aggregateName"": ""TestAgg"",
+                ""status"": ""PENDING"",
+                ""eventType"": ""INSERT"",
+                ""payload"": {{}}
+            }}");
+
+        await _collection.InsertOneAsync(doc);
+
+        // Act
+        bool wasMarked = await _repository.MarkAsDone(eventId);
+
+        // Assert
+        Assert.That(wasMarked, Is.True);
+
+        FilterDefinition<BsonDocument> filter = Builders<BsonDocument>.Filter.Eq("id", eventId.ToString());
+        BsonDocument? updatedDoc = await _collection.Find(filter).FirstOrDefaultAsync();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(updatedDoc, Is.Not.Null);
+            Assert.That(updatedDoc["status"].AsString, Is.EqualTo("DONE"));
+        });
     }
-    
+}
