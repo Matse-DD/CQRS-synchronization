@@ -13,8 +13,8 @@
     - Synchronisatie
       - Geen dataverlies
       - Mogelijkheid tot herstel
-      - Geen data inconsistentie
-    - Ervoor zorgen dat de databanken loosly coupled zijn
+      - Geen data-inconsistentie
+    - Ervoor zorgen dat de databanken loosely coupled zijn
     - Event sourcing (op later moment)
   - Buiten
     - Meerdere query/command databanken
