@@ -44,8 +44,8 @@ Developer:
 
 Product owner:
 
-- Als de product owner wil ik dat mijn product met zo weinig mogelijk down-time kan werken zodat ik geen klanten verlies omdat mijn product opnieuw offline is.
-- Als de product owner wil ik dat mijn product niet volledig kapot gaat indien er een databank niet meer werkt zodat er steeds een deel werkend zal zijn.
+- Als de product owner wil ik dat mijn product met zo weinig mogelijk downtime kan werken, zodat ik geen klanten verlies omdat mijn product opnieuw offline is.
+- Als de product owner wil ik dat mijn product niet volledig kapot gaat indien er een databank niet meer werkt, zodat er steeds een deel werkend zal zijn.
 
 ## Master Core Concepts
 
