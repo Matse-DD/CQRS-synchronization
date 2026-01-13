@@ -4,7 +4,7 @@ namespace Infrastructure.Events.Mappings.MySQL.Shared;
 
 public static class MySqlExtractionExtensions
 {
-    public static string DetermineMySqlValue(this string incoming)// TODO REIMPLEMENT WHEN CORRECTED
+    public static string DetermineMySqlValue(this string incoming)
     {
         if (!incoming.IsString()) return incoming;
 
@@ -50,7 +50,8 @@ public static class MySqlExtractionExtensions
 
     public static string Sanitize(this string value)
     {
-        return value.Replace("\'", "\'\'");
+        // TODO some sanitization
+        return value;
     }
 
     public static bool IsString(this string value)
