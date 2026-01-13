@@ -101,9 +101,9 @@ Deze oplossing kijkt naar veranderingen in de command databank met behulp van po
 
 ### Axon Framework door Axoniq (https://www.axoniq.io/framework)
 
-Deze oplossing is meer Event Sourcing specifiek en zal dus evenementen opslaan in een databank ook gekend als de event store. Er is ook een Tracking Event Processor dat door polling op de hoogte wordt gebracht van nieuwe events. De Tracking Event Processor houdt bij welk event het laatst afgehandeld is. Dit is op basis van de Tracking Token deze geeft weer op welke positie het event is in de event store. De Tracking Event Processor kan dan gewoon kijken naar het volgende Tracking Token voor het volgende event.
+Deze oplossing is meer Event Sourcing specifiek en zal dus events opslaan in een databank, ook gekend als de event store. Er is ook een Tracking Event Processor die door polling op de hoogte wordt gebracht van nieuwe events. De Tracking Event Processor houdt bij welk event het laatst afgehandeld is. Dit gebeurt op basis van de Tracking Token; deze geeft weer op welke positie het event is in de event store. De Tracking Event Processor kan dan gewoon kijken naar het volgende Tracking Token voor het volgende event.
 
-De query databank wordt aangepast door met projections van de events naar een correct commando. Eenmaal dit gelukt is, wordt de Tracking Token geupdate naar de Tracking Token van het zojuiste geslaagde event.
+De query databank wordt aangepast door met projecties van de events naar een correct commando te werken. Eenmaal dit gelukt is, wordt de Tracking Token geüpdatet naar de Tracking Token van het zojuist geslaagde event.
 
 ### Revo Framework (https://docs.revoframework.net/)
 
