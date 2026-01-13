@@ -106,7 +106,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         if (commandInfo.Parameters != null)
         {
             // TODO MAP PARAMETERS METHOD
-            foreach (KeyValuePair<string, string> keyValuePair in commandInfo.Parameters)
+            foreach (KeyValuePair<string, object> keyValuePair in commandInfo.Parameters)
             {
                 cmdDataUpdate.Parameters.AddWithValue(keyValuePair.Key, keyValuePair.Value);
             }
