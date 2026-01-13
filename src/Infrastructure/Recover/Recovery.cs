@@ -42,6 +42,7 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
     private async Task<IEnumerable<string>> GetEventsToRecover()
     {
         IEnumerable<OutboxEvent> outboxEvents = await GetAllEventsFromOutbox();
+        Console.WriteLine(outboxEvents.Count());
         Guid lastSuccessfulEventId = await GetLastSuccessfulEventId();
 
         logger.LogInformation("Found last checkpoint: {EventId}. Filtering outbox to get PENDING events...", lastSuccessfulEventId);
@@ -62,16 +63,14 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         return await queryRepository.GetLastSuccessfulEventId();
     }
 
-    private IEnumerable<OutboxEvent> DetermineEventsToRecover(IEnumerable<OutboxEvent> outboxEvents, Guid lastSuccessfulEventId)
+    private static IEnumerable<OutboxEvent> DetermineEventsToRecover(IEnumerable<OutboxEvent> outboxEvents, Guid lastSuccessfulEventId)
     {
-        return outboxEvents.Where(outboxEvent => HasToBeProcessed(lastSuccessfulEventId, outboxEvent));
+        return outboxEvents.Where(outboxEvent => { Console.WriteLine($"aaaaaaaaaaaaaaaah {HasToBeProcessed(lastSuccessfulEventId, outboxEvent)}"); return HasToBeProcessed(lastSuccessfulEventId, outboxEvent); });
     }
 
     private static bool HasToBeProcessed(Guid lastSuccessfulEventId, OutboxEvent outboxEvent)
     {
         if (!IsLastEventIdSet(lastSuccessfulEventId)) return IsEventPending(outboxEvent);
-
-        if (!Guid.TryParse(outboxEvent.EventId, out var currentEventId)) return false;
 
         return !outboxEvent.EventId.Equals(lastSuccessfulEventId.ToString()) && IsEventPending(outboxEvent);
     }
@@ -83,8 +82,11 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
 
         if (eventAsJson.TryGetProperty("status", out JsonElement statusElement))
         {
+            Console.WriteLine($"de status {statusElement.GetString()?.Equals(Status.PENDING.ToString()) ?? false}");
             return statusElement.GetString()?.Equals(Status.PENDING.ToString()) ?? false;
         }
+
+        Console.WriteLine("dat was ier een problemen met nemen status");
 
         return false;
     }
