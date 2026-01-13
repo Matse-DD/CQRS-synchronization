@@ -73,7 +73,7 @@ public class TestMongoDbEventOperations
         // Assert
         Assert.That(wasMarked, Is.False);
     }
-    
+
     [Test]
     public async Task GetAllEvents_Should_Return_Empty_Collection_When_No_Events_Exist()
     {
@@ -83,7 +83,7 @@ public class TestMongoDbEventOperations
         // Assert
         Assert.That(result, Is.Empty);
     }
-    
+
     [Test]
     public async Task GetAllEvents_Should_Handle_Multiple_Event_Types()
     {
@@ -175,7 +175,7 @@ public class TestMongoDbEventOperations
             Assert.That(remainingEvents[0]["id"].AsString, Is.EqualTo(eventId2.ToString()));
         });
     }
-    
+
     [Test]
     public async Task Events_Should_Be_Persisted_Across_Repository_Instances()
     {
