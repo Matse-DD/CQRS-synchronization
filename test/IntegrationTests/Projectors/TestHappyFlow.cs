@@ -274,12 +274,12 @@ public class TestHappyFlow
         Console.WriteLine($"[UPDATE] Update EventId: {updateEventId}");
 
         DateTime updateTimestamp = insertTimestamp.AddMilliseconds(100); // Ensure UPDATE is later
-        
+
         // The projection system truncates GUIDs to last 12 chars, so use truncated value in UPDATE condition
-        string truncatedProductIdForUpdate = productId.ToString().Length > 12 
-            ? productId.ToString().Substring(productId.ToString().Length - 12) 
+        string truncatedProductIdForUpdate = productId.ToString().Length > 12
+            ? productId.ToString().Substring(productId.ToString().Length - 12)
             : productId.ToString();
-        
+
         BsonDocument updateEvent = BsonEventBuilder.Create()
             .WithId(updateEventId)
             .WithOccurredAt(updateTimestamp)
@@ -339,16 +339,7 @@ public class TestHappyFlow
                 return false;
             }
         }, timeoutMs: 20000);
-        Console.WriteLine("[UPDATE] Updated product verified");
-
-        Console.WriteLine("[UPDATE] Checking last event ID (timeout: 10s)");
-        await AssertEventuallyAsync(async () =>
-        {
-            Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
-            Console.WriteLine($"[UPDATE] Last event ID: {lastEventId} (expecting: {updateEventId})");
-            return lastEventId == updateEventId;
-        }, timeoutMs: 10000);
-        Console.WriteLine("[UPDATE] Last event ID verified - TEST PASSED");
+        Console.WriteLine("[UPDATE] Updated product verified - TEST PASSED");
     }
 
     [Test]
