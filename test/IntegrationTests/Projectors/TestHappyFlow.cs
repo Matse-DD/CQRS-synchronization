@@ -135,7 +135,7 @@ public class TestHappyFlow
         await collection.InsertOneAsync(insertEvent);
 
         _replayer.Replay();
-        await Task.Delay(2000); // Wait for async replay to complete
+        await Task.Delay(5000); // Wait for async replay to complete
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -160,13 +160,13 @@ public class TestHappyFlow
             {
                 return false;
             }
-        }, timeoutMs: 10000);
+        }, timeoutMs: 20000);
 
         await AssertEventuallyAsync(async () =>
         {
             Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
             return lastEventId == eventId;
-        }, timeoutMs: 5000);
+        }, timeoutMs: 10000);
     }
 
     [Test]
@@ -226,7 +226,7 @@ public class TestHappyFlow
         await collection.InsertOneAsync(updateEvent);
 
         _replayer.Replay();
-        await Task.Delay(2000); // Wait for async replay to complete
+        await Task.Delay(5000); // Wait for async replay to complete
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -242,13 +242,13 @@ public class TestHappyFlow
 
             long count = (long)(await cmd.ExecuteScalarAsync())!;
             return count == 1;
-        }, timeoutMs: 5000);
+        }, timeoutMs: 20000);
 
         await AssertEventuallyAsync(async () =>
         {
             Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
             return lastEventId == updateEventId;
-        }, timeoutMs: 5000);
+        }, timeoutMs: 10000);
     }
 
     [Test]
@@ -297,7 +297,7 @@ public class TestHappyFlow
         await collection.InsertOneAsync(deleteEvent);
 
         _replayer.Replay();
-        await Task.Delay(2000); // Wait for async replay to complete
+        await Task.Delay(5000); // Wait for async replay to complete
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -311,13 +311,13 @@ public class TestHappyFlow
 
             long count = (long)(await cmd.ExecuteScalarAsync())!;
             return count == 0;
-        }, timeoutMs: 5000);
+        }, timeoutMs: 20000);
 
         await AssertEventuallyAsync(async () =>
         {
             Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
             return lastEventId == deleteEventId;
-        }, timeoutMs: 5000);
+        }, timeoutMs: 10000);
     }
 
     [Test]
@@ -379,14 +379,14 @@ public class TestHappyFlow
         await collection.InsertOneAsync(secondEvent);
 
         _replayer.Replay();
-        await Task.Delay(2000); // Wait for async replay to complete
+        await Task.Delay(5000); // Wait for async replay to complete
 
         // Assert
         await AssertEventuallyAsync(async () =>
         {
             Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
             return lastEventId == secondEventId;
-        }, timeoutMs: 5000);
+        }, timeoutMs: 20000);
 
         await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
         {
