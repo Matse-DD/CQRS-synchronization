@@ -1,5 +1,4 @@
 using Application.Contracts.Persistence;
-using Infrastructure.Persistence;
 
 namespace ApplicationTests.Shared.Persistence;
 

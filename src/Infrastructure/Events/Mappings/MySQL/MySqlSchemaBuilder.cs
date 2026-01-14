@@ -1,7 +1,6 @@
 using Application.Contracts.Events;
 using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Persistence;
-using Infrastructure.Persistence;
 using System.Text.Json;
 
 namespace Infrastructure.Events.Mappings.MySQL;

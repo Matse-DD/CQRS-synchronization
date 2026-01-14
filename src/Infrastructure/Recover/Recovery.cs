@@ -9,7 +9,6 @@ namespace Infrastructure.Recover;
 
 public class Recovery(ICommandRepository commandRepository, IQueryRepository queryRepository, Projector projector, ILogger<Recovery> logger)
 {
-
     public void Recover()
     {
         logger.LogInformation("Initiating Recovery Process...");
@@ -45,7 +44,7 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         Guid lastSuccessfulEventId = await GetLastSuccessfulEventId();
 
         logger.LogInformation("Found last checkpoint: {EventId}. Filtering outbox to get PENDING events...", lastSuccessfulEventId);
-        outboxEvents = DetermineEventsToRecover(outboxEvents, lastSuccessfulEventId);
+        outboxEvents = DetermineEventsToRecover(outboxEvents, lastSuccessfulEventId, commandRepository);
 
         return ExtractEvents(outboxEvents);
     }
@@ -62,16 +61,23 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         return await queryRepository.GetLastSuccessfulEventId();
     }
 
-    private static IEnumerable<OutboxEvent> DetermineEventsToRecover(IEnumerable<OutboxEvent> outboxEvents, Guid lastSuccessfulEventId)
+    private static IEnumerable<OutboxEvent> DetermineEventsToRecover(IEnumerable<OutboxEvent> outboxEvents, Guid lastSuccessfulEventId, ICommandRepository commandRepository)
     {
-        return outboxEvents.Where(outboxEvent => HasToBeProcessed(lastSuccessfulEventId, outboxEvent));
+        return outboxEvents.Where(outboxEvent => HasToBeProcessed(lastSuccessfulEventId, outboxEvent, commandRepository));
     }
 
-    private static bool HasToBeProcessed(Guid lastSuccessfulEventId, OutboxEvent outboxEvent)
+    private static bool HasToBeProcessed(Guid lastSuccessfulEventId, OutboxEvent outboxEvent, ICommandRepository commandRepository)
     {
         if (!IsLastEventIdSet(lastSuccessfulEventId)) return IsEventPending(outboxEvent);
 
-        return !outboxEvent.EventId.Equals(lastSuccessfulEventId.ToString()) && IsEventPending(outboxEvent);
+
+        if (IsLastEventId(outboxEvent, lastSuccessfulEventId) && IsEventPending(outboxEvent))
+        {
+            commandRepository.MarkAsDone(lastSuccessfulEventId);
+            return false;
+        }
+
+        return IsEventPending(outboxEvent);
     }
 
     private static bool IsEventPending(OutboxEvent outboxEvent)
@@ -84,9 +90,12 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
             return statusElement.GetString()?.Equals(Status.PENDING.ToString()) ?? false;
         }
 
-        Console.WriteLine("dat was ier een problemen met nemen status");
-
         return false;
+    }
+
+    private static bool IsLastEventId(OutboxEvent outboxEvent, Guid lastSuccessfulEventId)
+    {
+        return outboxEvent.EventId.Equals(lastSuccessfulEventId.ToString());
     }
 
     private static bool IsLastEventIdSet(Guid lastSuccessfulEventId)

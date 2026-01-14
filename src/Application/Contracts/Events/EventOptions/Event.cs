@@ -1,6 +1,6 @@
 ﻿using Application.Contracts.Events.Enums;
 using Application.Contracts.Events.Factory;
-using Infrastructure.Persistence;
+using Application.Contracts.Persistence;
 
 namespace Application.Contracts.Events.EventOptions;
 
