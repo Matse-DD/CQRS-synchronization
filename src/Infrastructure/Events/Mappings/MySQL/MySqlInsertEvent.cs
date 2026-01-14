@@ -1,8 +1,10 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
+using Infrastructure.Events.Mappings.MySQL.Shared;
 using Infrastructure.Events.Mappings.Shared;
 using Infrastructure.Persistence;
 using System.Text.Json;
+using static Mysqlx.Expect.Open.Types;
 
 namespace Infrastructure.Events.Mappings.MySQL;
 
@@ -13,7 +15,9 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
         string command = $"INSERT INTO {AggregateName.Sanitize()} ({MapColumns(Properties.Keys)})\n" +
                          $"VALUES ({MapValues(Properties.Keys)})";
 
-        return new CommandInfo(command, BuildParamDict(Properties));
+        Dictionary<string, object> parametersWithValue = MapValuesToParameters(Properties);
+
+        return new CommandInfo(command, parametersWithValue);
     }
 
     private static string MapColumns(IEnumerable<string> keys)
@@ -27,7 +31,7 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
         return string.Join(", ", parameters);
     }
 
-    private static Dictionary<string, object> BuildParamDict(Dictionary<string, object> properties)
+    private static Dictionary<string, object> MapValuesToParameters(Dictionary<string, object> properties)
     {
         Dictionary<string, object> parameters = new Dictionary<string, object>();
 
