@@ -1,7 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using static Mysqlx.Expect.Open.Types;
-using static Mysqlx.Expect.Open.Types.Condition.Types;
-
+﻿using Infrastructure.Events.Mappings.Shared;
 namespace Infrastructure.Events.Mappings.MySQL.Shared;
 
 public static class SharedMySqlMappings
@@ -17,7 +14,6 @@ public static class SharedMySqlMappings
     {
         string onProperty = conditionPart.Key;
         string sign = conditionPart.Value.ExtractSign();
-        Console.WriteLine(sign);
         string parameterizedValue = $"@{prefix}_{onProperty}";
 
         if (HasConditionSign(sign))
@@ -33,6 +29,7 @@ public static class SharedMySqlMappings
     public static Dictionary<string, object> MapValuesToParameters(string prefix, Dictionary<string, string> incoming)
     {
         Dictionary<string, object> mappedValues = new Dictionary<string, object>();
+
         foreach (KeyValuePair<string, string> keyValuePair in incoming)
         {
             string onProperty = keyValuePair.Key;
