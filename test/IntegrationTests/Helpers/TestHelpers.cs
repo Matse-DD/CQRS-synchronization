@@ -17,4 +17,9 @@ public static class TestHelpers
 
         throw new TimeoutException($"Condition was not met within {timeoutMs}ms");
     }
+
+    public static async Task AssertEventuallyAsync(Func<bool> condition, int timeoutMs = 5000, int intervalMs = 100)
+    {
+        await AssertEventuallyAsync(() => Task.FromResult(condition()), timeoutMs, intervalMs);
+    }
 }
