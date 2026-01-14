@@ -279,8 +279,8 @@ public class TestHappyFlow
             .WithStatus("PENDING")
             .WithInsertPayload(new Dictionary<string, object>
             {
-                { "id", recordId.ToString() },
-                { "product_id", productId.ToString() },
+                { "id", $"'{recordId.ToString()}'" },
+                { "product_id", $"'{productId.ToString()}'" },
                 { "name", "Product To Delete" },
                 { "sku", "DELETE-TEST" },
                 { "price", 25.00 },
@@ -297,7 +297,7 @@ public class TestHappyFlow
             .WithStatus("PENDING")
             .WithDeletePayload(new Dictionary<string, object>
             {
-                { "product_id", productId.ToString() }
+                { "product_id", $"'{productId.ToString()}'" }
             })
             .Build();
 
@@ -321,8 +321,7 @@ public class TestHappyFlow
 
                 string query = "SELECT COUNT(*) FROM Products WHERE product_id = @productId";
                 await using MySqlCommand cmd = new MySqlCommand(query, connection);
-                string truncatedProductId = productId.ToString().Length > 12 ? productId.ToString().Substring(productId.ToString().Length - 12) : productId.ToString();
-                cmd.Parameters.AddWithValue("@productId", truncatedProductId);
+                cmd.Parameters.AddWithValue("@productId", $"'{productId}'");
 
                 long count = (long)(await cmd.ExecuteScalarAsync())!;
                 return count == 0;
