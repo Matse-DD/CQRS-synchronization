@@ -32,17 +32,18 @@ public static class ExtractionMethods
         {
             return ExtractStringValue(incoming);
         }
-        IEnumerable<string> splittedOnSign = SplitOnPossibleSigns(incoming);
 
+        IEnumerable<string> splittedOnSign = SplitOnPossibleSigns(incoming);
         string value = splittedOnSign.Last();
 
-        if (value.ToUpper() == "TRUE" || value.ToUpper() == "FALSE")
+        if (IsBool(value))
         {
-            return value.ToUpper() == "TRUE" ? 1 : 0;
+            return ExtractBoolValue(value);
         }
 
         return value;
     }
+
 
     private static IEnumerable<string> SplitOnPossibleSigns(string incoming)
     {
@@ -62,6 +63,11 @@ public static class ExtractionMethods
         return incoming.Substring(startIndexStringValue, stringLength);
     }
 
+    private static int ExtractBoolValue(string value)
+    {
+        return value.ToUpper() == "TRUE" ? 1 : 0;
+    }
+
     public static string Sanitize(this string value)
     {
         // TODO some sanitization bij properties
@@ -71,5 +77,11 @@ public static class ExtractionMethods
     public static bool IsString(string value)
     {
         return value.Contains('\'');
+    }
+
+    public static bool IsBool(string value)
+    {
+        string upper = value.ToUpper();
+        return upper == "TRUE" || upper == "FALSE";
     }
 }
