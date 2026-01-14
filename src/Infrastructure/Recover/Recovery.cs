@@ -84,8 +84,6 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
             return statusElement.GetString()?.Equals(Status.PENDING.ToString()) ?? false;
         }
 
-        Console.WriteLine("dat was ier een problemen met nemen status");
-
         return false;
     }
 
