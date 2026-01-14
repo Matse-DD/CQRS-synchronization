@@ -71,7 +71,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
     {
         string commandCreateDatabase = $"CREATE DATABASE IF NOT EXISTS {queryDatabaseName};";
         string commandCreateTable = $"CREATE TABLE IF NOT EXISTS last_info (id INT, last_event_id VARCHAR(36), PRIMARY KEY (id));";
-        string commandInsertTable = $"REPLACE INTO last_info VALUES(1, '{Guid.Empty}');";
+        string commandInsertTable = $"INSERT IGNORE INTO last_info(id, last_event_id) VALUES(1, '{Guid.Empty}');";
 
         using MySqlConnection connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
@@ -86,7 +86,7 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         await insertTable.ExecuteNonQueryAsync();
 
         logger.LogInformation("Created {queryDatabaseName} database with empty.", queryDatabaseName);
-        logger.LogInformation("Initialized 'last_info' table with empty GUID.");
+        logger.LogInformation("Initialized 'last_info' table.");
     }
 
     private async Task<MySqlConnection> OpenMySqlConnection()
