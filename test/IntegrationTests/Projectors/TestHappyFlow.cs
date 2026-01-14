@@ -135,6 +135,7 @@ public class TestHappyFlow
         await collection.InsertOneAsync(insertEvent);
 
         _replayer.Replay();
+        await Task.Delay(2000); // Wait for async replay to complete
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -225,6 +226,7 @@ public class TestHappyFlow
         await collection.InsertOneAsync(updateEvent);
 
         _replayer.Replay();
+        await Task.Delay(2000); // Wait for async replay to complete
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -295,6 +297,7 @@ public class TestHappyFlow
         await collection.InsertOneAsync(deleteEvent);
 
         _replayer.Replay();
+        await Task.Delay(2000); // Wait for async replay to complete
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -376,6 +379,7 @@ public class TestHappyFlow
         await collection.InsertOneAsync(secondEvent);
 
         _replayer.Replay();
+        await Task.Delay(2000); // Wait for async replay to complete
 
         // Assert
         await AssertEventuallyAsync(async () =>
