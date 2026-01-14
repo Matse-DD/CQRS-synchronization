@@ -3,7 +3,6 @@ using Application.Contracts.Events.Enums;
 using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
 using Application.Contracts.Persistence;
-using Infrastructure.Persistence;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Threading.Channels;

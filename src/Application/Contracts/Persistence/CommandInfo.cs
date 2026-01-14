@@ -1,5 +1,4 @@
-﻿
-namespace Infrastructure.Persistence;
+﻿namespace Application.Contracts.Persistence;
 
 public class CommandInfo(string pureCommand, Dictionary<string, object>? parameters = null)
 {

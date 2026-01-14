@@ -42,9 +42,9 @@ public static class SharedMySqlMappings
         return mappedValues;
     }
 
-    private static bool HasConditionSign(string value)
+    private static bool HasConditionSign(string sign)
     {
-        return value.StartsWith(">=") || value.StartsWith("<=") || value.StartsWith("<>") || value.StartsWith('>') || value.StartsWith('<') || value.StartsWith('=');
+        return sign != "";
     }
 
     private static bool DoesConditionExist(IDictionary<string, string>? condition)

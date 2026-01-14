@@ -1,4 +1,4 @@
-using Infrastructure.Persistence;
+using Application.Contracts.Persistence;
 using Infrastructure.Persistence.QueryRepository;
 using Microsoft.Extensions.Logging.Abstractions;
 using MySql.Data.MySqlClient;

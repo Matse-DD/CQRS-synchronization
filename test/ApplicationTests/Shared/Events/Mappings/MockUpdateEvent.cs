@@ -1,6 +1,6 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
-using Infrastructure.Persistence;
+using Application.Contracts.Persistence;
 
 namespace ApplicationTests.Shared.Events.Mappings;
 

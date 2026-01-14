@@ -2,6 +2,7 @@ using Application.Contracts.Events;
 using Application.Contracts.Events.Factory;
 using Application.Contracts.Persistence;
 using Infrastructure.Events.Mappings.MySQL;
+using Infrastructure.Events.Mappings.Shared;
 using Infrastructure.Persistence.CommandRepository;
 using Infrastructure.Persistence.QueryRepository;
 using Infrastructure.Projectors;
@@ -179,10 +180,10 @@ public class TestHappyFlow
     {
         // Arrange
         Guid insertEventId = Guid.NewGuid();
-        Guid productId = Guid.NewGuid();
-        string originalName = "Original Product";
+        string productId = $"'{Guid.NewGuid()}'";
+        string originalName = "'Original Product'";
         decimal originalPrice = 50.00m;
-        Guid recordId = Guid.NewGuid();
+        string recordId = $"'{Guid.NewGuid()}'";
 
         DateTime insertTimestamp = DateTime.UtcNow;
         BsonDocument insertEvent = BsonEventBuilder.Create()
@@ -192,10 +193,10 @@ public class TestHappyFlow
             .WithStatus("PENDING")
             .WithInsertPayload(new Dictionary<string, object>
             {
-                { "id", recordId.ToString() },
-                { "product_id", productId.ToString() },
+                { "id", recordId },
+                { "product_id", productId },
                 { "name", originalName },
-                { "sku", "UPDATE-TEST" },
+                { "sku", "'UPDATE-TEST'" },
                 { "price", originalPrice },
                 { "stock_level", 100 },
                 { "is_active", true }
@@ -203,15 +204,10 @@ public class TestHappyFlow
             .Build();
 
         Guid updateEventId = Guid.NewGuid();
-        string updatedName = "Updated Product Name";
+        string updatedName = "'Updated Product Name'";
         double updatedPrice = 75.50;
 
         DateTime updateTimestamp = insertTimestamp.AddMilliseconds(100);
-
-        // The projection system truncates GUIDs to last 12 chars, so use truncated value in UPDATE condition
-        string truncatedProductIdForUpdate = productId.ToString().Length > 12
-            ? productId.ToString().Substring(productId.ToString().Length - 12)
-            : productId.ToString();
 
         BsonDocument updateEvent = BsonEventBuilder.Create()
             .WithId(updateEventId)
@@ -226,7 +222,7 @@ public class TestHappyFlow
                 },
                 condition: new Dictionary<string, object>
                 {
-                    { "product_id", truncatedProductIdForUpdate }
+                    { "product_id", productId }
                 })
             .Build();
 
@@ -251,8 +247,7 @@ public class TestHappyFlow
 
                 string query = "SELECT COUNT(*) FROM Products WHERE product_id = @productId";
                 await using MySqlCommand cmd = new MySqlCommand(query, connection);
-                string truncatedProductId = productId.ToString().Length > 12 ? productId.ToString().Substring(productId.ToString().Length - 12) : productId.ToString();
-                cmd.Parameters.AddWithValue("@productId", truncatedProductId);
+                cmd.Parameters.AddWithValue("@productId", productId.ExtractValue());
 
                 long count = (long)(await cmd.ExecuteScalarAsync())!;
                 return count == 1;
@@ -269,8 +264,8 @@ public class TestHappyFlow
     {
         // Arrange
         Guid insertEventId = Guid.NewGuid();
-        Guid productId = Guid.NewGuid();
-        Guid recordId = Guid.NewGuid();
+        string productId = $"'{Guid.NewGuid()}'";
+        string recordId = $"'{Guid.NewGuid()}'";
 
         BsonDocument insertEvent = BsonEventBuilder.Create()
             .WithId(insertEventId)
@@ -279,10 +274,10 @@ public class TestHappyFlow
             .WithStatus("PENDING")
             .WithInsertPayload(new Dictionary<string, object>
             {
-                { "id", recordId.ToString() },
-                { "product_id", productId.ToString() },
-                { "name", "Product To Delete" },
-                { "sku", "DELETE-TEST" },
+                { "id", recordId },
+                { "product_id", productId },
+                { "name", "'Product To Delete'" },
+                { "sku", "'DELETE-TEST'" },
                 { "price", 25.00 },
                 { "stock_level", 10 },
                 { "is_active", false }
@@ -297,7 +292,7 @@ public class TestHappyFlow
             .WithStatus("PENDING")
             .WithDeletePayload(new Dictionary<string, object>
             {
-                { "product_id", productId.ToString() }
+                { "product_id", productId }
             })
             .Build();
 
@@ -321,8 +316,7 @@ public class TestHappyFlow
 
                 string query = "SELECT COUNT(*) FROM Products WHERE product_id = @productId";
                 await using MySqlCommand cmd = new MySqlCommand(query, connection);
-                string truncatedProductId = productId.ToString().Length > 12 ? productId.ToString().Substring(productId.ToString().Length - 12) : productId.ToString();
-                cmd.Parameters.AddWithValue("@productId", truncatedProductId);
+                cmd.Parameters.AddWithValue("@productId", productId);
 
                 long count = (long)(await cmd.ExecuteScalarAsync())!;
                 return count == 0;
@@ -348,8 +342,8 @@ public class TestHappyFlow
         Assert.That(initialLastEventId, Is.EqualTo(Guid.Empty), "Last event ID should be empty initially");
 
         Guid firstEventId = Guid.NewGuid();
-        Guid firstProductId = Guid.NewGuid();
-        Guid firstRecordId = Guid.NewGuid();
+        string firstProductId = $"'{Guid.NewGuid()}'";
+        string firstRecordId = $"'{Guid.NewGuid()}'";
 
         BsonDocument firstEvent = BsonEventBuilder.Create()
             .WithId(firstEventId)
@@ -358,10 +352,10 @@ public class TestHappyFlow
             .WithStatus("PENDING")
             .WithInsertPayload(new Dictionary<string, object>
             {
-                { "id", firstRecordId.ToString() },
-                { "product_id", firstProductId.ToString() },
-                { "name", "First Product" },
-                { "sku", "TRACK-001" },
+                { "id", firstRecordId },
+                { "product_id", firstProductId },
+                { "name", "'First Product'" },
+                { "sku", "'TRACK-001'" },
                 { "price", 10.00 },
                 { "stock_level", 5 },
                 { "is_active", true }
@@ -370,8 +364,8 @@ public class TestHappyFlow
 
         await Task.Delay(100);
         Guid secondEventId = Guid.NewGuid();
-        Guid secondProductId = Guid.NewGuid();
-        Guid secondRecordId = Guid.NewGuid();
+        string secondProductId = $"'{Guid.NewGuid()}'";
+        string secondRecordId = $"'{Guid.NewGuid()}'";
 
         BsonDocument secondEvent = BsonEventBuilder.Create()
             .WithId(secondEventId)
@@ -380,10 +374,10 @@ public class TestHappyFlow
             .WithStatus("PENDING")
             .WithInsertPayload(new Dictionary<string, object>
             {
-                { "id", secondRecordId.ToString() },
-                { "product_id", secondProductId.ToString() },
-                { "name", "Second Product" },
-                { "sku", "TRACK-002" },
+                { "id", secondRecordId },
+                { "product_id", secondProductId },
+                { "name", "'Second Product'" },
+                { "sku", "'TRACK-002'" },
                 { "price", 20.00 },
                 { "stock_level", 15 },
                 { "is_active", true }
@@ -433,10 +427,9 @@ public class TestHappyFlow
             await connection.OpenAsync();
             string query = "SELECT COUNT(*) FROM Products WHERE product_id IN (@firstProductId, @secondProductId)";
             await using MySqlCommand cmd = new MySqlCommand(query, connection);
-            string truncatedFirstProductId = firstProductId.ToString().Length > 12 ? firstProductId.ToString().Substring(firstProductId.ToString().Length - 12) : firstProductId.ToString();
-            string truncatedSecondProductId = secondProductId.ToString().Length > 12 ? secondProductId.ToString().Substring(secondProductId.ToString().Length - 12) : secondProductId.ToString();
-            cmd.Parameters.AddWithValue("@firstProductId", truncatedFirstProductId);
-            cmd.Parameters.AddWithValue("@secondProductId", truncatedSecondProductId);
+
+            cmd.Parameters.AddWithValue("@firstProductId", firstProductId.ExtractValue());
+            cmd.Parameters.AddWithValue("@secondProductId", secondProductId.ExtractValue());
             long count = (long)(await cmd.ExecuteScalarAsync())!;
             return count == 2;
         }, timeoutMs: 10000);
