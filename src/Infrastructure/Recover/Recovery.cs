@@ -42,7 +42,6 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
     private async Task<IEnumerable<string>> GetEventsToRecover()
     {
         IEnumerable<OutboxEvent> outboxEvents = await GetAllEventsFromOutbox();
-        Console.WriteLine(outboxEvents.Count());
         Guid lastSuccessfulEventId = await GetLastSuccessfulEventId();
 
         logger.LogInformation("Found last checkpoint: {EventId}. Filtering outbox to get PENDING events...", lastSuccessfulEventId);
