@@ -49,9 +49,23 @@ public class TestHappyFlow
     {
         await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringQueryRepoMySql);
         await connectionMySql.OpenAsync();
-        const string cleanupSql = "UPDATE last_info SET last_event_id = NULL WHERE id = 1";
-        await using MySqlCommand cmd = new MySqlCommand(cleanupSql, connectionMySql);
-        await cmd.ExecuteNonQueryAsync();
+        const string dropProductsSql = "DROP TABLE IF EXISTS Products";
+        await using (MySqlCommand dropProducts = new MySqlCommand(dropProductsSql, connectionMySql))
+        {
+            await dropProducts.ExecuteNonQueryAsync();
+        }
+
+        const string resetLastInfoSql = "DELETE FROM last_info;";
+        await using (MySqlCommand resetLastInfo = new MySqlCommand(resetLastInfoSql, connectionMySql))
+        {
+            await resetLastInfo.ExecuteNonQueryAsync();
+        }
+
+        const string insertLastInfoSql = "INSERT INTO last_info (id, last_event_id) VALUES (1, NULL)";
+        await using (MySqlCommand insertLastInfo = new MySqlCommand(insertLastInfoSql, connectionMySql))
+        {
+            await insertLastInfo.ExecuteNonQueryAsync();
+        }
 
         MongoUrl mongoUrl = new(ConnectionStringCommandRepoMongo);
         MongoClient client = new MongoClient(mongoUrl);
