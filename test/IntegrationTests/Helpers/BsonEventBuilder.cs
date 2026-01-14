@@ -56,7 +56,7 @@ public class BsonEventBuilder
         return this;
     }
 
-        public BsonEventBuilder WithUpdatePayload(Dictionary<string, object> change, Dictionary<string, object> condition)
+    public BsonEventBuilder WithUpdatePayload(Dictionary<string, object> change, Dictionary<string, object> condition)
     {
         _eventType = "UPDATE";
         _payload = new BsonDocument
@@ -108,12 +108,12 @@ public class BsonEventBuilder
             .Build();
     }
 
-     public static BsonDocument CreateUpdateEvent(
-        string aggregateName,
-        Dictionary<string, object> change,
-        Dictionary<string, object> condition,
-        Guid? id = null,
-        string status = "PENDING")
+    public static BsonDocument CreateUpdateEvent(
+       string aggregateName,
+       Dictionary<string, object> change,
+       Dictionary<string, object> condition,
+       Guid? id = null,
+       string status = "PENDING")
     {
         return Create()
             .WithId(id ?? Guid.NewGuid())
@@ -137,7 +137,7 @@ public class BsonEventBuilder
             .Build();
     }
 
-        public static string CreateProductInsertEvent(int productNumber, Guid? id = null)
+    public static string CreateProductInsertEvent(int productNumber, Guid? id = null)
     {
         return Create()
             .WithId(id ?? Guid.NewGuid())
