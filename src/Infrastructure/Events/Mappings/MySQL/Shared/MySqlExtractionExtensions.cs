@@ -1,9 +1,12 @@
-﻿using MySqlX.XDevAPI.Common;
-
-namespace Infrastructure.Events.Mappings.MySQL.Shared;
+﻿namespace Infrastructure.Events.Mappings.MySQL.Shared;
 
 public static class MySqlExtractionExtensions
 {
+    private static readonly IEnumerable<string> POSSIBLE_SIGNS =
+    [
+        "+", "-","*","/","<",">","<>","<=",">=", "="
+    ];
+
     public static string DetermineMySqlValue(this string incoming) //TODO mogelijks niet meer nodig
     {
         if (!incoming.IsString()) return incoming;
@@ -18,8 +21,16 @@ public static class MySqlExtractionExtensions
 
     public static string ExtractSign(this string incoming)
     {
-        if (!incoming.IsString()) return incoming;
+        if (incoming.IsString()) return ExtractSignForString(incoming);
 
+        string? sign = POSSIBLE_SIGNS.FirstOrDefault(sign => incoming.Contains(sign));
+
+        if (sign == null) return "";
+        return sign;
+    }
+
+    private static string ExtractSignForString(string incoming)
+    {
         int startIndexStringForLength = incoming.IndexOf('\'');
 
         return incoming.Substring(0, startIndexStringForLength);
@@ -31,13 +42,21 @@ public static class MySqlExtractionExtensions
         {
             return ExtractStringValue(incoming);
         }
+        IEnumerable<string> splittedOnSign = SplitOnPossibleSigns(incoming);
 
-        if (incoming.ToUpper() == "TRUE" || incoming.ToUpper() == "FALSE")
+        string value = splittedOnSign.Last();
+
+        if (value.ToUpper() == "TRUE" || value.ToUpper() == "FALSE")
         {
-            return incoming == "true" ? 1 : 0;
+            return value.ToUpper() == "TRUE" ? 1 : 0;
         }
 
-        return incoming;
+        return value;
+    }
+
+    private static IEnumerable<string> SplitOnPossibleSigns(string incoming)
+    {
+        return incoming.Split(POSSIBLE_SIGNS.ToArray(), StringSplitOptions.None);
     }
 
     private static string ExtractStringValue(string incoming)
