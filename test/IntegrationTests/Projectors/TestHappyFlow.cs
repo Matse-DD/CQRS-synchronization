@@ -43,7 +43,7 @@ public class TestHappyFlow
     {
         await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringQueryRepoMySql);
         await connectionMySql.OpenAsync();
-        const string cleanupSql = "DROP TABLE IF EXISTS Products; DELETE FROM last_info WHERE collection_name = 'events'";
+        const string cleanupSql = "DROP TABLE IF EXISTS Products; UPDATE last_info SET last_event_id = NULL WHERE id = 1";
         await using MySqlCommand cmd = new MySqlCommand(cleanupSql, connectionMySql);
         await cmd.ExecuteNonQueryAsync();
 
@@ -63,7 +63,7 @@ public class TestHappyFlow
 
         _cancellationTokenSource = new CancellationTokenSource();
         _ = _observer.StartListening(_projector.AddEvent, _cancellationTokenSource.Token);
-        
+
         await Task.Delay(500);
     }
 
@@ -75,7 +75,7 @@ public class TestHappyFlow
 
         await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringQueryRepoMySql);
         await connectionMySql.OpenAsync();
-        const string cleanupSql = "DROP TABLE IF EXISTS Products; DELETE FROM last_info WHERE collection_name = 'events'";
+        const string cleanupSql = "DROP TABLE IF EXISTS Products; UPDATE last_info SET last_event_id = NULL WHERE id = 1";
         await using MySqlCommand cmd = new MySqlCommand(cleanupSql, connectionMySql);
         await cmd.ExecuteNonQueryAsync();
 
@@ -361,7 +361,7 @@ public class TestHappyFlow
         await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
         {
             await connection.OpenAsync();
-            string query = "SELECT last_event_id FROM last_info WHERE collection_name = 'events'";
+            string query = "SELECT last_event_id FROM last_info WHERE id = 1";
             await using MySqlCommand cmd = new MySqlCommand(query, connection);
             string? storedEventId = (await cmd.ExecuteScalarAsync())?.ToString();
             Assert.That(storedEventId, Is.EqualTo(firstEventId.ToString()), "First event ID should be stored in last_info");
@@ -400,7 +400,7 @@ public class TestHappyFlow
         await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
         {
             await connection.OpenAsync();
-            string query = "SELECT last_event_id FROM last_info WHERE collection_name = 'events'";
+            string query = "SELECT last_event_id FROM last_info WHERE id = 1";
             await using MySqlCommand cmd = new MySqlCommand(query, connection);
             string? storedEventId = (await cmd.ExecuteScalarAsync())?.ToString();
             Assert.That(storedEventId, Is.EqualTo(secondEventId.ToString()), "Second event ID should replace first in last_info");
