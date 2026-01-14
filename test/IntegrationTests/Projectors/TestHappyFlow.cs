@@ -86,4 +86,72 @@ public class TestHappyFlow
         await collection.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
     }
 
+
+    [Test]
+    public async Task HappyFlow_INSERT_Should_Sync_From_MongoDB_To_MySQL()
+    {
+        // Arrange
+        Guid eventId = Guid.NewGuid();
+        Guid productId = Guid.NewGuid();
+        string productName = "Happy Flow Test Product";
+        string productSku = "HFT-001";
+        double productPrice = 99.99;
+        int stockLevel = 50;
+
+        BsonDocument insertEvent = BsonEventBuilder.Create()
+            .WithId(eventId)
+            .WithOccurredAt(DateTime.UtcNow)
+            .WithAggregateName("Products")
+            .WithStatus("PENDING")
+            .WithInsertPayload(new Dictionary<string, object>
+            {
+                { "product_id", productId.ToString() },
+                { "name", productName },
+                { "sku", productSku },
+                { "price", productPrice },
+                { "stock_level", stockLevel },
+                { "is_active", true }
+            })
+            .Build();
+
+        // Act
+        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoClient client = new MongoClient(url);
+        IMongoDatabase database = client.GetDatabase(url.DatabaseName);
+        IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
+        await collection.InsertOneAsync(insertEvent);
+
+        // Assert
+        await AssertEventuallyAsync(async () =>
+        {
+            try
+            {
+                await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+                await connection.OpenAsync();
+
+                string query = "SELECT COUNT(*) FROM Products WHERE product_id = @productId AND name = @name AND sku = @sku AND price = @price AND stock_level = @stockLevel";
+                await using MySqlCommand cmd = new MySqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@productId", productId.ToString());
+                cmd.Parameters.AddWithValue("@name", productName);
+                cmd.Parameters.AddWithValue("@sku", productSku);
+                cmd.Parameters.AddWithValue("@price", productPrice);
+                cmd.Parameters.AddWithValue("@stockLevel", stockLevel);
+
+                long count = (long)(await cmd.ExecuteScalarAsync())!;
+                return count == 1;
+            }
+            catch (MySqlException)
+            {
+                return false;
+            }
+        }, timeoutMs: 10000);
+
+        await AssertEventuallyAsync(async () =>
+        {
+            Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
+            return lastEventId == eventId;
+        }, timeoutMs: 5000);
+    }
+
+
 }
