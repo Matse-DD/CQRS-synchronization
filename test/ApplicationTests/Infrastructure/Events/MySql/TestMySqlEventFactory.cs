@@ -237,8 +237,8 @@ public class TestMySqlEventFactory
 
         string expectedMySqlCommand =
             "UPDATE Product\n" +
-            "SET price = price * 1.10, is_active = true\n" +
-            "WHERE is_active = false AND price>10";
+            "SET price = price * @Change_price, is_active = is_active  @Change_is_active\n" +
+            "WHERE is_active = @Condition_is_active AND price > @Condition_price";
 
         Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
     }
