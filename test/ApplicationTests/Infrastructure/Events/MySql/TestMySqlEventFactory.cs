@@ -1,6 +1,6 @@
 ﻿using Application.Contracts.Events.EventOptions;
+using Application.Contracts.Persistence;
 using Infrastructure.Events.Mappings.MySQL;
-using Infrastructure.Persistence;
 
 namespace ApplicationTests.Infrastructure.Events.MySql;
 
