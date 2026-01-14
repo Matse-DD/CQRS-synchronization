@@ -70,7 +70,7 @@ public static class ExtractionMethods
 
     public static string Sanitize(this string value)
     {
-        // TODO some sanitization bij properties
+        // TODO some sanitization for properties (extra safety can be done)
         return value;
     }
 
