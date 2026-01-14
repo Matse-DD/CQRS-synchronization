@@ -105,14 +105,18 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
 
         if (commandInfo.Parameters != null)
         {
-            // TODO MAP PARAMETERS METHOD
-            foreach (KeyValuePair<string, object> keyValuePair in commandInfo.Parameters)
-            {
-                cmdDataUpdate.Parameters.AddWithValue(keyValuePair.Key, keyValuePair.Value);
-            }
+            MapParametersToCommand(commandInfo, cmdDataUpdate);
         }
 
         await cmdDataUpdate.ExecuteNonQueryAsync();
+    }
+
+    private static void MapParametersToCommand(CommandInfo commandInfo, MySqlCommand cmdDataUpdate)
+    {
+        foreach (KeyValuePair<string, object> keyValuePair in commandInfo.Parameters)
+        {
+            cmdDataUpdate.Parameters.AddWithValue(keyValuePair.Key, keyValuePair.Value);
+        }
     }
 
     private async Task UpdateLastEventId(Guid eventId, MySqlConnection connection, MySqlTransaction transaction)
