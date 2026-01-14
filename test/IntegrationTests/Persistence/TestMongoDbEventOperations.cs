@@ -129,24 +129,8 @@ public class TestMongoDbEventOperations
 
         await _collection.InsertManyAsync(new[]
         {
-            BsonDocument.Parse($@"
-            {{
-                ""id"": ""{eventId1}"",
-                ""occurredAt"": ""{DateTime.UtcNow:O}"",
-                ""aggregateName"": ""TestAgg"",
-                ""status"": ""PENDING"",
-                ""eventType"": ""INSERT"",
-                ""payload"": {{}}
-            }}"),
-            BsonDocument.Parse($@"
-            {{
-                ""id"": ""{eventId2}"",
-                ""occurredAt"": ""{DateTime.UtcNow:O}"",
-                ""aggregateName"": ""TestAgg"",
-                ""status"": ""PENDING"",
-                ""eventType"": ""INSERT"",
-                ""payload"": {{}}
-            }}")
+            BsonEventBuilder.CreateInsertEvent("TestAgg", new Dictionary<string, object>(), eventId1),
+            BsonEventBuilder.CreateInsertEvent("TestAgg", new Dictionary<string, object>(), eventId2)
         });
 
         // Act
