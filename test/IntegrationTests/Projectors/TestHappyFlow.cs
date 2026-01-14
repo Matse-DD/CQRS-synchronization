@@ -154,4 +154,88 @@ public class TestHappyFlow
     }
 
 
+    [Test]
+    public async Task HappyFlow_UPDATE_Should_Sync_From_MongoDB_To_MySQL()
+    {
+        // Arrange
+        Guid insertEventId = Guid.NewGuid();
+        Guid productId = Guid.NewGuid();
+        string originalName = "Original Product";
+        decimal originalPrice = 50.00m;
+
+        BsonDocument insertEvent = BsonEventBuilder.Create()
+            .WithId(insertEventId)
+            .WithOccurredAt(DateTime.UtcNow)
+            .WithAggregateName("Products")
+            .WithStatus("PENDING")
+            .WithInsertPayload(new Dictionary<string, object>
+            {
+                { "product_id", productId.ToString() },
+                { "name", originalName },
+                { "sku", "UPDATE-TEST" },
+                { "price", originalPrice },
+                { "stock_level", 100 },
+                { "is_active", true }
+            })
+            .Build();
+
+        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoClient client = new MongoClient(url);
+        IMongoDatabase database = client.GetDatabase(url.DatabaseName);
+        IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
+        await collection.InsertOneAsync(insertEvent);
+
+        await AssertEventuallyAsync(async () =>
+        {
+            Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
+            return lastEventId == insertEventId;
+        }, timeoutMs: 5000);
+
+        // Act
+        Guid updateEventId = Guid.NewGuid();
+        string updatedName = "Updated Product Name";
+        double updatedPrice = 75.50;
+
+        BsonDocument updateEvent = BsonEventBuilder.Create()
+            .WithId(updateEventId)
+            .WithOccurredAt(DateTime.UtcNow)
+            .WithAggregateName("Products")
+            .WithStatus("PENDING")
+            .WithUpdatePayload(
+                change: new Dictionary<string, object>
+                {
+                    { "name", updatedName },
+                    { "price", updatedPrice }
+                },
+                condition: new Dictionary<string, object>
+                {
+                    { "product_id", productId.ToString() }
+                })
+            .Build();
+
+        await collection.InsertOneAsync(updateEvent);
+
+        // Assert
+        await AssertEventuallyAsync(async () =>
+        {
+            await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+            await connection.OpenAsync();
+
+            string query = "SELECT COUNT(*) FROM Products WHERE product_id = @productId AND name = @name AND price = @price";
+            await using MySqlCommand cmd = new MySqlCommand(query, connection);
+            cmd.Parameters.AddWithValue("@productId", productId.ToString());
+            cmd.Parameters.AddWithValue("@name", updatedName);
+            cmd.Parameters.AddWithValue("@price", updatedPrice);
+
+            long count = (long)(await cmd.ExecuteScalarAsync())!;
+            return count == 1;
+        }, timeoutMs: 5000);
+
+        await AssertEventuallyAsync(async () =>
+        {
+            Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
+            return lastEventId == updateEventId;
+        }, timeoutMs: 5000);
+    }
+
 }
