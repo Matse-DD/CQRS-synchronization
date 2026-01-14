@@ -2,7 +2,6 @@ using Application.Contracts.Events;
 using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Persistence;
 using Infrastructure.Persistence;
-using System;
 using System.Text.Json;
 
 namespace Infrastructure.Events.Mappings.MySQL;
@@ -15,17 +14,12 @@ public class MySqlSchemaBuilder : ISchemaBuilder
     {
         string aggregateName = insertEvent.AggregateName;
 
-        if (!DoesTableExists(aggregateName))
-        {
-            string createCommand = $"CREATE TABLE IF NOT EXISTS {aggregateName} ({MapFields(insertEvent.Properties)})";
+        if (DoesTableExists(aggregateName)) return;
 
-            CommandInfo create = new CommandInfo(createCommand);
-            await mySqlQueryRepository.Execute(create, Guid.Empty);
+        string command = $"CREATE TABLE IF NOT EXISTS {aggregateName} ({MapFields(insertEvent.Properties)})";
 
-            alreadyCreatedTables.Add(aggregateName);
-        }
-
-        await EnsureColumnsExist(mySqlQueryRepository, aggregateName, insertEvent.Properties);
+        CommandInfo commandInfo = new CommandInfo(command);
+        await mySqlQueryRepository.Execute(commandInfo, insertEvent.EventId);
     }
 
     private bool DoesTableExists(string aggregateName)
@@ -35,22 +29,15 @@ public class MySqlSchemaBuilder : ISchemaBuilder
 
     private string MapFields(IDictionary<string, object> properties)
     {
-        List<string> mappedColumns = new();
-
+        ICollection<string> resultArr = [];
         foreach (KeyValuePair<string, object> pair in properties)
         {
-            mappedColumns.Add($"{pair.Key} {DetermineDataType(pair.Key, pair.Value)}");
+            resultArr.Add($"{pair.Key} {DetermineDataType(pair.Key, pair.Value)}");
         }
 
-        string primaryKey = DeterminePrimaryKey(properties.Keys);
-        if (!properties.ContainsKey(primaryKey))
-        {
-            mappedColumns.Insert(0, $"{primaryKey} VARCHAR(60)");
-        }
+        resultArr.Add($"PRIMARY KEY (id)");
 
-        mappedColumns.Add($"PRIMARY KEY ({primaryKey})");
-
-        return string.Join(", ", mappedColumns);
+        return string.Join(", ", resultArr);
     }
 
     private string DetermineDataType(string key, object value)
@@ -68,34 +55,5 @@ public class MySqlSchemaBuilder : ISchemaBuilder
             JsonValueKind.Array => "JSON",
             _ => throw new ArgumentOutOfRangeException()
         };
-    }
-
-    private static string DeterminePrimaryKey(IEnumerable<string> keys)
-    {
-        string? exactId = keys.FirstOrDefault(key => string.Equals(key, "id", StringComparison.OrdinalIgnoreCase));
-        if (exactId != null)
-        {
-            return exactId;
-        }
-
-        string? suffixedId = keys.FirstOrDefault(key => key.EndsWith("_id", StringComparison.OrdinalIgnoreCase));
-        if (suffixedId != null)
-        {
-            return suffixedId;
-        }
-
-        string? firstKey = keys.FirstOrDefault();
-        return string.IsNullOrWhiteSpace(firstKey) ? "id" : firstKey;
-    }
-
-    private async Task EnsureColumnsExist(IQueryRepository repository, string aggregateName, IDictionary<string, object> properties)
-    {
-        foreach (KeyValuePair<string, object> column in properties)
-        {
-            string columnDefinition = $"ALTER TABLE {aggregateName} ADD COLUMN IF NOT EXISTS {column.Key} {DetermineDataType(column.Key, column.Value)}";
-
-            CommandInfo addColumn = new CommandInfo(columnDefinition);
-            await repository.Execute(addColumn, Guid.Empty);
-        }
     }
 }

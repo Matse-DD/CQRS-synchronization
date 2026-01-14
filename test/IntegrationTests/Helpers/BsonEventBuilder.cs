@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using MongoDB.Bson;
 
 namespace IntegrationTests.Helpers;
@@ -52,7 +55,14 @@ public class BsonEventBuilder
     public BsonEventBuilder WithInsertPayload(Dictionary<string, object> fields)
     {
         _eventType = "INSERT";
-        _payload = new BsonDocument(fields.Select(kvp => new BsonElement(kvp.Key, BsonValue.Create(kvp.Value))));
+        Dictionary<string, object> payloadFields = new(fields);
+
+        if (!payloadFields.ContainsKey("id"))
+        {
+            payloadFields["id"] = Guid.NewGuid().ToString();
+        }
+
+        _payload = new BsonDocument(payloadFields.Select(kvp => new BsonElement(kvp.Key, BsonValue.Create(kvp.Value))));
         return this;
     }
 
@@ -104,7 +114,7 @@ public class BsonEventBuilder
             .WithId(id ?? Guid.NewGuid())
             .WithAggregateName(aggregateName)
             .WithStatus(status)
-            .WithInsertPayload(payload)
+            .WithInsertPayload(AddIdIfMissing(payload))
             .Build();
     }
 
@@ -144,6 +154,7 @@ public class BsonEventBuilder
             .WithAggregateName("Products")
             .WithInsertPayload(new Dictionary<string, object>
             {
+                { "id", Guid.NewGuid().ToString() },
                 { "product_id", Guid.NewGuid().ToString() },
                 { "name", $"Test Product {productNumber}" },
                 { "sku", $"TEST-{productNumber}" },
@@ -152,5 +163,20 @@ public class BsonEventBuilder
                 { "is_active", true }
             })
             .BuildAsJson();
+    }
+
+    private static Dictionary<string, object> AddIdIfMissing(Dictionary<string, object> payload)
+    {
+        if (payload.ContainsKey("id"))
+        {
+            return payload;
+        }
+
+        Dictionary<string, object> enriched = new(payload)
+        {
+            ["id"] = Guid.NewGuid().ToString()
+        };
+
+        return enriched;
     }
 }

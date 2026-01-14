@@ -94,6 +94,7 @@ public class TestHappyFlow
         string productSku = "HFT-001";
         double productPrice = 99.99;
         int stockLevel = 50;
+        Guid recordId = Guid.NewGuid();
 
         BsonDocument insertEvent = BsonEventBuilder.Create()
             .WithId(eventId)
@@ -102,6 +103,7 @@ public class TestHappyFlow
             .WithStatus("PENDING")
             .WithInsertPayload(new Dictionary<string, object>
             {
+                { "id", recordId.ToString() },
                 { "product_id", productId.ToString() },
                 { "name", productName },
                 { "sku", productSku },
@@ -160,6 +162,7 @@ public class TestHappyFlow
         Guid productId = Guid.NewGuid();
         string originalName = "Original Product";
         decimal originalPrice = 50.00m;
+        Guid recordId = Guid.NewGuid();
 
         BsonDocument insertEvent = BsonEventBuilder.Create()
             .WithId(insertEventId)
@@ -168,6 +171,7 @@ public class TestHappyFlow
             .WithStatus("PENDING")
             .WithInsertPayload(new Dictionary<string, object>
             {
+                { "id", recordId.ToString() },
                 { "product_id", productId.ToString() },
                 { "name", originalName },
                 { "sku", "UPDATE-TEST" },
@@ -237,6 +241,7 @@ public class TestHappyFlow
         // Arrange
         Guid insertEventId = Guid.NewGuid();
         Guid productId = Guid.NewGuid();
+        Guid recordId = Guid.NewGuid();
 
         BsonDocument insertEvent = BsonEventBuilder.Create()
             .WithId(insertEventId)
@@ -245,6 +250,7 @@ public class TestHappyFlow
             .WithStatus("PENDING")
             .WithInsertPayload(new Dictionary<string, object>
             {
+                { "id", recordId.ToString() },
                 { "product_id", productId.ToString() },
                 { "name", "Product To Delete" },
                 { "sku", "DELETE-TEST" },
@@ -306,6 +312,7 @@ public class TestHappyFlow
 
         Guid firstEventId = Guid.NewGuid();
         Guid firstProductId = Guid.NewGuid();
+        Guid firstRecordId = Guid.NewGuid();
 
         BsonDocument firstEvent = BsonEventBuilder.Create()
             .WithId(firstEventId)
@@ -314,6 +321,7 @@ public class TestHappyFlow
             .WithStatus("PENDING")
             .WithInsertPayload(new Dictionary<string, object>
             {
+                { "id", firstRecordId.ToString() },
                 { "product_id", firstProductId.ToString() },
                 { "name", "First Product" },
                 { "sku", "TRACK-001" },
@@ -326,6 +334,7 @@ public class TestHappyFlow
         await Task.Delay(100);
         Guid secondEventId = Guid.NewGuid();
         Guid secondProductId = Guid.NewGuid();
+        Guid secondRecordId = Guid.NewGuid();
 
         BsonDocument secondEvent = BsonEventBuilder.Create()
             .WithId(secondEventId)
@@ -334,6 +343,7 @@ public class TestHappyFlow
             .WithStatus("PENDING")
             .WithInsertPayload(new Dictionary<string, object>
             {
+                { "id", secondRecordId.ToString() },
                 { "product_id", secondProductId.ToString() },
                 { "name", "Second Product" },
                 { "sku", "TRACK-002" },
