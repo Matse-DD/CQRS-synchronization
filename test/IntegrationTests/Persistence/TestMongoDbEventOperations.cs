@@ -152,15 +152,7 @@ public class TestMongoDbEventOperations
     {
         // Arrange
         Guid eventId = Guid.NewGuid();
-        BsonDocument doc = BsonDocument.Parse($@"
-            {{
-                ""id"": ""{eventId}"",
-                ""occurredAt"": ""{DateTime.UtcNow:O}"",
-                ""aggregateName"": ""TestAgg"",
-                ""status"": ""PENDING"",
-                ""eventType"": ""INSERT"",
-                ""payload"": {{}}
-            }}");
+        BsonDocument doc = BsonEventBuilder.CreateInsertEvent("TestAgg", new Dictionary<string, object>(), eventId);
 
         await _collection.InsertOneAsync(doc);
 
