@@ -136,4 +136,21 @@ public class BsonEventBuilder
             .WithDeletePayload(condition)
             .Build();
     }
+
+        public static string CreateProductInsertEvent(int productNumber, Guid? id = null)
+    {
+        return Create()
+            .WithId(id ?? Guid.NewGuid())
+            .WithAggregateName("Products")
+            .WithInsertPayload(new Dictionary<string, object>
+            {
+                { "product_id", Guid.NewGuid().ToString() },
+                { "name", $"Test Product {productNumber}" },
+                { "sku", $"TEST-{productNumber}" },
+                { "price", 10 + productNumber },
+                { "stock_level", 100 },
+                { "is_active", true }
+            })
+            .BuildAsJson();
+    }
 }
