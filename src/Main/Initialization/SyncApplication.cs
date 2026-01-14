@@ -10,7 +10,7 @@ public class SyncApplication(Replayer replay, Recovery recover, IObserver observ
     public async Task RunAsync(CancellationToken cancellationToken = default)
     {
         recover.Recover();
-        //replay.Replay(); // TODO use this in a seperate branch so we can call upon this with a webapi 
+        //replay.Replay(); // This can be used instead of recover it replays all events instead of just the pending events.
         await observer.StartListening(projector.AddEvent, cancellationToken);
     }
 }
