@@ -1,9 +1,8 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
-using Google.Protobuf.WellKnownTypes;
 using Infrastructure.Events.Mappings.MySQL.Shared;
+using Infrastructure.Events.Mappings.Shared;
 using Infrastructure.Persistence;
-using MySql.Data.MySqlClient;
 
 namespace Infrastructure.Events.Mappings.MySQL;
 

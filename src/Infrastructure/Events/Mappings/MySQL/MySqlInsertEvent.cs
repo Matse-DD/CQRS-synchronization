@@ -1,6 +1,6 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
-using Infrastructure.Events.Mappings.MySQL.Shared;
+using Infrastructure.Events.Mappings.Shared;
 using Infrastructure.Persistence;
 using System.Text.Json;
 
@@ -10,7 +10,7 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
 {
     public override PersistenceCommandInfo GetCommandInfo()
     {
-        string command = $"INSERT INTO {AggregateName} ({MapColumns(Properties.Keys)})\n" +
+        string command = $"INSERT INTO {AggregateName.Sanitize()} ({MapColumns(Properties.Keys)})\n" +
                          $"VALUES ({MapValues(Properties.Keys)})";
 
         return new PersistenceCommandInfo(command, BuildParamDict(Properties));
