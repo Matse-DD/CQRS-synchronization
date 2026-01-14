@@ -65,7 +65,12 @@ public static class ExtractionMethods
 
     private static int ExtractBoolValue(string value)
     {
-        return value.ToUpper() == "TRUE" ? 1 : 0;
+        
+        if (value.toUpperCase() === "TRUE") {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 
     public static string Sanitize(this string value)
