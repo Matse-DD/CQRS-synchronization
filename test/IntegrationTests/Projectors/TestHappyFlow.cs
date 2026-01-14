@@ -2,11 +2,9 @@ using Application.Contracts.Events;
 using Application.Contracts.Events.Factory;
 using Application.Contracts.Persistence;
 using Infrastructure.Events.Mappings.MySQL;
-using Infrastructure.Observer;
 using Infrastructure.Persistence.CommandRepository;
 using Infrastructure.Persistence.QueryRepository;
 using Infrastructure.Projectors;
-using Infrastructure.Recover;
 using IntegrationTests.Helpers;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson;
@@ -109,9 +107,8 @@ public class TestHappyFlow
         IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
         await collection.InsertOneAsync(insertEvent);
-
-        Recovery recovery = new(_commandRepo, _queryRepo, _projector, NullLogger<Recovery>.Instance);
-        recovery.Recover();
+        _projector.AddEvent(insertEvent.ToJson());
+        await Task.Delay(500);
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -175,9 +172,7 @@ public class TestHappyFlow
         IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
         await collection.InsertOneAsync(insertEvent);
-
-        Recovery recovery = new(_commandRepo, _queryRepo, _projector, NullLogger<Recovery>.Instance);
-        recovery.Recover();
+        _projector.AddEvent(insertEvent.ToJson());
         await Task.Delay(500);
 
         await AssertEventuallyAsync(async () =>
@@ -209,7 +204,7 @@ public class TestHappyFlow
             .Build();
 
         await collection.InsertOneAsync(updateEvent);
-        recovery.Recover();
+        _projector.AddEvent(updateEvent.ToJson());
         await Task.Delay(500);
 
         // Assert
@@ -263,9 +258,7 @@ public class TestHappyFlow
         IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
         await collection.InsertOneAsync(insertEvent);
-
-        Recovery recovery = new(_commandRepo, _queryRepo, _projector, NullLogger<Recovery>.Instance);
-        recovery.Recover();
+        _projector.AddEvent(insertEvent.ToJson());
         await Task.Delay(500);
 
         await AssertEventuallyAsync(async () =>
@@ -299,7 +292,7 @@ public class TestHappyFlow
             .Build();
 
         await collection.InsertOneAsync(deleteEvent);
-        recovery.Recover();
+        _projector.AddEvent(deleteEvent.ToJson());
         await Task.Delay(500);
 
         // Assert
@@ -355,9 +348,7 @@ public class TestHappyFlow
         IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
         await collection.InsertOneAsync(firstEvent);
-
-        Recovery recovery = new(_commandRepo, _queryRepo, _projector, NullLogger<Recovery>.Instance);
-        recovery.Recover();
+        _projector.AddEvent(firstEvent.ToJson());
         await Task.Delay(500);
 
         // Assert 1
@@ -398,7 +389,7 @@ public class TestHappyFlow
             .Build();
 
         await collection.InsertOneAsync(secondEvent);
-        recovery.Recover();
+        _projector.AddEvent(secondEvent.ToJson());
         await Task.Delay(500);
 
         // Assert 2
