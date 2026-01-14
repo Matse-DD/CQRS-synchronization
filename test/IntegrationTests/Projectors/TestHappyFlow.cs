@@ -238,4 +238,87 @@ public class TestHappyFlow
         }, timeoutMs: 5000);
     }
 
+    [Test]
+    public async Task HappyFlow_DELETE_Should_Sync_From_MongoDB_To_MySQL()
+    {
+        // Arrange
+        Guid insertEventId = Guid.NewGuid();
+        Guid productId = Guid.NewGuid();
+
+        BsonDocument insertEvent = BsonEventBuilder.Create()
+            .WithId(insertEventId)
+            .WithOccurredAt(DateTime.UtcNow)
+            .WithAggregateName("Products")
+            .WithStatus("PENDING")
+            .WithInsertPayload(new Dictionary<string, object>
+            {
+                { "product_id", productId.ToString() },
+                { "name", "Product To Delete" },
+                { "sku", "DELETE-TEST" },
+                { "price", 25.00 },
+                { "stock_level", 10 },
+                { "is_active", false }
+            })
+            .Build();
+
+        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoClient client = new MongoClient(url);
+        IMongoDatabase database = client.GetDatabase(url.DatabaseName);
+        IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
+        await collection.InsertOneAsync(insertEvent);
+
+        await AssertEventuallyAsync(async () =>
+        {
+            Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
+            return lastEventId == insertEventId;
+        }, timeoutMs: 5000);
+
+        await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
+        {
+            await connection.OpenAsync();
+            string checkQuery = "SELECT COUNT(*) FROM Products WHERE product_id = @productId";
+            await using MySqlCommand checkCmd = new MySqlCommand(checkQuery, connection);
+            checkCmd.Parameters.AddWithValue("@productId", productId.ToString());
+            long countBefore = (long)(await checkCmd.ExecuteScalarAsync())!;
+            Assert.That(countBefore, Is.EqualTo(1), "Product should exist before deletion");
+        }
+
+        // Act
+        Guid deleteEventId = Guid.NewGuid();
+
+        BsonDocument deleteEvent = BsonEventBuilder.Create()
+            .WithId(deleteEventId)
+            .WithOccurredAt(DateTime.UtcNow)
+            .WithAggregateName("Products")
+            .WithStatus("PENDING")
+            .WithDeletePayload(new Dictionary<string, object>
+            {
+                { "product_id", productId.ToString() }
+            })
+            .Build();
+
+        await collection.InsertOneAsync(deleteEvent);
+
+        // Assert
+        await AssertEventuallyAsync(async () =>
+        {
+            await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+            await connection.OpenAsync();
+
+            string query = "SELECT COUNT(*) FROM Products WHERE product_id = @productId";
+            await using MySqlCommand cmd = new MySqlCommand(query, connection);
+            cmd.Parameters.AddWithValue("@productId", productId.ToString());
+
+            long count = (long)(await cmd.ExecuteScalarAsync())!;
+            return count == 0;
+        }, timeoutMs: 5000);
+
+        await AssertEventuallyAsync(async () =>
+        {
+            Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
+            return lastEventId == deleteEventId;
+        }, timeoutMs: 5000);
+    }
+
+
 }
