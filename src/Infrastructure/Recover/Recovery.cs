@@ -71,7 +71,8 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         if (!IsLastEventIdSet(lastSuccessfulEventId)) return IsEventPending(outboxEvent);
 
 
-        if(IsLastEventId(outboxEvent, lastSuccessfulEventId) && IsEventPending(outboxEvent)){
+        if (IsLastEventId(outboxEvent, lastSuccessfulEventId) && IsEventPending(outboxEvent))
+        {
             commandRepository.MarkAsDone(lastSuccessfulEventId);
             return false;
         }
