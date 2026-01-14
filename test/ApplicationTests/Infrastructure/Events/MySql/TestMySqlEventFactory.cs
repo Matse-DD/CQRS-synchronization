@@ -65,7 +65,7 @@ public class TestMySqlEventFactory
 
         // Act
         Event determinedEvent = _eventFactory.DetermineEvent(insertEventMessage);
-        PersistenceCommandInfo mySqlCommandInfo = determinedEvent.GetCommandInfo();
+        CommandInfo mySqlCommandInfo = determinedEvent.GetCommandInfo();
 
         // Assert
         Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlInsertEvent)));
@@ -156,7 +156,7 @@ public class TestMySqlEventFactory
 
         // Act
         Event determinedEvent = _eventFactory.DetermineEvent(deleteEventMessage);
-        PersistenceCommandInfo mySqlCommandInfo = determinedEvent.GetCommandInfo();
+        CommandInfo mySqlCommandInfo = determinedEvent.GetCommandInfo();
 
         // Assert
         Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlDeleteEvent)));

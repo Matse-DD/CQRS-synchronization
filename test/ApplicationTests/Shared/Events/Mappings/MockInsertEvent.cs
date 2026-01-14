@@ -6,7 +6,7 @@ namespace ApplicationTests.Shared.Events.Mappings;
 
 public class MockInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent(intermediateEvent)
 {
-    public override PersistenceCommandInfo GetCommandInfo()
+    public override CommandInfo GetCommandInfo()
     {
         return new($"insert {EventId.ToString()}");
     }

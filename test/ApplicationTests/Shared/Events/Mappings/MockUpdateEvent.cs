@@ -6,7 +6,7 @@ namespace ApplicationTests.Shared.Events.Mappings;
 
 public class MockUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent(intermediateEvent)
 {
-    public override PersistenceCommandInfo GetCommandInfo()
+    public override CommandInfo GetCommandInfo()
     {
         return new($"update {EventId.ToString()}");
     }

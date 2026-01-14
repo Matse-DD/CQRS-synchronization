@@ -11,7 +11,7 @@ public class SynchronizedQueryRepository(int expectedCount) : IQueryRepository
 
     public IReadOnlyList<string> History => _history;
 
-    public Task Execute(PersistenceCommandInfo commandInfo, Guid eventId)
+    public Task Execute(CommandInfo commandInfo, Guid eventId)
     {
         lock (_history)
         {

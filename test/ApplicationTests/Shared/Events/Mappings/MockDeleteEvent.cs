@@ -6,7 +6,7 @@ namespace ApplicationTests.Shared.Events.Mappings;
 
 public class MockDeleteEvent(IntermediateEvent intermediateEvent) : DeleteEvent(intermediateEvent)
 {
-    public override PersistenceCommandInfo GetCommandInfo()
+    public override CommandInfo GetCommandInfo()
     {
         return new($"delete {EventId.ToString()}");
     }

@@ -123,7 +123,7 @@ public class Projector
 
     private async Task Project(Event convertedEvent)
     {
-        PersistenceCommandInfo commandInfoForEvent = convertedEvent.GetCommandInfo();
+        CommandInfo commandInfoForEvent = convertedEvent.GetCommandInfo();
         Guid eventId = convertedEvent.EventId;
 
         _logger.LogDebug("Projecting Event {EventId}", eventId);

@@ -8,7 +8,7 @@ public class MockQueryRepository : IQueryRepository
     public ICollection<string> History { get; private set; } = [];
     public Guid LastSuccessfulEventId { get; set; }
 
-    public Task Execute(PersistenceCommandInfo commandinfo, Guid eventId)
+    public Task Execute(CommandInfo commandinfo, Guid eventId)
     {
         string stringCommand = commandinfo.PureCommand;
         string lowerCommand = stringCommand.ToLower();

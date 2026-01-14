@@ -8,12 +8,12 @@ namespace Infrastructure.Events.Mappings.MySQL;
 
 public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent(intermediateEvent)
 {
-    public override PersistenceCommandInfo GetCommandInfo()
+    public override CommandInfo GetCommandInfo()
     {
         string command = $"INSERT INTO {AggregateName.Sanitize()} ({MapColumns(Properties.Keys)})\n" +
                          $"VALUES ({MapValues(Properties.Keys)})";
 
-        return new PersistenceCommandInfo(command, BuildParamDict(Properties));
+        return new CommandInfo(command, BuildParamDict(Properties));
     }
 
     private static string MapColumns(IEnumerable<string> keys)

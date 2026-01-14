@@ -18,7 +18,7 @@ public class MySqlSchemaBuilder : ISchemaBuilder
 
         string command = $"CREATE TABLE IF NOT EXISTS {aggregateName} ({MapFields(insertEvent.Properties)})";
 
-        PersistenceCommandInfo commandInfo = new PersistenceCommandInfo(command);
+        CommandInfo commandInfo = new CommandInfo(command);
         await mySqlQueryRepository.Execute(commandInfo, insertEvent.EventId);
     }
 

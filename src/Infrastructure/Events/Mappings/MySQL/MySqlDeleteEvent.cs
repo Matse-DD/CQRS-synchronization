@@ -8,12 +8,12 @@ namespace Infrastructure.Events.Mappings.MySQL;
 
 public class MySqlDeleteEvent(IntermediateEvent intermediateEvent) : DeleteEvent(intermediateEvent)
 {
-    public override PersistenceCommandInfo GetCommandInfo()
+    public override CommandInfo GetCommandInfo()
     {
         string command = $"DELETE FROM {AggregateName.Sanitize()} WHERE {SharedMySqlMappings.MapWhere(nameof(Condition),Condition)}";
 
         Dictionary<string, object> parametersWithValue = SharedMySqlMappings.MapValuesToParameters(nameof(Condition),Condition);
 
-        return new PersistenceCommandInfo(command, parametersWithValue);
+        return new CommandInfo(command, parametersWithValue);
     }
 }
