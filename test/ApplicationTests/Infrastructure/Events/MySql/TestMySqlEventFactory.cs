@@ -163,7 +163,7 @@ public class TestMySqlEventFactory
         const string expectedMySqlCommand = "DELETE FROM Product WHERE name = @name AND price>@price";
         Assert.That(mySqlCommandInfo.PureCommand, Is.EqualTo(expectedMySqlCommand));
 
-        Assert.That(mySqlCommandInfo.Parameters["@name"],Is.EqualTo("gene''s in a bottle"));
+        Assert.That(mySqlCommandInfo.Parameters["@name"], Is.EqualTo("gene''s in a bottle"));
         //Assert.That(mySqlCommandInfo.Parameters["@price"], Is.EqualTo(10));
     }
 

@@ -10,9 +10,9 @@ public class MySqlDeleteEvent(IntermediateEvent intermediateEvent) : DeleteEvent
 {
     public override CommandInfo GetCommandInfo()
     {
-        string command = $"DELETE FROM {AggregateName.Sanitize()} WHERE {SharedMySqlMappings.MapWhere(nameof(Condition),Condition)}";
+        string command = $"DELETE FROM {AggregateName.Sanitize()} WHERE {SharedMySqlMappings.MapWhere(nameof(Condition), Condition)}";
 
-        Dictionary<string, object> parametersWithValue = SharedMySqlMappings.MapValuesToParameters(nameof(Condition),Condition);
+        Dictionary<string, object> parametersWithValue = SharedMySqlMappings.MapValuesToParameters(nameof(Condition), Condition);
 
         return new CommandInfo(command, parametersWithValue);
     }

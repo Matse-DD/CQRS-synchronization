@@ -12,7 +12,7 @@ public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent
     {
         string command = $"UPDATE {AggregateName.Sanitize()}\n" +
                          $"SET {MapSet(nameof(Change), Change)}\n" +
-                         $"WHERE {SharedMySqlMappings.MapWhere(nameof(Condition),Condition)}";
+                         $"WHERE {SharedMySqlMappings.MapWhere(nameof(Condition), Condition)}";
 
         Dictionary<string, object> parametersCondition = SharedMySqlMappings.MapValuesToParameters(nameof(Condition), Condition);
         Dictionary<string, object> parametersChange = SharedMySqlMappings.MapValuesToParameters(nameof(Change), Change);

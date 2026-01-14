@@ -60,7 +60,7 @@ public class MongoDbCommandRepository : ICommandRepository
             _logger.LogInformation("Marked event {EventId} as DONE", eventId);
         }
 
-        return result.IsAcknowledged == true 
+        return result.IsAcknowledged == true
                && result.ModifiedCount > 0;
     }
 
