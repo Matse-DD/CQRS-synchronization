@@ -2,6 +2,7 @@ using Application.Contracts.Events;
 using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Persistence;
 using Infrastructure.Persistence;
+using System;
 using System.Text.Json;
 
 namespace Infrastructure.Events.Mappings.MySQL;
@@ -14,14 +15,17 @@ public class MySqlSchemaBuilder : ISchemaBuilder
     {
         string aggregateName = insertEvent.AggregateName;
 
-        if (DoesTableExists(aggregateName)) return;
+        if (!DoesTableExists(aggregateName))
+        {
+            string createCommand = $"CREATE TABLE IF NOT EXISTS {aggregateName} ({MapFields(insertEvent.Properties)})";
 
-        string command = $"CREATE TABLE IF NOT EXISTS {aggregateName} ({MapFields(insertEvent.Properties)})";
+            CommandInfo create = new CommandInfo(createCommand);
+            await mySqlQueryRepository.Execute(create, Guid.Empty);
 
-        CommandInfo commandInfo = new CommandInfo(command);
-        await mySqlQueryRepository.Execute(commandInfo, insertEvent.EventId);
+            alreadyCreatedTables.Add(aggregateName);
+        }
 
-        alreadyCreatedTables.Add(aggregateName);
+        await EnsureColumnsExist(mySqlQueryRepository, aggregateName, insertEvent.Properties);
     }
 
     private bool DoesTableExists(string aggregateName)
@@ -82,5 +86,16 @@ public class MySqlSchemaBuilder : ISchemaBuilder
 
         string? firstKey = keys.FirstOrDefault();
         return string.IsNullOrWhiteSpace(firstKey) ? "id" : firstKey;
+    }
+
+    private async Task EnsureColumnsExist(IQueryRepository repository, string aggregateName, IDictionary<string, object> properties)
+    {
+        foreach (KeyValuePair<string, object> column in properties)
+        {
+            string columnDefinition = $"ALTER TABLE {aggregateName} ADD COLUMN IF NOT EXISTS {column.Key} {DetermineDataType(column.Key, column.Value)}";
+
+            CommandInfo addColumn = new CommandInfo(columnDefinition);
+            await repository.Execute(addColumn, Guid.Empty);
+        }
     }
 }
