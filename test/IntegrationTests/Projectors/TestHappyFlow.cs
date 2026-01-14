@@ -19,7 +19,7 @@ public class TestHappyFlow
 {
     private const string ConnectionStringToStartRepoMySql = "Server=localhost;Port=13306;User=root;Password=;";
     private const string ConnectionStringQueryRepoMySql = "Server=localhost;Port=13306;Database=cqrs_read;User=root;Password=;";
-    private const string ConnectionStringCommandRepoMongo = "mongodb://localhost:27017/users?directConnection=true&replicaSet=rs0";
+    private const string ConnectionStringCommandRepoMongo = "mongodb://localhost:27017/users?connect=direct&replicaSet=rs0";
 
     private ICommandRepository _commandRepo;
     private IQueryRepository _queryRepo;
@@ -178,6 +178,7 @@ public class TestHappyFlow
 
         Recovery recovery = new(_commandRepo, _queryRepo, _projector, NullLogger<Recovery>.Instance);
         recovery.Recover();
+        await Task.Delay(500);
 
         await AssertEventuallyAsync(async () =>
         {
@@ -209,6 +210,7 @@ public class TestHappyFlow
 
         await collection.InsertOneAsync(updateEvent);
         recovery.Recover();
+        await Task.Delay(500);
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -264,6 +266,7 @@ public class TestHappyFlow
 
         Recovery recovery = new(_commandRepo, _queryRepo, _projector, NullLogger<Recovery>.Instance);
         recovery.Recover();
+        await Task.Delay(500);
 
         await AssertEventuallyAsync(async () =>
         {
@@ -297,6 +300,7 @@ public class TestHappyFlow
 
         await collection.InsertOneAsync(deleteEvent);
         recovery.Recover();
+        await Task.Delay(500);
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -354,6 +358,7 @@ public class TestHappyFlow
 
         Recovery recovery = new(_commandRepo, _queryRepo, _projector, NullLogger<Recovery>.Instance);
         recovery.Recover();
+        await Task.Delay(500);
 
         // Assert 1
         await AssertEventuallyAsync(async () =>
@@ -394,6 +399,7 @@ public class TestHappyFlow
 
         await collection.InsertOneAsync(secondEvent);
         recovery.Recover();
+        await Task.Delay(500);
 
         // Assert 2
         await AssertEventuallyAsync(async () =>
