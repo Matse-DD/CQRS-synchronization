@@ -55,4 +55,16 @@ public class BsonEventBuilder
         _payload = new BsonDocument(fields.Select(kvp => new BsonElement(kvp.Key, BsonValue.Create(kvp.Value))));
         return this;
     }
+
+        public BsonEventBuilder WithUpdatePayload(Dictionary<string, object> change, Dictionary<string, object> condition)
+    {
+        _eventType = "UPDATE";
+        _payload = new BsonDocument
+        {
+            { "change", new BsonDocument(change.Select(kvp => new BsonElement(kvp.Key, BsonValue.Create(kvp.Value)))) },
+            { "condition", new BsonDocument(condition.Select(kvp => new BsonElement(kvp.Key, BsonValue.Create(kvp.Value)))) }
+        };
+        return this;
+    }
+
 }
