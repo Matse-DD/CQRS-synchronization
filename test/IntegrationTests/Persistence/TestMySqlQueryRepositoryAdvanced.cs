@@ -1,3 +1,4 @@
+using Infrastructure.Persistence;
 using Infrastructure.Persistence.QueryRepository;
 using Microsoft.Extensions.Logging.Abstractions;
 using MySql.Data.MySqlClient;
@@ -54,7 +55,7 @@ public class TestMySqlQueryRepositoryAdvanced
                                  ('Another Product', 149.99)";
 
         // Act
-        await _repository.Execute(command, eventId);
+        await _repository.Execute(new CommandInfo(command), eventId);
 
         // Assert
         await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
@@ -83,7 +84,7 @@ public class TestMySqlQueryRepositoryAdvanced
         string command = "UPDATE Products SET price = 75.00 WHERE name = 'Test'";
 
         // Act
-        await _repository.Execute(command, eventId);
+        await _repository.Execute(new CommandInfo(command), eventId);
 
         // Assert
         await using MySqlConnection verifyConn = new MySqlConnection(ConnectionStringQueryRepoMySql);
@@ -111,7 +112,7 @@ public class TestMySqlQueryRepositoryAdvanced
         string command = "DELETE FROM Products WHERE name = 'ToDelete'";
 
         // Act
-        await _repository.Execute(command, eventId);
+        await _repository.Execute(new CommandInfo(command), eventId);
 
         // Assert
         await using MySqlConnection verifyConn = new MySqlConnection(ConnectionStringQueryRepoMySql);
@@ -147,7 +148,7 @@ public class TestMySqlQueryRepositoryAdvanced
         // Act & Assert
         try
         {
-            await _repository.Execute(command, eventId);
+            await _repository.Execute(new CommandInfo(command), eventId);
             Assert.Fail("Should have thrown exception due to invalid SQL");
         }
         catch (MySqlException)
@@ -177,9 +178,9 @@ public class TestMySqlQueryRepositoryAdvanced
         Guid eventId3 = Guid.NewGuid();
 
         // Act
-        await _repository.Execute("INSERT INTO Products (name, price) VALUES ('Product1', 10.00)", eventId1);
-        await _repository.Execute("INSERT INTO Products (name, price) VALUES ('Product2', 20.00)", eventId2);
-        await _repository.Execute("UPDATE Products SET price = 15.00 WHERE name = 'Product1'", eventId3);
+        await _repository.Execute(new CommandInfo("INSERT INTO Products (name, price) VALUES ('Product1', 10.00)"), eventId1);
+        await _repository.Execute(new CommandInfo("INSERT INTO Products (name, price) VALUES ('Product2', 20.00)"), eventId2);
+        await _repository.Execute(new CommandInfo("UPDATE Products SET price = 15.00 WHERE name = 'Product1'"), eventId3);
 
         // Assert
         Guid lastEventId = await _repository.GetLastSuccessfulEventId();
@@ -200,7 +201,7 @@ public class TestMySqlQueryRepositoryAdvanced
         string command = "INSERT INTO Products (name, price) VALUES ('Product with \"quotes\" and ''apostrophes''', 99.99)";
 
         // Act
-        await _repository.Execute(command, eventId);
+        await _repository.Execute(new CommandInfo(command), eventId);
 
         // Assert
         await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
@@ -216,7 +217,7 @@ public class TestMySqlQueryRepositoryAdvanced
     {
         // Arrange
         Guid eventId = Guid.NewGuid();
-        await _repository.Execute("INSERT INTO Products (name, price) VALUES ('Test', 10.00)", eventId);
+        await _repository.Execute(new CommandInfo("INSERT INTO Products (name, price) VALUES ('Test', 10.00)"), eventId);
 
         // Act
         MySqlQueryRepository newRepository = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
@@ -234,7 +235,7 @@ public class TestMySqlQueryRepositoryAdvanced
         string command = "INSERT INTO Products (name, price) VALUES ('NullTest', NULL)";
 
         // Act
-        await _repository.Execute(command, eventId);
+        await _repository.Execute(new CommandInfo(command), eventId);
 
         // Assert
         await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
