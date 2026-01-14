@@ -6,6 +6,7 @@ using Infrastructure.Observer;
 using Infrastructure.Persistence.CommandRepository;
 using Infrastructure.Persistence.QueryRepository;
 using Infrastructure.Projectors;
+using Infrastructure.Recover;
 using IntegrationTests.Helpers;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson;
@@ -18,13 +19,11 @@ public class TestHappyFlow
 {
     private const string ConnectionStringToStartRepoMySql = "Server=localhost;Port=13306;User=root;Password=;";
     private const string ConnectionStringQueryRepoMySql = "Server=localhost;Port=13306;Database=cqrs_read;User=root;Password=;";
-    private const string ConnectionStringCommandRepoMongo = "mongodb://localhost:27017/users?connect=direct&replicaSet=rs0";
+    private const string ConnectionStringCommandRepoMongo = "mongodb://localhost:27017/users?directConnection=true&replicaSet=rs0";
 
     private ICommandRepository _commandRepo;
     private IQueryRepository _queryRepo;
     private Projector _projector;
-    private MongoDbObserver _observer;
-    private CancellationTokenSource _cancellationTokenSource;
 
     [OneTimeSetUp]
     public async Task OneTimeSetUp()
@@ -59,20 +58,11 @@ public class TestHappyFlow
         ISchemaBuilder schemaBuilder = new MySqlSchemaBuilder();
 
         _projector = new Projector(_commandRepo, _queryRepo, eventFactory, NullLogger<Projector>.Instance, schemaBuilder);
-        _observer = new MongoDbObserver(ConnectionStringCommandRepoMongo, NullLogger<MongoDbObserver>.Instance);
-
-        _cancellationTokenSource = new CancellationTokenSource();
-        _ = _observer.StartListening(_projector.AddEvent, _cancellationTokenSource.Token);
-
-        await Task.Delay(500);
     }
 
     [TearDown]
     public async Task TearDown()
     {
-        await _cancellationTokenSource.CancelAsync();
-        _cancellationTokenSource.Dispose();
-
         await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringQueryRepoMySql);
         await connectionMySql.OpenAsync();
         const string cleanupSql = "DROP TABLE IF EXISTS Products; UPDATE last_info SET last_event_id = NULL WHERE id = 1";
@@ -119,6 +109,9 @@ public class TestHappyFlow
         IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
         await collection.InsertOneAsync(insertEvent);
+
+        Recovery recovery = new(_commandRepo, _queryRepo, _projector, NullLogger<Recovery>.Instance);
+        recovery.Recover();
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -183,6 +176,9 @@ public class TestHappyFlow
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
         await collection.InsertOneAsync(insertEvent);
 
+        Recovery recovery = new(_commandRepo, _queryRepo, _projector, NullLogger<Recovery>.Instance);
+        recovery.Recover();
+
         await AssertEventuallyAsync(async () =>
         {
             Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
@@ -212,6 +208,7 @@ public class TestHappyFlow
             .Build();
 
         await collection.InsertOneAsync(updateEvent);
+        recovery.Recover();
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -265,6 +262,9 @@ public class TestHappyFlow
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
         await collection.InsertOneAsync(insertEvent);
 
+        Recovery recovery = new(_commandRepo, _queryRepo, _projector, NullLogger<Recovery>.Instance);
+        recovery.Recover();
+
         await AssertEventuallyAsync(async () =>
         {
             Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
@@ -296,6 +296,7 @@ public class TestHappyFlow
             .Build();
 
         await collection.InsertOneAsync(deleteEvent);
+        recovery.Recover();
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -351,6 +352,9 @@ public class TestHappyFlow
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
         await collection.InsertOneAsync(firstEvent);
 
+        Recovery recovery = new(_commandRepo, _queryRepo, _projector, NullLogger<Recovery>.Instance);
+        recovery.Recover();
+
         // Assert 1
         await AssertEventuallyAsync(async () =>
         {
@@ -389,6 +393,7 @@ public class TestHappyFlow
             .Build();
 
         await collection.InsertOneAsync(secondEvent);
+        recovery.Recover();
 
         // Assert 2
         await AssertEventuallyAsync(async () =>
