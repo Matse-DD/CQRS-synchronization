@@ -72,7 +72,7 @@ public class TestMySqlEventFactory
 
         string expectedMySqlCommand =
             "INSERT INTO Product (product_id, name, sku, price, stock_level, is_active)\n" +
-            @"VALUES (@product_id, @name, @sku, @price, @stock_level, is_active)";
+            @"VALUES (@product_id, @name, @sku, @price, @stock_level, @is_active)";
 
         Assert.That(mySqlCommandInfo.PureCommand, Is.EqualTo(expectedMySqlCommand));
     }
