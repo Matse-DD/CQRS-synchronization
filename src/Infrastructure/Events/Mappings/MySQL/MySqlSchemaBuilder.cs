@@ -1,4 +1,4 @@
-﻿using Application.Contracts.Events;
+using Application.Contracts.Events;
 using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Persistence;
 using Infrastructure.Persistence;
