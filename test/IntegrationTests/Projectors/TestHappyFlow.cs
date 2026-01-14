@@ -165,6 +165,45 @@ public class TestHappyFlow
                 }
                 Console.WriteLine("[INSERT] Products table exists");
 
+                // Debug: Check table structure and all data
+                string showColumnsQuery = "SHOW COLUMNS FROM Products";
+                await using (MySqlCommand showCmd = new MySqlCommand(showColumnsQuery, connection))
+                {
+                    using var reader = await showCmd.ExecuteReaderAsync();
+                    Console.WriteLine("[INSERT] Products table columns:");
+                    while (await reader.ReadAsync())
+                    {
+                        Console.WriteLine($"[INSERT]   - {reader.GetString(0)} ({reader.GetString(1)})");
+                    }
+                }
+
+                long totalCount = 0;
+                string countAllQuery = "SELECT COUNT(*) FROM Products";
+                await using (MySqlCommand countCmd = new MySqlCommand(countAllQuery, connection))
+                {
+                    totalCount = (long)(await countCmd.ExecuteScalarAsync())!;
+                    Console.WriteLine($"[INSERT] Total rows in Products table: {totalCount}");
+                }
+
+                if (totalCount > 0)
+                {
+                    string selectAllQuery = "SELECT * FROM Products LIMIT 5";
+                    await using (MySqlCommand selectCmd = new MySqlCommand(selectAllQuery, connection))
+                    {
+                        using var reader = await selectCmd.ExecuteReaderAsync();
+                        Console.WriteLine("[INSERT] Sample rows from Products:");
+                        while (await reader.ReadAsync())
+                        {
+                            var rowData = new List<string>();
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                rowData.Add($"{reader.GetName(i)}={reader.GetValue(i)}");
+                            }
+                            Console.WriteLine($"[INSERT]   Row: {string.Join(", ", rowData)}");
+                        }
+                    }
+                }
+
                 string query = "SELECT COUNT(*) FROM Products WHERE product_id = @productId AND name = @name AND sku = @sku AND price = @price AND stock_level = @stockLevel";
                 await using MySqlCommand cmd = new MySqlCommand(query, connection);
                 cmd.Parameters.AddWithValue("@productId", productId.ToString());
