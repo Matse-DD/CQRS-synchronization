@@ -75,4 +75,22 @@ public class BsonEventBuilder
         };
         return this;
     }
+
+    public BsonDocument Build()
+    {
+        return new BsonDocument
+        {
+            { "id", _id.ToString() },
+            { "occurredAt", _occurredAt.ToString("O") },
+            { "aggregateName", _aggregateName },
+            { "status", _status },
+            { "eventType", _eventType },
+            { "payload", _payload }
+        };
+    }
+
+    public string BuildAsJson()
+    {
+        return Build().ToJson();
+    }
 }
