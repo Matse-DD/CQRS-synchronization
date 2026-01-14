@@ -66,5 +66,13 @@ public class BsonEventBuilder
         };
         return this;
     }
-
+    public BsonEventBuilder WithDeletePayload(Dictionary<string, object> condition)
+    {
+        _eventType = "DELETE";
+        _payload = new BsonDocument
+        {
+            { "condition", new BsonDocument(condition.Select(kvp => new BsonElement(kvp.Key, BsonValue.Create(kvp.Value)))) }
+        };
+        return this;
+    }
 }
