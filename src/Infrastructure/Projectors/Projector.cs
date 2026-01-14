@@ -3,6 +3,7 @@ using Application.Contracts.Events.Enums;
 using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
 using Application.Contracts.Persistence;
+using Infrastructure.Persistence;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Threading.Channels;
@@ -122,12 +123,12 @@ public class Projector
 
     private async Task Project(Event convertedEvent)
     {
-        string commandForEvent = convertedEvent.GetCommand();
+        CommandInfo commandInfoForEvent = convertedEvent.GetCommandInfo();
         Guid eventId = convertedEvent.EventId;
 
         _logger.LogDebug("Projecting Event {EventId}", eventId);
 
-        await _queryRepository.Execute(commandForEvent, eventId);
+        await _queryRepository.Execute(commandInfoForEvent, eventId);
         await _commandRepository.MarkAsDone(eventId);
 
         _logger.LogInformation("Successfully projected Event {EventId}", eventId);

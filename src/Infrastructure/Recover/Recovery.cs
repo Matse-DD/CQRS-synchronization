@@ -62,7 +62,7 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         return await queryRepository.GetLastSuccessfulEventId();
     }
 
-    private IEnumerable<OutboxEvent> DetermineEventsToRecover(IEnumerable<OutboxEvent> outboxEvents, Guid lastSuccessfulEventId)
+    private static IEnumerable<OutboxEvent> DetermineEventsToRecover(IEnumerable<OutboxEvent> outboxEvents, Guid lastSuccessfulEventId)
     {
         return outboxEvents.Where(outboxEvent => HasToBeProcessed(lastSuccessfulEventId, outboxEvent));
     }
@@ -70,8 +70,6 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
     private static bool HasToBeProcessed(Guid lastSuccessfulEventId, OutboxEvent outboxEvent)
     {
         if (!IsLastEventIdSet(lastSuccessfulEventId)) return IsEventPending(outboxEvent);
-
-        if (!Guid.TryParse(outboxEvent.EventId, out var currentEventId)) return false;
 
         return !outboxEvent.EventId.Equals(lastSuccessfulEventId.ToString()) && IsEventPending(outboxEvent);
     }
@@ -85,6 +83,8 @@ public class Recovery(ICommandRepository commandRepository, IQueryRepository que
         {
             return statusElement.GetString()?.Equals(Status.PENDING.ToString()) ?? false;
         }
+
+        Console.WriteLine("dat was ier een problemen met nemen status");
 
         return false;
     }

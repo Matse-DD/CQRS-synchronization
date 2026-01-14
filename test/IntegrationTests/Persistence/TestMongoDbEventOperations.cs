@@ -1,5 +1,6 @@
 using Application.Contracts.Persistence;
 using Infrastructure.Persistence.CommandRepository;
+using IntegrationTests.Helpers;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -36,15 +37,13 @@ public class TestMongoDbEventOperations
     {
         // Arrange
         Guid eventId = Guid.NewGuid();
-        BsonDocument doc = BsonDocument.Parse($@"
-            {{
-                ""id"": ""{eventId}"",
-                ""occurredAt"": ""{DateTime.UtcNow:O}"",
-                ""aggregateName"": ""TestAgg"",
-                ""status"": ""PENDING"",
-                ""eventType"": ""INSERT"",
-                ""payload"": {{}}
-            }}");
+        BsonDocument doc = BsonEventBuilder.Create()
+            .WithId(eventId)
+            .WithAggregateName("TestAgg")
+            .WithStatus("PENDING")
+            .WithEventType("INSERT")
+            .WithPayload(new BsonDocument())
+            .Build();
 
         await _collection.InsertOneAsync(doc);
 
@@ -91,35 +90,23 @@ public class TestMongoDbEventOperations
         DateTime baseTime = DateTime.UtcNow;
         List<BsonDocument> events =
         [
-            BsonDocument.Parse($@"
-            {{
-                ""id"": ""{Guid.NewGuid()}"",
-                ""occurredAt"": ""{baseTime:O}"",
-                ""aggregateName"": ""Product"",
-                ""status"": ""PENDING"",
-                ""eventType"": ""INSERT"",
-                ""payload"": {{ ""name"": ""Product1"" }}
-            }}"),
+            BsonEventBuilder.CreateInsertEvent("Product",
+                new Dictionary<string, object> { { "name", "Product1" } }),
 
-            BsonDocument.Parse($@"
-            {{
-                ""id"": ""{Guid.NewGuid()}"",
-                ""occurredAt"": ""{baseTime.AddSeconds(1):O}"",
-                ""aggregateName"": ""Product"",
-                ""status"": ""PENDING"",
-                ""eventType"": ""UPDATE"",
-                ""payload"": {{ ""change"": {{ ""price"": ""100"" }}, ""condition"": {{ ""id"": ""1"" }} }}
-            }}"),
+            BsonEventBuilder.Create()
+                .WithOccurredAt(baseTime.AddSeconds(1))
+                .WithUpdatePayload(
+                    new Dictionary<string, object> { { "price", "100" } },
+                    new Dictionary<string, object> { { "id", "1" } })
+                .WithAggregateName("Product")
+                .Build(),
 
-            BsonDocument.Parse($@"
-            {{
-                ""id"": ""{Guid.NewGuid()}"",
-                ""occurredAt"": ""{baseTime.AddSeconds(2):O}"",
-                ""aggregateName"": ""Product"",
-                ""status"": ""DONE"",
-                ""eventType"": ""DELETE"",
-                ""payload"": {{ ""condition"": {{ ""id"": ""2"" }} }}
-            }}")
+            BsonEventBuilder.Create()
+                .WithOccurredAt(baseTime.AddSeconds(2))
+                .WithDeletePayload(new Dictionary<string, object> { { "id", "2" } })
+                .WithAggregateName("Product")
+                .WithStatus("DONE")
+                .Build()
         ];
 
         await _collection.InsertManyAsync(events);
@@ -142,24 +129,8 @@ public class TestMongoDbEventOperations
 
         await _collection.InsertManyAsync(new[]
         {
-            BsonDocument.Parse($@"
-            {{
-                ""id"": ""{eventId1}"",
-                ""occurredAt"": ""{DateTime.UtcNow:O}"",
-                ""aggregateName"": ""TestAgg"",
-                ""status"": ""PENDING"",
-                ""eventType"": ""INSERT"",
-                ""payload"": {{}}
-            }}"),
-            BsonDocument.Parse($@"
-            {{
-                ""id"": ""{eventId2}"",
-                ""occurredAt"": ""{DateTime.UtcNow:O}"",
-                ""aggregateName"": ""TestAgg"",
-                ""status"": ""PENDING"",
-                ""eventType"": ""INSERT"",
-                ""payload"": {{}}
-            }}")
+            BsonEventBuilder.CreateInsertEvent("TestAgg", new Dictionary<string, object>(), eventId1),
+            BsonEventBuilder.CreateInsertEvent("TestAgg", new Dictionary<string, object>(), eventId2)
         });
 
         // Act
@@ -181,15 +152,7 @@ public class TestMongoDbEventOperations
     {
         // Arrange
         Guid eventId = Guid.NewGuid();
-        BsonDocument doc = BsonDocument.Parse($@"
-            {{
-                ""id"": ""{eventId}"",
-                ""occurredAt"": ""{DateTime.UtcNow:O}"",
-                ""aggregateName"": ""TestAgg"",
-                ""status"": ""PENDING"",
-                ""eventType"": ""INSERT"",
-                ""payload"": {{}}
-            }}");
+        BsonDocument doc = BsonEventBuilder.CreateInsertEvent("TestAgg", new Dictionary<string, object>(), eventId);
 
         await _collection.InsertOneAsync(doc);
 

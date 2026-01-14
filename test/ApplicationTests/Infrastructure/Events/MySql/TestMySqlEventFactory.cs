@@ -1,5 +1,6 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Infrastructure.Events.Mappings.MySQL;
+using Infrastructure.Persistence;
 
 namespace ApplicationTests.Infrastructure.Events.MySql;
 
@@ -64,16 +65,16 @@ public class TestMySqlEventFactory
 
         // Act
         Event determinedEvent = _eventFactory.DetermineEvent(insertEventMessage);
-        string mySqlCommand = determinedEvent.GetCommand();
+        CommandInfo mySqlCommandInfo = determinedEvent.GetCommandInfo();
 
         // Assert
         Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlInsertEvent)));
 
         string expectedMySqlCommand =
             "INSERT INTO Product (product_id, name, sku, price, stock_level, is_active)\n" +
-            @"VALUES ('038e2f47-c1a0-4b3d-98e1-5f2d0c1b4e9f', 'Wireless Mechanical Keyboard', 'KB-WM-001', 129.99, 50, True)";
+            @"VALUES (@product_id, @name, @sku, @price, @stock_level, @is_active)";
 
-        Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
+        Assert.That(mySqlCommandInfo.PureCommand, Is.EqualTo(expectedMySqlCommand));
     }
 
     [Test]
@@ -97,11 +98,11 @@ public class TestMySqlEventFactory
 
         // Act
         Event determinedEvent = _eventFactory.DetermineEvent(deleteEventMessage);
-        string mySqlCommand = determinedEvent.GetCommand();
+        string mySqlCommand = determinedEvent.GetCommandInfo().PureCommand;
 
         // Assert
         Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlDeleteEvent)));
-        const string expectedMySqlCommand = "DELETE FROM Product WHERE amount_sold>5 AND price>10";
+        const string expectedMySqlCommand = "DELETE FROM Product WHERE amount_sold > @Condition_amount_sold AND price > @Condition_price";
         Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
     }
 
@@ -126,11 +127,11 @@ public class TestMySqlEventFactory
 
         // Act
         Event determinedEvent = _eventFactory.DetermineEvent(deleteEventMessage);
-        string mySqlCommand = determinedEvent.GetCommand();
+        string mySqlCommand = determinedEvent.GetCommandInfo().PureCommand;
 
         // Assert
         Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlDeleteEvent)));
-        const string expectedMySqlCommand = "DELETE FROM Product WHERE name = 'gene in a bottle' AND price>10";
+        const string expectedMySqlCommand = "DELETE FROM Product WHERE name = @Condition_name AND price > @Condition_price";
         Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
     }
 
@@ -155,12 +156,15 @@ public class TestMySqlEventFactory
 
         // Act
         Event determinedEvent = _eventFactory.DetermineEvent(deleteEventMessage);
-        string mySqlCommand = determinedEvent.GetCommand();
+        CommandInfo mySqlCommandInfo = determinedEvent.GetCommandInfo();
 
         // Assert
         Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlDeleteEvent)));
-        const string expectedMySqlCommand = "DELETE FROM Product WHERE name = 'gene''s in a bottle' AND price>10";
-        Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
+        const string expectedMySqlCommand = "DELETE FROM Product WHERE name = @Condition_name AND price > @Condition_price";
+        Assert.That(mySqlCommandInfo.PureCommand, Is.EqualTo(expectedMySqlCommand));
+
+        Assert.That(mySqlCommandInfo.Parameters["@Condition_name"], Is.EqualTo("gene's in a bottle"));
+        Assert.That(mySqlCommandInfo.Parameters["@Condition_price"], Is.EqualTo("10"));
     }
 
     [Test]
@@ -188,18 +192,19 @@ public class TestMySqlEventFactory
 
         // Act
         Event determinedEvent = _eventFactory.DetermineEvent(updateEventMessage);
-        string mySqlCommand = determinedEvent.GetCommand();
+        string mySqlCommand = determinedEvent.GetCommandInfo().PureCommand;
 
         // Assert
         Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlUpdateEvent)));
 
         string expectedMySqlCommand =
             "UPDATE Product\n" +
-            "SET price = price * 1.10, amount_sold = amount_sold + 1\n" +
-            "WHERE amount_sold>5 AND price>10";
+            "SET price = price * @Change_price, amount_sold = amount_sold + @Change_amount_sold\n" +
+            "WHERE amount_sold > @Condition_amount_sold AND price > @Condition_price";
 
         Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
     }
+
     [Test]
     public void MySqlEventFactory_Gives_MySqlUpdateEvent_Back_When_Given_A_Event_Of_EventType_Update_With_A_Bool()
     {
@@ -225,15 +230,15 @@ public class TestMySqlEventFactory
 
         // Act
         Event determinedEvent = _eventFactory.DetermineEvent(updateEventMessage);
-        string mySqlCommand = determinedEvent.GetCommand();
+        string mySqlCommand = determinedEvent.GetCommandInfo().PureCommand;
 
         // Assert
         Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlUpdateEvent)));
 
         string expectedMySqlCommand =
             "UPDATE Product\n" +
-            "SET price = price * 1.10, is_active = true\n" +
-            "WHERE is_active = false AND price>10";
+            "SET price = price * @Change_price, is_active = is_active  @Change_is_active\n" +
+            "WHERE is_active = @Condition_is_active AND price > @Condition_price";
 
         Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
     }

@@ -1,3 +1,4 @@
+using Infrastructure.Persistence;
 using Infrastructure.Persistence.QueryRepository;
 using Microsoft.Extensions.Logging.Abstractions;
 using MySql.Data.MySqlClient;
@@ -50,7 +51,7 @@ public class TestMySqlConcurrency
         Guid testEventId = Guid.NewGuid();
 
         // Act
-        await repo1.Execute("INSERT INTO TestTableConcurrency (value_col) VALUES ('test')", testEventId);
+        await repo1.Execute(new CommandInfo("INSERT INTO TestTableConcurrency (value_col) VALUES ('test')"), testEventId);
 
         // Assert
         Guid lastEventIdFromRepo2 = await repo2.GetLastSuccessfulEventId();
@@ -71,7 +72,7 @@ public class TestMySqlConcurrency
         {
             Guid eventId = Guid.NewGuid();
             eventIds.Add(eventId);
-            tasks.Add(repository.Execute($"INSERT INTO TestTableConcurrency (value_col) VALUES ('value{i}')", eventId));
+            tasks.Add(repository.Execute(new CommandInfo($"INSERT INTO TestTableConcurrency (value_col) VALUES ('value{i}')"), eventId));
         }
 
         await Task.WhenAll(tasks);
@@ -98,7 +99,7 @@ public class TestMySqlConcurrency
         // Act
         try
         {
-            await repository.Execute("INVALID SQL SYNTAX", eventId);
+            await repository.Execute(new CommandInfo("INVALID SQL SYNTAX"), eventId);
             Assert.Fail("Should have thrown exception");
         }
         catch (MySqlException)
@@ -132,11 +133,11 @@ public class TestMySqlConcurrency
         Guid eventId = Guid.NewGuid();
 
         // Act
-        await repository.Execute(@"
+        await repository.Execute(new CommandInfo(@"
             INSERT INTO TestTableConcurrency (value_col) VALUES ('first');
             INSERT INTO TestTableConcurrency (value_col) VALUES ('second');
             INSERT INTO TestTableConcurrency (value_col) VALUES ('third');
-        ", eventId);
+        "), eventId);
 
         // Assert
         await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);

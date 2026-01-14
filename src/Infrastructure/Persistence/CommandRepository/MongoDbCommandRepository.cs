@@ -60,7 +60,8 @@ public class MongoDbCommandRepository : ICommandRepository
             _logger.LogInformation("Marked event {EventId} as DONE", eventId);
         }
 
-        return result is { IsAcknowledged: true, ModifiedCount: > 0 };
+        return result.IsAcknowledged == true
+               && result.ModifiedCount > 0;
     }
 
     private OutboxEvent MapToOutboxEvent(BsonDocument incomingEventItem)

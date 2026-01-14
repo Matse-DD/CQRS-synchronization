@@ -1,16 +1,19 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
-using Infrastructure.Events.Mappings.MySQL.Shared;
+using Infrastructure.Events.Mappings.Shared;
+using Infrastructure.Persistence;
 using System.Text.Json;
 
 namespace Infrastructure.Events.Mappings.MySQL;
 
 public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent(intermediateEvent)
 {
-    public override string GetCommand()
+    public override CommandInfo GetCommandInfo()
     {
-        return $"INSERT INTO {AggregateName} ({MapColumns(Properties.Keys)})\n" +
-               $"VALUES ({MapValues(Properties.Values)})";
+        string command = $"INSERT INTO {AggregateName.Sanitize()} ({MapColumns(Properties.Keys)})\n" +
+                         $"VALUES ({MapValues(Properties.Keys)})";
+
+        return new CommandInfo(command, BuildParamDict(Properties));
     }
 
     private static string MapColumns(IEnumerable<string> keys)
@@ -18,15 +21,27 @@ public class MySqlInsertEvent(IntermediateEvent intermediateEvent) : InsertEvent
         return string.Join(", ", keys);
     }
 
-    private static string MapValues(IEnumerable<object> incomingValues)
+    private static string MapValues(IEnumerable<object> incomingParameters)
     {
-        IEnumerable<string> convertedValues = incomingValues.Select(ConvertValue);
-        return string.Join(", ", convertedValues);
+        IEnumerable<string> parameters = incomingParameters.Select(parameter => $"@{parameter}");
+        return string.Join(", ", parameters);
     }
 
-    private static string ConvertValue(object incomingValue)
+    private static Dictionary<string, object> BuildParamDict(Dictionary<string, object> properties)
+    {
+        Dictionary<string, object> parameters = new Dictionary<string, object>();
+
+        foreach (KeyValuePair<string, object> keyValuePair in properties)
+        {
+            parameters.Add($"@{keyValuePair.Key}", ConvertValue(keyValuePair.Value));
+        }
+
+        return parameters;
+    }
+
+    private static object ConvertValue(object incomingValue)
     {
         if (incomingValue is not JsonElement value) return "NULL";
-        return value.ToString().DetermineMySqlValue();
+        return value.ToString().ExtractValue();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Application.Contracts.Events;
 using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Persistence;
+using Infrastructure.Persistence;
 using System.Text.Json;
 
 namespace Infrastructure.Events.Mappings.MySQL;
@@ -17,7 +18,8 @@ public class MySqlSchemaBuilder : ISchemaBuilder
 
         string command = $"CREATE TABLE IF NOT EXISTS {aggregateName} ({MapFields(insertEvent.Properties)})";
 
-        await mySqlQueryRepository.Execute(command, insertEvent.EventId);
+        CommandInfo commandInfo = new CommandInfo(command);
+        await mySqlQueryRepository.Execute(commandInfo, insertEvent.EventId);
     }
 
     private bool DoesTableExists(string aggregateName)
@@ -46,7 +48,7 @@ public class MySqlSchemaBuilder : ISchemaBuilder
         return jsonValue.ValueKind switch
         {
             JsonValueKind.String => "VARCHAR(255)",
-            JsonValueKind.Number => "INT",
+            JsonValueKind.Number => "FLOAT",
             JsonValueKind.True => "BOOL",
             JsonValueKind.False => "BOOL",
             JsonValueKind.Object => "JSON",
