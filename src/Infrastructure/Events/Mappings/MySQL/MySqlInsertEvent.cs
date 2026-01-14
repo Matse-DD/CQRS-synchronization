@@ -1,10 +1,8 @@
 ﻿using Application.Contracts.Events.EventOptions;
 using Application.Contracts.Events.Factory;
 using Application.Contracts.Persistence;
-using Infrastructure.Events.Mappings.MySQL.Shared;
 using Infrastructure.Events.Mappings.Shared;
 using System.Text.Json;
-using static Mysqlx.Expect.Open.Types;
 
 namespace Infrastructure.Events.Mappings.MySQL;
 
