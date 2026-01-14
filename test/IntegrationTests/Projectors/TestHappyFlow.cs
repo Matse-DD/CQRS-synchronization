@@ -135,7 +135,6 @@ public class TestHappyFlow
         await collection.InsertOneAsync(insertEvent);
 
         _replayer.Replay();
-        await Task.Delay(5000); // Wait for async replay to complete
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -144,6 +143,12 @@ public class TestHappyFlow
             {
                 await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
                 await connection.OpenAsync();
+
+                // First check if table exists
+                string checkTableQuery = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'cqrs_read' AND table_name = 'Products'";
+                await using MySqlCommand checkCmd = new MySqlCommand(checkTableQuery, connection);
+                long tableExists = (long)(await checkCmd.ExecuteScalarAsync())!;
+                if (tableExists == 0) return false;
 
                 string query = "SELECT COUNT(*) FROM Products WHERE product_id = @productId AND name = @name AND sku = @sku AND price = @price AND stock_level = @stockLevel";
                 await using MySqlCommand cmd = new MySqlCommand(query, connection);
@@ -226,7 +231,6 @@ public class TestHappyFlow
         await collection.InsertOneAsync(updateEvent);
 
         _replayer.Replay();
-        await Task.Delay(5000); // Wait for async replay to complete
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -297,7 +301,6 @@ public class TestHappyFlow
         await collection.InsertOneAsync(deleteEvent);
 
         _replayer.Replay();
-        await Task.Delay(5000); // Wait for async replay to complete
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -379,7 +382,6 @@ public class TestHappyFlow
         await collection.InsertOneAsync(secondEvent);
 
         _replayer.Replay();
-        await Task.Delay(5000); // Wait for async replay to complete
 
         // Assert
         await AssertEventuallyAsync(async () =>
