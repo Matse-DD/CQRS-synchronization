@@ -199,11 +199,12 @@ public class TestMySqlEventFactory
 
         string expectedMySqlCommand =
             "UPDATE Product\n" +
-            "SET price = price * 1.10, amount_sold = amount_sold + 1\n" +
-            "WHERE amount_sold>5 AND price>10";
+            "SET price = price * @Change_price, amount_sold = amount_sold + @Change_amount_sold\n" +
+            "WHERE amount_sold > @Condition_amount_sold AND price > @Condition_price";
 
         Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
     }
+
     [Test]
     public void MySqlEventFactory_Gives_MySqlUpdateEvent_Back_When_Given_A_Event_Of_EventType_Update_With_A_Bool()
     {
