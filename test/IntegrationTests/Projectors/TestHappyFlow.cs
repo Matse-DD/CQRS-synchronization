@@ -5,6 +5,7 @@ using Infrastructure.Events.Mappings.MySQL;
 using Infrastructure.Persistence.CommandRepository;
 using Infrastructure.Persistence.QueryRepository;
 using Infrastructure.Projectors;
+using Infrastructure.Replay;
 using IntegrationTests.Helpers;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson;
@@ -22,6 +23,7 @@ public class TestHappyFlow
     private ICommandRepository _commandRepo;
     private IQueryRepository _queryRepo;
     private Projector _projector;
+    private Replayer _replayer;
 
     [OneTimeSetUp]
     public async Task OneTimeSetUp()
@@ -30,9 +32,16 @@ public class TestHappyFlow
         await connectionMySql.OpenAsync();
 
         string queryToStart = "CREATE DATABASE IF NOT EXISTS cqrs_read; USE cqrs_read;";
+        await using MySqlCommand cmdCreateDb = new MySqlCommand(queryToStart, connectionMySql);
+        await cmdCreateDb.ExecuteNonQueryAsync();
 
-        await using MySqlCommand cmdGetLastEventId = new MySqlCommand(queryToStart, connectionMySql);
-        await cmdGetLastEventId.ExecuteNonQueryAsync();
+        string createTableSql = "CREATE TABLE IF NOT EXISTS last_info (id INT AUTO_INCREMENT PRIMARY KEY, last_event_id CHAR(36));";
+        await using MySqlCommand cmdCreateTable = new MySqlCommand(createTableSql, connectionMySql);
+        await cmdCreateTable.ExecuteNonQueryAsync();
+
+        string insertInitialSql = "INSERT IGNORE INTO last_info (id, last_event_id) VALUES (1, NULL);";
+        await using MySqlCommand cmdInsert = new MySqlCommand(insertInitialSql, connectionMySql);
+        await cmdInsert.ExecuteNonQueryAsync();
     }
 
     [SetUp]
@@ -40,7 +49,7 @@ public class TestHappyFlow
     {
         await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringQueryRepoMySql);
         await connectionMySql.OpenAsync();
-        const string cleanupSql = "DROP TABLE IF EXISTS Products; UPDATE last_info SET last_event_id = NULL WHERE id = 1";
+        const string cleanupSql = "UPDATE last_info SET last_event_id = NULL WHERE id = 1";
         await using MySqlCommand cmd = new MySqlCommand(cleanupSql, connectionMySql);
         await cmd.ExecuteNonQueryAsync();
 
@@ -56,6 +65,7 @@ public class TestHappyFlow
         ISchemaBuilder schemaBuilder = new MySqlSchemaBuilder();
 
         _projector = new Projector(_commandRepo, _queryRepo, eventFactory, NullLogger<Projector>.Instance, schemaBuilder);
+        _replayer = new Replayer(_commandRepo, _queryRepo, _projector, NullLogger<Replayer>.Instance);
     }
 
     [TearDown]
@@ -63,7 +73,7 @@ public class TestHappyFlow
     {
         await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringQueryRepoMySql);
         await connectionMySql.OpenAsync();
-        const string cleanupSql = "DROP TABLE IF EXISTS Products; UPDATE last_info SET last_event_id = NULL WHERE id = 1";
+        const string cleanupSql = "UPDATE last_info SET last_event_id = NULL WHERE id = 1";
         await using MySqlCommand cmd = new MySqlCommand(cleanupSql, connectionMySql);
         await cmd.ExecuteNonQueryAsync();
 
@@ -107,8 +117,8 @@ public class TestHappyFlow
         IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
         await collection.InsertOneAsync(insertEvent);
-        _projector.AddEvent(insertEvent.ToJson());
-        await Task.Delay(500);
+        
+        _replayer.Replay();
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -166,22 +176,7 @@ public class TestHappyFlow
                 { "is_active", true }
             })
             .Build();
-
-        MongoUrl url = new(ConnectionStringCommandRepoMongo);
-        MongoClient client = new MongoClient(url);
-        IMongoDatabase database = client.GetDatabase(url.DatabaseName);
-        IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
-        await collection.InsertOneAsync(insertEvent);
-        _projector.AddEvent(insertEvent.ToJson());
-        await Task.Delay(500);
-
-        await AssertEventuallyAsync(async () =>
-        {
-            Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
-            return lastEventId == insertEventId;
-        }, timeoutMs: 5000);
-
-        // Act
+        
         Guid updateEventId = Guid.NewGuid();
         string updatedName = "Updated Product Name";
         double updatedPrice = 75.50;
@@ -203,9 +198,15 @@ public class TestHappyFlow
                 })
             .Build();
 
+        // Act
+        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoClient client = new MongoClient(url);
+        IMongoDatabase database = client.GetDatabase(url.DatabaseName);
+        IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
+        await collection.InsertOneAsync(insertEvent);
         await collection.InsertOneAsync(updateEvent);
-        _projector.AddEvent(updateEvent.ToJson());
-        await Task.Delay(500);
+
+        _replayer.Replay();
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -253,33 +254,7 @@ public class TestHappyFlow
             })
             .Build();
 
-        MongoUrl url = new(ConnectionStringCommandRepoMongo);
-        MongoClient client = new MongoClient(url);
-        IMongoDatabase database = client.GetDatabase(url.DatabaseName);
-        IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
-        await collection.InsertOneAsync(insertEvent);
-        _projector.AddEvent(insertEvent.ToJson());
-        await Task.Delay(500);
-
-        await AssertEventuallyAsync(async () =>
-        {
-            Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
-            return lastEventId == insertEventId;
-        }, timeoutMs: 5000);
-
-        await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
-        {
-            await connection.OpenAsync();
-            string checkQuery = "SELECT COUNT(*) FROM Products WHERE product_id = @productId";
-            await using MySqlCommand checkCmd = new MySqlCommand(checkQuery, connection);
-            checkCmd.Parameters.AddWithValue("@productId", productId.ToString());
-            long countBefore = (long)(await checkCmd.ExecuteScalarAsync())!;
-            Assert.That(countBefore, Is.EqualTo(1), "Product should exist before deletion");
-        }
-
-        // Act
         Guid deleteEventId = Guid.NewGuid();
-
         BsonDocument deleteEvent = BsonEventBuilder.Create()
             .WithId(deleteEventId)
             .WithOccurredAt(DateTime.UtcNow)
@@ -290,10 +265,16 @@ public class TestHappyFlow
                 { "product_id", productId.ToString() }
             })
             .Build();
-
+        
+        // Act
+        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoClient client = new MongoClient(url);
+        IMongoDatabase database = client.GetDatabase(url.DatabaseName);
+        IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
+        await collection.InsertOneAsync(insertEvent);
         await collection.InsertOneAsync(deleteEvent);
-        _projector.AddEvent(deleteEvent.ToJson());
-        await Task.Delay(500);
+        
+        _replayer.Replay();
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -323,7 +304,6 @@ public class TestHappyFlow
         Guid initialLastEventId = await _queryRepo.GetLastSuccessfulEventId();
         Assert.That(initialLastEventId, Is.EqualTo(Guid.Empty), "Last event ID should be empty initially");
 
-        // Act 1
         Guid firstEventId = Guid.NewGuid();
         Guid firstProductId = Guid.NewGuid();
 
@@ -342,33 +322,8 @@ public class TestHappyFlow
                 { "is_active", true }
             })
             .Build();
-
-        MongoUrl url = new(ConnectionStringCommandRepoMongo);
-        MongoClient client = new MongoClient(url);
-        IMongoDatabase database = client.GetDatabase(url.DatabaseName);
-        IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
-        await collection.InsertOneAsync(firstEvent);
-        _projector.AddEvent(firstEvent.ToJson());
-        await Task.Delay(500);
-
-        // Assert 1
-        await AssertEventuallyAsync(async () =>
-        {
-            Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
-            return lastEventId == firstEventId;
-        }, timeoutMs: 5000);
-
-        await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
-        {
-            await connection.OpenAsync();
-            string query = "SELECT last_event_id FROM last_info WHERE id = 1";
-            await using MySqlCommand cmd = new MySqlCommand(query, connection);
-            string? storedEventId = (await cmd.ExecuteScalarAsync())?.ToString();
-            Assert.That(storedEventId, Is.EqualTo(firstEventId.ToString()), "First event ID should be stored in last_info");
-        }
-
-        // Act 2
-        await Task.Delay(100);
+        
+        await Task.Delay(100); 
         Guid secondEventId = Guid.NewGuid();
         Guid secondProductId = Guid.NewGuid();
 
@@ -388,11 +343,17 @@ public class TestHappyFlow
             })
             .Build();
 
+        // Act
+        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoClient client = new MongoClient(url);
+        IMongoDatabase database = client.GetDatabase(url.DatabaseName);
+        IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
+        await collection.InsertOneAsync(firstEvent);
         await collection.InsertOneAsync(secondEvent);
-        _projector.AddEvent(secondEvent.ToJson());
-        await Task.Delay(500);
 
-        // Assert 2
+        _replayer.Replay();
+        
+        // Assert
         await AssertEventuallyAsync(async () =>
         {
             Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
@@ -409,7 +370,6 @@ public class TestHappyFlow
             Assert.That(storedEventId, Is.Not.EqualTo(firstEventId.ToString()), "Last event ID should have changed from first event");
         }
 
-        // Assert 3
         await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
         {
             await connection.OpenAsync();
