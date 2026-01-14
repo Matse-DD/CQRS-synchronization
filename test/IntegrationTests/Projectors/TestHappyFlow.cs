@@ -66,4 +66,24 @@ public class TestHappyFlow
         
         await Task.Delay(500);
     }
+    
+    [TearDown]
+    public async Task TearDown()
+    {
+        await _cancellationTokenSource.CancelAsync();
+        _cancellationTokenSource.Dispose();
+
+        await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await connectionMySql.OpenAsync();
+        const string cleanupSql = "DROP TABLE IF EXISTS Products; DELETE FROM last_info WHERE collection_name = 'events'";
+        await using MySqlCommand cmd = new MySqlCommand(cleanupSql, connectionMySql);
+        await cmd.ExecuteNonQueryAsync();
+
+        MongoUrl mongoUrl = new(ConnectionStringCommandRepoMongo);
+        MongoClient client = new MongoClient(mongoUrl);
+        IMongoDatabase? database = client.GetDatabase(mongoUrl.DatabaseName);
+        IMongoCollection<BsonDocument>? collection = database.GetCollection<BsonDocument>("events");
+        await collection.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
+    }
+
 }
