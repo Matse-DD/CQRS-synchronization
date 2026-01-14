@@ -66,7 +66,7 @@ public class TestHappyFlow
         
         await Task.Delay(500);
     }
-    
+
     [TearDown]
     public async Task TearDown()
     {
@@ -85,7 +85,6 @@ public class TestHappyFlow
         IMongoCollection<BsonDocument>? collection = database.GetCollection<BsonDocument>("events");
         await collection.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
     }
-
 
     [Test]
     public async Task HappyFlow_INSERT_Should_Sync_From_MongoDB_To_MySQL()
@@ -152,7 +151,6 @@ public class TestHappyFlow
             return lastEventId == eventId;
         }, timeoutMs: 5000);
     }
-
 
     [Test]
     public async Task HappyFlow_UPDATE_Should_Sync_From_MongoDB_To_MySQL()
@@ -320,5 +318,105 @@ public class TestHappyFlow
         }, timeoutMs: 5000);
     }
 
+    [Test]
+    public async Task LastEventId_Should_Update_In_MySQL_After_Each_Projection()
+    {
+        // Arrange
+        Guid initialLastEventId = await _queryRepo.GetLastSuccessfulEventId();
+        Assert.That(initialLastEventId, Is.EqualTo(Guid.Empty), "Last event ID should be empty initially");
 
+        // Act 1
+        Guid firstEventId = Guid.NewGuid();
+        Guid firstProductId = Guid.NewGuid();
+
+        BsonDocument firstEvent = BsonEventBuilder.Create()
+            .WithId(firstEventId)
+            .WithOccurredAt(DateTime.UtcNow)
+            .WithAggregateName("Products")
+            .WithStatus("PENDING")
+            .WithInsertPayload(new Dictionary<string, object>
+            {
+                { "product_id", firstProductId.ToString() },
+                { "name", "First Product" },
+                { "sku", "TRACK-001" },
+                { "price", 10.00 },
+                { "stock_level", 5 },
+                { "is_active", true }
+            })
+            .Build();
+
+        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoClient client = new MongoClient(url);
+        IMongoDatabase database = client.GetDatabase(url.DatabaseName);
+        IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
+        await collection.InsertOneAsync(firstEvent);
+
+        // Assert 1
+        await AssertEventuallyAsync(async () =>
+        {
+            Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
+            return lastEventId == firstEventId;
+        }, timeoutMs: 5000);
+
+        await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
+        {
+            await connection.OpenAsync();
+            string query = "SELECT last_event_id FROM last_info WHERE collection_name = 'events'";
+            await using MySqlCommand cmd = new MySqlCommand(query, connection);
+            string? storedEventId = (await cmd.ExecuteScalarAsync())?.ToString();
+            Assert.That(storedEventId, Is.EqualTo(firstEventId.ToString()), "First event ID should be stored in last_info");
+        }
+
+        // Act 2
+        await Task.Delay(100);
+        Guid secondEventId = Guid.NewGuid();
+        Guid secondProductId = Guid.NewGuid();
+
+        BsonDocument secondEvent = BsonEventBuilder.Create()
+            .WithId(secondEventId)
+            .WithOccurredAt(DateTime.UtcNow)
+            .WithAggregateName("Products")
+            .WithStatus("PENDING")
+            .WithInsertPayload(new Dictionary<string, object>
+            {
+                { "product_id", secondProductId.ToString() },
+                { "name", "Second Product" },
+                { "sku", "TRACK-002" },
+                { "price", 20.00 },
+                { "stock_level", 15 },
+                { "is_active", true }
+            })
+            .Build();
+
+        await collection.InsertOneAsync(secondEvent);
+
+        // Assert 2
+        await AssertEventuallyAsync(async () =>
+        {
+            Guid lastEventId = await _queryRepo.GetLastSuccessfulEventId();
+            return lastEventId == secondEventId;
+        }, timeoutMs: 5000);
+
+        await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
+        {
+            await connection.OpenAsync();
+            string query = "SELECT last_event_id FROM last_info WHERE collection_name = 'events'";
+            await using MySqlCommand cmd = new MySqlCommand(query, connection);
+            string? storedEventId = (await cmd.ExecuteScalarAsync())?.ToString();
+            Assert.That(storedEventId, Is.EqualTo(secondEventId.ToString()), "Second event ID should replace first in last_info");
+            Assert.That(storedEventId, Is.Not.EqualTo(firstEventId.ToString()), "Last event ID should have changed from first event");
+        }
+
+        // Assert 3
+        await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
+        {
+            await connection.OpenAsync();
+            string query = "SELECT COUNT(*) FROM Products WHERE product_id IN (@firstProductId, @secondProductId)";
+            await using MySqlCommand cmd = new MySqlCommand(query, connection);
+            cmd.Parameters.AddWithValue("@firstProductId", firstProductId.ToString());
+            cmd.Parameters.AddWithValue("@secondProductId", secondProductId.ToString());
+            long count = (long)(await cmd.ExecuteScalarAsync())!;
+            Assert.That(count, Is.EqualTo(2), "Both products should exist in MySQL");
+        }
+    }
 }
