@@ -131,7 +131,7 @@ public class TestMySqlEventFactory
 
         // Assert
         Assert.That(determinedEvent, Is.TypeOf(typeof(MySqlDeleteEvent)));
-        const string expectedMySqlCommand = "DELETE FROM Product WHERE name = @name AND price > @price";
+        const string expectedMySqlCommand = "DELETE FROM Product WHERE name = @Condition_name AND price > @Condition_price";
         Assert.That(mySqlCommand, Is.EqualTo(expectedMySqlCommand));
     }
 
