@@ -122,4 +122,18 @@ public class BsonEventBuilder
             .WithUpdatePayload(change, condition)
             .Build();
     }
+
+    public static BsonDocument CreateDeleteEvent(
+        string aggregateName,
+        Dictionary<string, object> condition,
+        Guid? id = null,
+        string status = "PENDING")
+    {
+        return Create()
+            .WithId(id ?? Guid.NewGuid())
+            .WithAggregateName(aggregateName)
+            .WithStatus(status)
+            .WithDeletePayload(condition)
+            .Build();
+    }
 }
