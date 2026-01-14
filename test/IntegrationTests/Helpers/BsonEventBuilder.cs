@@ -93,4 +93,18 @@ public class BsonEventBuilder
     {
         return Build().ToJson();
     }
+
+        public static BsonDocument CreateInsertEvent(
+        string aggregateName,
+        Dictionary<string, object> payload,
+        Guid? id = null,
+        string status = "PENDING")
+    {
+        return Create()
+            .WithId(id ?? Guid.NewGuid())
+            .WithAggregateName(aggregateName)
+            .WithStatus(status)
+            .WithInsertPayload(payload)
+            .Build();
+    }
 }
