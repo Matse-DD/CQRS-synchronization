@@ -171,6 +171,13 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         return result.GetGuid(columnLastEventId);
     }
 
+    public async Task ExecuteSchemaCommand(string command)
+    {
+        using MySqlConnection connection = await OpenMySqlConnection();
+        using MySqlCommand schemaCommand = new MySqlCommand(command, connection);
+        await schemaCommand.ExecuteNonQueryAsync();
+    }
+
     public async Task ExecuteString(string command, Guid eventId)
     {
         using MySqlConnection connection = await OpenMySqlConnection();
