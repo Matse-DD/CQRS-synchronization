@@ -117,7 +117,7 @@ public class TestHappyFlow
         IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
         await collection.InsertOneAsync(insertEvent);
-        
+
         _replayer.Replay();
 
         // Assert
@@ -176,7 +176,7 @@ public class TestHappyFlow
                 { "is_active", true }
             })
             .Build();
-        
+
         Guid updateEventId = Guid.NewGuid();
         string updatedName = "Updated Product Name";
         double updatedPrice = 75.50;
@@ -265,7 +265,7 @@ public class TestHappyFlow
                 { "product_id", productId.ToString() }
             })
             .Build();
-        
+
         // Act
         MongoUrl url = new(ConnectionStringCommandRepoMongo);
         MongoClient client = new MongoClient(url);
@@ -273,7 +273,7 @@ public class TestHappyFlow
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
         await collection.InsertOneAsync(insertEvent);
         await collection.InsertOneAsync(deleteEvent);
-        
+
         _replayer.Replay();
 
         // Assert
@@ -322,8 +322,8 @@ public class TestHappyFlow
                 { "is_active", true }
             })
             .Build();
-        
-        await Task.Delay(100); 
+
+        await Task.Delay(100);
         Guid secondEventId = Guid.NewGuid();
         Guid secondProductId = Guid.NewGuid();
 
@@ -352,7 +352,7 @@ public class TestHappyFlow
         await collection.InsertOneAsync(secondEvent);
 
         _replayer.Replay();
-        
+
         // Assert
         await AssertEventuallyAsync(async () =>
         {
