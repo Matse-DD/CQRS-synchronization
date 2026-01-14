@@ -249,9 +249,10 @@ public class TestHappyFlow
 
         Console.WriteLine($"[UPDATE] Insert EventId: {insertEventId}, ProductId: {productId}, RecordId: {recordId}");
 
+        DateTime insertTimestamp = DateTime.UtcNow;
         BsonDocument insertEvent = BsonEventBuilder.Create()
             .WithId(insertEventId)
-            .WithOccurredAt(DateTime.UtcNow)
+            .WithOccurredAt(insertTimestamp)
             .WithAggregateName("Products")
             .WithStatus("PENDING")
             .WithInsertPayload(new Dictionary<string, object>
@@ -270,9 +271,12 @@ public class TestHappyFlow
         string updatedName = "Updated Product Name";
         double updatedPrice = 75.50;
 
+        Console.WriteLine($"[UPDATE] Update EventId: {updateEventId}");
+
+        DateTime updateTimestamp = insertTimestamp.AddMilliseconds(100); // Ensure UPDATE is later
         BsonDocument updateEvent = BsonEventBuilder.Create()
             .WithId(updateEventId)
-            .WithOccurredAt(DateTime.UtcNow)
+            .WithOccurredAt(updateTimestamp)
             .WithAggregateName("Products")
             .WithStatus("PENDING")
             .WithUpdatePayload(
@@ -294,8 +298,10 @@ public class TestHappyFlow
         IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
         await collection.InsertOneAsync(insertEvent);
+        Console.WriteLine("[UPDATE] INSERT event inserted, waiting 100ms before UPDATE...");
+        await Task.Delay(100); // Ensure UPDATE has later timestamp
         await collection.InsertOneAsync(updateEvent);
-        Console.WriteLine("[UPDATE] Both INSERT and UPDATE events inserted");
+        Console.WriteLine($"[UPDATE] Both events inserted - INSERT: {insertEventId}, UPDATE: {updateEventId}");
 
         Console.WriteLine("[UPDATE] Calling Replay()");
         _replayer.Replay();
