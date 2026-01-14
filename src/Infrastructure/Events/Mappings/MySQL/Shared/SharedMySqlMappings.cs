@@ -1,29 +1,48 @@
 ﻿using Google.Protobuf.WellKnownTypes;
+using static Mysqlx.Expect.Open.Types;
 using static Mysqlx.Expect.Open.Types.Condition.Types;
 
 namespace Infrastructure.Events.Mappings.MySQL.Shared;
 
 public static class SharedMySqlMappings
 {
-    public static string MapWhere(IDictionary<string, string>? condition)
+    public static string MapWhere(string prefix, IDictionary<string, string>? condition)
     {
         if (!DoesConditionExist(condition)) return "True";
 
-        return string.Join(" AND ", condition!.Select(MapConditionPart));
+        return string.Join(" AND ", condition!.Select(conditionPart => MapConditionPart(prefix, conditionPart)));
     }
 
-    private static string MapConditionPart(KeyValuePair<string, string> conditionPart)
+    private static string MapConditionPart(string prefix, KeyValuePair<string, string> conditionPart)
     {
-        string key = conditionPart.Key;
-        string value = conditionPart.Value.Trim();
-        string sqlValue = value.DetermineMySqlValue();
+        string onProperty = conditionPart.Key;
+        string sign = conditionPart.Value.ExtractSign();
+        Console.WriteLine(sign);
+        string parameterizedValue = $"@{prefix}_{onProperty}";
 
-        if (HasConditionSign(value))
+        if (HasConditionSign(sign))
         {
-            return $"{key}{sqlValue}";
+            return $"{onProperty} {sign} {parameterizedValue}";
+        }
+        else
+        {
+            return $"{onProperty} = {parameterizedValue}";
+        }
+    }
+
+    public static Dictionary<string, object> MapValuesToParameters(string prefix, Dictionary<string, string> incoming)
+    {
+        Dictionary<string, object> mappedValues = new Dictionary<string, object>();
+        foreach (KeyValuePair<string, string> keyValuePair in incoming)
+        {
+            string onProperty = keyValuePair.Key;
+            string parameterizedValue = $"@{prefix}_{onProperty}";
+
+            object value = keyValuePair.Value.ExtractValue();
+            mappedValues.Add(parameterizedValue, value);
         }
 
-        return $"{key} = {sqlValue}";
+        return mappedValues;
     }
 
     private static bool HasConditionSign(string value)
