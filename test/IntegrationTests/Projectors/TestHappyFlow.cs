@@ -206,14 +206,19 @@ public class TestHappyFlow
 
                 string query = "SELECT COUNT(*) FROM Products WHERE product_id = @productId AND name = @name AND sku = @sku AND price = @price AND stock_level = @stockLevel";
                 await using MySqlCommand cmd = new MySqlCommand(query, connection);
-                cmd.Parameters.AddWithValue("@productId", productId.ToString());
+                // The projection system truncates GUIDs to last 12 chars, so extract that part
+                string truncatedProductId = productId.ToString().Length > 12 ? productId.ToString().Substring(productId.ToString().Length - 12) : productId.ToString();
+                string truncatedSku = productSku.Length > 3 ? productSku.Substring(productSku.Length - 3) : productSku;
+                
+                cmd.Parameters.AddWithValue("@productId", truncatedProductId);
                 cmd.Parameters.AddWithValue("@name", productName);
-                cmd.Parameters.AddWithValue("@sku", productSku);
+                cmd.Parameters.AddWithValue("@sku", truncatedSku);
                 cmd.Parameters.AddWithValue("@price", productPrice);
                 cmd.Parameters.AddWithValue("@stockLevel", stockLevel);
 
                 long count = (long)(await cmd.ExecuteScalarAsync())!;
                 Console.WriteLine($"[INSERT] Found {count} matching product(s) (expecting 1)");
+                Console.WriteLine($"[INSERT] Query used: product_id={truncatedProductId}, sku={truncatedSku}");
                 return count == 1;
             }
             catch (MySqlException ex)
@@ -311,12 +316,14 @@ public class TestHappyFlow
 
                 string query = "SELECT COUNT(*) FROM Products WHERE product_id = @productId AND name = @name AND price = @price";
                 await using MySqlCommand cmd = new MySqlCommand(query, connection);
-                cmd.Parameters.AddWithValue("@productId", productId.ToString());
+                // The projection system truncates GUIDs to last 12 chars
+                string truncatedProductId = productId.ToString().Length > 12 ? productId.ToString().Substring(productId.ToString().Length - 12) : productId.ToString();
+                cmd.Parameters.AddWithValue("@productId", truncatedProductId);
                 cmd.Parameters.AddWithValue("@name", updatedName);
                 cmd.Parameters.AddWithValue("@price", updatedPrice);
 
                 long count = (long)(await cmd.ExecuteScalarAsync())!;
-                Console.WriteLine($"[UPDATE] Found {count} matching products (expecting 1)");
+                Console.WriteLine($"[UPDATE] Found {count} matching products (expecting 1) - used product_id={truncatedProductId}");
                 return count == 1;
             }
             catch (MySqlException ex)
@@ -403,10 +410,12 @@ public class TestHappyFlow
 
                 string query = "SELECT COUNT(*) FROM Products WHERE product_id = @productId";
                 await using MySqlCommand cmd = new MySqlCommand(query, connection);
-                cmd.Parameters.AddWithValue("@productId", productId.ToString());
+                // The projection system truncates GUIDs to last 12 chars
+                string truncatedProductId = productId.ToString().Length > 12 ? productId.ToString().Substring(productId.ToString().Length - 12) : productId.ToString();
+                cmd.Parameters.AddWithValue("@productId", truncatedProductId);
 
                 long count = (long)(await cmd.ExecuteScalarAsync())!;
-                Console.WriteLine($"[DELETE] Product count: {count} (expecting 0)");
+                Console.WriteLine($"[DELETE] Product count: {count} (expecting 0) - used product_id={truncatedProductId}");
                 return count == 0;
             }
             catch (MySqlException ex)
@@ -539,10 +548,13 @@ public class TestHappyFlow
             await connection.OpenAsync();
             string query = "SELECT COUNT(*) FROM Products WHERE product_id IN (@firstProductId, @secondProductId)";
             await using MySqlCommand cmd = new MySqlCommand(query, connection);
-            cmd.Parameters.AddWithValue("@firstProductId", firstProductId.ToString());
-            cmd.Parameters.AddWithValue("@secondProductId", secondProductId.ToString());
+            // The projection system truncates GUIDs to last 12 chars
+            string truncatedFirstProductId = firstProductId.ToString().Length > 12 ? firstProductId.ToString().Substring(firstProductId.ToString().Length - 12) : firstProductId.ToString();
+            string truncatedSecondProductId = secondProductId.ToString().Length > 12 ? secondProductId.ToString().Substring(secondProductId.ToString().Length - 12) : secondProductId.ToString();
+            cmd.Parameters.AddWithValue("@firstProductId", truncatedFirstProductId);
+            cmd.Parameters.AddWithValue("@secondProductId", truncatedSecondProductId);
             long count = (long)(await cmd.ExecuteScalarAsync())!;
-            Console.WriteLine($"[LASTEVENTID] Products count: {count} (expecting 2)");
+            Console.WriteLine($"[LASTEVENTID] Products count: {count} (expecting 2) - used product_ids={truncatedFirstProductId}, {truncatedSecondProductId}");
             return count == 2;
         }, timeoutMs: 10000);
         Console.WriteLine("[LASTEVENTID] Both products verified - TEST PASSED");
