@@ -48,7 +48,7 @@ public class MySqlSchemaBuilder : ISchemaBuilder
         return jsonValue.ValueKind switch
         {
             JsonValueKind.String => "VARCHAR(255)",
-            JsonValueKind.Number => "INT", //TODO expand to be able to work with decimal, float, ...
+            JsonValueKind.Number => "FLOAT",
             JsonValueKind.True => "BOOL",
             JsonValueKind.False => "BOOL",
             JsonValueKind.Object => "JSON",
