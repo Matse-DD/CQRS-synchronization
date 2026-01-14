@@ -1,5 +1,6 @@
 using Application.Contracts.Persistence;
 using Infrastructure.Persistence.CommandRepository;
+using IntegrationTests.Helpers;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -36,15 +37,13 @@ public class TestMongoDbEventOperations
     {
         // Arrange
         Guid eventId = Guid.NewGuid();
-        BsonDocument doc = BsonDocument.Parse($@"
-            {{
-                ""id"": ""{eventId}"",
-                ""occurredAt"": ""{DateTime.UtcNow:O}"",
-                ""aggregateName"": ""TestAgg"",
-                ""status"": ""PENDING"",
-                ""eventType"": ""INSERT"",
-                ""payload"": {{}}
-            }}");
+        BsonDocument doc = BsonEventBuilder.Create()
+            .WithId(eventId)
+            .WithAggregateName("TestAgg")
+            .WithStatus("PENDING")
+            .WithEventType("INSERT")
+            .WithPayload(new BsonDocument())
+            .Build();
 
         await _collection.InsertOneAsync(doc);
 
