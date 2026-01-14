@@ -1,27 +1,17 @@
-﻿namespace Infrastructure.Events.Mappings.MySQL.Shared;
+﻿using Infrastructure.Events.Mappings.MySQL.Shared;
 
-public static class MySqlExtractionExtensions
+namespace Infrastructure.Events.Mappings.Shared;
+
+public static class ExtractionMethods
 {
     private static readonly IEnumerable<string> POSSIBLE_SIGNS =
     [
-        "+", "-","*","/","<",">","<>","<=",">=", "="
+        "+", "-", "*", "/", "<=", ">=", "<>", "=", "<", ">"
     ];
-
-    public static string DetermineMySqlValue(this string incoming) //TODO mogelijks niet meer nodig
-    {
-        if (!incoming.IsString()) return incoming;
-
-        string sign = incoming.ExtractSign();
-        object value = incoming.ExtractValue();
-
-        //value = value.Sanitize(); //TODO enkel mij properties
-
-        return $"{sign}{value}";
-    }
 
     public static string ExtractSign(this string incoming)
     {
-        if (incoming.IsString()) return ExtractSignForString(incoming);
+        if (IsString(incoming)) return ExtractSignForString(incoming);
 
         string? sign = POSSIBLE_SIGNS.FirstOrDefault(sign => incoming.Contains(sign));
 
@@ -38,7 +28,7 @@ public static class MySqlExtractionExtensions
 
     public static object ExtractValue(this string incoming)
     {
-        if (incoming.IsString())
+        if (IsString(incoming))
         {
             return ExtractStringValue(incoming);
         }
@@ -78,7 +68,7 @@ public static class MySqlExtractionExtensions
         return value;
     }
 
-    public static bool IsString(this string value)
+    public static bool IsString(string value)
     {
         return value.Contains('\'');
     }
