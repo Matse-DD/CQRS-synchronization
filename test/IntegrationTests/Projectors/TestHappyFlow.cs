@@ -274,6 +274,12 @@ public class TestHappyFlow
         Console.WriteLine($"[UPDATE] Update EventId: {updateEventId}");
 
         DateTime updateTimestamp = insertTimestamp.AddMilliseconds(100); // Ensure UPDATE is later
+        
+        // The projection system truncates GUIDs to last 12 chars, so use truncated value in UPDATE condition
+        string truncatedProductIdForUpdate = productId.ToString().Length > 12 
+            ? productId.ToString().Substring(productId.ToString().Length - 12) 
+            : productId.ToString();
+        
         BsonDocument updateEvent = BsonEventBuilder.Create()
             .WithId(updateEventId)
             .WithOccurredAt(updateTimestamp)
@@ -287,7 +293,7 @@ public class TestHappyFlow
                 },
                 condition: new Dictionary<string, object>
                 {
-                    { "product_id", productId.ToString() }
+                    { "product_id", truncatedProductIdForUpdate }
                 })
             .Build();
 
