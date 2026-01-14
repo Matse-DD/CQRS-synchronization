@@ -419,4 +419,16 @@ public class TestHappyFlow
             Assert.That(count, Is.EqualTo(2), "Both products should exist in MySQL");
         }
     }
+
+    private async Task AssertEventuallyAsync(Func<Task<bool>> condition, int timeoutMs)
+    {
+        DateTime start = DateTime.UtcNow;
+        while ((DateTime.UtcNow - start).TotalMilliseconds < timeoutMs)
+        {
+            if (await condition()) return;
+            await Task.Delay(100);
+        }
+
+        Assert.Fail($"Condition was not met within {timeoutMs}ms");
+    }
 }
