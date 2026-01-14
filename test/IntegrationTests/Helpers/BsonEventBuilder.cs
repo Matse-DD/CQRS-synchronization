@@ -24,4 +24,35 @@ public class BsonEventBuilder
         _occurredAt = occurredAt;
         return this;
     }
+
+    public BsonEventBuilder WithAggregateName(string aggregateName)
+    {
+        _aggregateName = aggregateName;
+        return this;
+    }
+
+    public BsonEventBuilder WithStatus(string status)
+    {
+        _status = status;
+        return this;
+    }
+
+    public BsonEventBuilder WithEventType(string eventType)
+    {
+        _eventType = eventType;
+        return this;
+    }
+
+    public BsonEventBuilder WithPayload(BsonDocument payload)
+    {
+        _payload = payload;
+        return this;
+    }
+
+    public BsonEventBuilder WithInsertPayload(Dictionary<string, object> fields)
+    {
+        _eventType = "INSERT";
+        _payload = new BsonDocument(fields.Select(kvp => new BsonElement(kvp.Key, BsonValue.Create(kvp.Value))));
+        return this;
+    }
 }
