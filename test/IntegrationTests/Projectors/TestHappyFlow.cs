@@ -131,7 +131,7 @@ public class TestHappyFlow
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
         await collection.InsertOneAsync(insertEvent);
 
-        _replayer.Replay();
+        _ = _replayer.Replay();
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -231,7 +231,7 @@ public class TestHappyFlow
         await Task.Delay(100);
         await collection.InsertOneAsync(updateEvent);
 
-        _replayer.Replay();
+        _ = _replayer.Replay();
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -300,7 +300,7 @@ public class TestHappyFlow
         await collection.InsertOneAsync(insertEvent);
         await collection.InsertOneAsync(deleteEvent);
 
-        _replayer.Replay();
+        _ = _replayer.Replay();
 
         // Assert
         await AssertEventuallyAsync(async () =>
@@ -388,7 +388,7 @@ public class TestHappyFlow
         await collection.InsertOneAsync(firstEvent);
         await collection.InsertOneAsync(secondEvent);
 
-        _replayer.Replay();
+        _ = _replayer.Replay();
 
         // Assert
         await AssertEventuallyAsync(async () =>

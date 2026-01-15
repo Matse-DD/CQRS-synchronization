@@ -6,10 +6,10 @@ namespace Infrastructure.Replay;
 
 public class Replayer(ICommandRepository commandRepository, IQueryRepository queryRepository, Projector projector, ILogger<Replayer> logger)
 {
-    public void Replay()
+    public Task Replay()
     {
         projector.Lock();
-        _ = StartReplaying();
+        return StartReplaying();
     }
 
     private async Task StartReplaying()

@@ -23,7 +23,9 @@ public static class ExtractionMethods
     {
         int startIndexStringForLength = incoming.IndexOf('\'');
 
-        return incoming.Substring(0, startIndexStringForLength);
+        string expectedSign = incoming.Substring(0, startIndexStringForLength);
+
+        return expectedSign.ExtractSign();
     }
 
     public static object ExtractValue(this string incoming)
