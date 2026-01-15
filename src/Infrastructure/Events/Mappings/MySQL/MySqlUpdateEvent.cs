@@ -24,18 +24,14 @@ public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent
 
     private static string MapSet(string prefix, IDictionary<string, string> change)
     {
-        return string.Join(", ", change.Select(changePair => ParameterizedChange(prefix, changePair)));
+        return string.Join(", ", change.Select(changePair => MapChangePart(prefix, changePair)));
     }
 
-    private static string ParameterizedChange(string prefix, KeyValuePair<string, string> changePart)
+    private static string MapChangePart(string prefix, KeyValuePair<string, string> changePart)
     {
-        return $"{changePart.Key} = {DetermineChange(prefix, changePart.Key, changePart.Value)}";
-    }
+        string onProperty = changePart.Key;
+        string sign = changePart.Value.ExtractSign();
 
-    private static string DetermineChange(string prefix, string key, string change)
-    {
-        string sign = change.ExtractSign();
-
-        return $"{key} {sign} @{prefix}_{key}";
+        return $"{onProperty} {sign} @{prefix}_{onProperty}";
     }
 }
