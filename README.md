@@ -72,6 +72,86 @@ A short explanation of the necessary environment variables:
 - SEQ_SERVER_URL= url of the SEQ log monitoring dashboard
 - SEQ_API_KEY= API key of the SEQ log monitoring dashboard
 
+## Structure of Events
+Events are structured like this
+
+```json
+{
+  "eventId": "c7a15639-872a-40bc-af08-7d790740b2fa", //UUID
+  "occurredAt": "2026-01-15T09:59:00Z",
+  "aggregateName": "string",
+  "status": "PENDING",
+  "eventType": "INSERT" | "UPDATE" | "DELETE",
+  "payload": {
+    /*
+    depends on the typze of event
+    - for insert it will be the properties incluiding id,
+    - for update it will be the condition and the changes
+    - for delete it will be the condition 
+    
+    below here are how the types of the values should be structured
+    */
+    "string": "'value'", // don't forget the single quotes around the value
+    "number": 123,
+    "boolean": "TRUE" | "FALSE",
+  }
+}
+```
+The status when sent should be `PENDING`. When it is handled the status will change to `DONE`.
+
+Below are some examples:
+```json
+//INSERT
+{
+  "id": "491ba616-fe56-4a01-a86f-0efd7913a73b",
+  "aggregateName": "cars",
+  "eventType": "INSERT",
+  "occurredAt": "2026-01-03T16:08:01.139Z",
+  "payload": {
+    "id": "'15c17874-33ce-4d18-ad09-4fec29f22d2e'",
+    "milage": 10,
+    "driving": true,
+    "name": "'BMW'",
+    "price": 50500.58
+  },
+  "status": "PENDING"
+}
+
+//UPDATE
+{
+  "id": "c56423c2-ec67-4202-9646-a08be1386a92",
+  "aggregateName": "cars",
+  "eventType": "UPDATE",
+  "occurredAt": "2026-01-14T10:18:13.000Z",
+  "payload": {
+    "condition": {
+      "milage": "10",
+      "price": "price > 50000"
+    },
+    "change":{
+      "price": "* 5",
+      "name" : "'Audi'"
+    }
+  },
+  "status": "PENDING"
+}
+
+//DELETE
+{
+  "id": "abf41769-6efb-4f94-b5dd-d9442ea6d8e8",
+  "aggregateName": "cars",
+  "eventType": "DELETE",
+  "occurredAt": ISODate("2026-01-14T10:18:13.000Z"),
+  "payload": {
+    "condition": {
+      "milage": ">= 10",
+      "price": "price > 50000"
+    },
+  },
+  "status": "PENDING"
+}
+```
+
 ## Demo
 
 The demo (in the repos below) is a simple user management application using a MongoDB command database and a MySQL query database
@@ -85,6 +165,8 @@ Then you can run all tests (unit and integration) by running
 ```bash
 dotnet test
 ```
+
+
 
 ## Links
 
