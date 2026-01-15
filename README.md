@@ -45,6 +45,15 @@ services:
 
 If the environment variables are correcly set, the service will automatically connect to the two databases and update the query database when necessary.
 
+## Configuration
+
+A short explanation of the necessary environment variables:
+
+- CONNECTION_STRING_COMMAND_DB: connection string of the command database
+- CONNECTION_STRING_QUERY_DB: connection string of the query database
+- SEQ_SERVER_URL= url of the SEQ log monitoring dashboard
+- SEQ_API_KEY= API key of the SEQ log monitoring dashboard
+
 ### How to get SEQ api key
 In order to monitor the logs, the seq framework is provided in the docker compose. However the API key will still need to be provided. This section explains how you can obtain it.
 
@@ -63,14 +72,6 @@ Click on the add API key button and fill in the following form:
 Just give it a title and set the minimum level to Information and click Save changes.
 
 You will get a  pop-up showing the api key, which you need to copy and put in the env files
-## Configuration
-
-A short explanation of the necessary environment variables:
-
-- CONNECTION_STRING_COMMAND_DB: connection string of the command database
-- CONNECTION_STRING_QUERY_DB: connection string of the query database
-- SEQ_SERVER_URL= url of the SEQ log monitoring dashboard
-- SEQ_API_KEY= API key of the SEQ log monitoring dashboard
 
 ## Structure of Events
 Events are structured like this
