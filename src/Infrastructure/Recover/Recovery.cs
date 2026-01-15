@@ -9,12 +9,12 @@ namespace Infrastructure.Recover;
 
 public class Recovery(ICommandRepository commandRepository, IQueryRepository queryRepository, Projector projector, ILogger<Recovery> logger)
 {
-    public void Recover()
+    public Task Recover()
     {
         logger.LogInformation("Initiating Recovery Process...");
         projector.Lock();
 
-        _ = StartRecovering();
+        return StartRecovering();
     }
 
     private async Task StartRecovering()
