@@ -164,7 +164,7 @@ Below are some examples:
 
 ## Demo
 
-The demo (in the repos below) is a simple user management application using a MongoDB command database and a MySQL query database
+The [demo (in the repos below)](#links) is a simple user management application using a MongoDB command database and a MySQL query database
 
 ## Tests
 In order to run the integration tests you have to first setup the docker environment by running
@@ -175,8 +175,6 @@ Then you can run all tests (unit and integration) by running
 ```bash
 dotnet test
 ```
-
-
 
 ## Links
 
