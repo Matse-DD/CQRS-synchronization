@@ -92,7 +92,7 @@ Events are structured like this
     below here are how the types of the values should be structured
     */
     "string": "'value'", // don't forget the single quotes around the value
-    "number": 123,
+    "number": "123",
     "boolean": "TRUE" | "FALSE",
   }
 }
