@@ -12,6 +12,7 @@ By Youri Haentjens, Pratik Lohani, Lander Debeir & Matse De Deyn
 - [Structure of events](#structure-of-events)
 - [Demo](#demo)
 - [Tests](#tests)
+- [Troubleshooting](#troubleshooting)
 - [Links](#links)
 
 ## Usage
@@ -102,7 +103,7 @@ Events are structured like this
   "eventType": "INSERT" | "UPDATE" | "DELETE",
   "payload": {
     /*
-    depends on the typze of event
+    depends on the type of event
     - for insert it will be the properties incluiding id,
     - for update it will be the condition and the changes
     - for delete it will be the condition 
@@ -183,6 +184,14 @@ Then you can run all tests (unit and integration) by running
 ```bash
 dotnet test
 ```
+
+## Troubleshooting
+
+### Databases are not yet started
+wait until the databases are started and try again later
+
+### Events are formatted incorrectly
+Problems with events can be found in logging.
 
 ## Links
 
