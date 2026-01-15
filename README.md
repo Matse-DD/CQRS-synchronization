@@ -6,6 +6,7 @@ By Youri Haentjens, Pratik Lohani, Lander Debeir & Matse De Deyn
 
 ## Contents
 - [Usage](#usage)
+- [Features](#features)
 - [Configuration](#configuration)
     - [How to get SEQ api key](#how-to-get-seq-api-key)
 - [Structure of events](#structure-of-events)
@@ -53,6 +54,13 @@ services:
 ```
 
 If the environment variables are correcly set, the service will automatically connect to the two databases and update the query database when necessary.
+
+## Features
+
+- (CQRS) Synchronization between a read and write database.
+- Recovery and Replay mechanisms.
+- Monitoring of logs (via SEQ).
+- Webapi (on the webApi branch and accessible via http://localhost:5000/swagger/index.html once you launch it).
 
 ## Configuration
 
