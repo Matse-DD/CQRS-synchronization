@@ -5,12 +5,12 @@ using Infrastructure.Replay;
 
 namespace Main.Initialization;
 
-public class SyncApplication(Replayer replay, Recovery recover, IObserver observer, Projector projector)
+public class SyncApplication(Replayer replayer, Recovery recovery, IObserver observer, Projector projector)
 {
     public async Task RunAsync(CancellationToken cancellationToken = default)
     {
-        recover.Recover();
-        //replay.Replay(); // This can be used instead of recover it replays all events instead of just the pending events.
+        _ = recovery.Recover();
+        //_ = replayer.Replay(); // This can be used instead of recover it replays all events instead of just the pending events.
         await observer.StartListening(projector.AddEvent, cancellationToken);
     }
 }
