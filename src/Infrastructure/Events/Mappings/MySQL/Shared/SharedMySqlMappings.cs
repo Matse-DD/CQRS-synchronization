@@ -18,12 +18,22 @@ public static class SharedMySqlMappings
 
         if (HasConditionSign(sign))
         {
-            return $"{onProperty} {sign} {parameterizedValue}";
+            return ExplicitCondition(onProperty, sign, parameterizedValue);
         }
         else
         {
-            return $"{onProperty} = {parameterizedValue}";
+            return ImplicitCondition(onProperty, parameterizedValue);
         }
+    }
+
+    private static string ExplicitCondition(string onProperty, string sign, string parameterizedValue)
+    {
+        return $"{onProperty} {sign} {parameterizedValue}";
+    }
+
+    private static string ImplicitCondition(string onProperty, string parameterizedValue)
+    {
+        return $"{onProperty} = {parameterizedValue}";
     }
 
     public static Dictionary<string, object> MapValuesToParameters(string prefix, Dictionary<string, string> incoming)
