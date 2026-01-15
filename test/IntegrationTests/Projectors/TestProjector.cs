@@ -64,7 +64,7 @@ public class TestProjector
         string lastEventId = ExtractEventId(eventsAdded.Last());
 
         Recovery recover = new Recovery(commandRepo, queryRepo, projector, NullLogger<Recovery>.Instance);
-        recover.Recover();
+        _ = recover.Recover();
 
         // Assert
         await AssertEventuallyAsync(async () =>

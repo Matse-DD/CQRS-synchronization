@@ -2,7 +2,6 @@
 using Application.Contracts.Persistence;
 using Infrastructure.Projectors;
 using Microsoft.Extensions.Logging;
-using SharpCompress.Common;
 using System.Text.Json;
 
 namespace Infrastructure.Recover;

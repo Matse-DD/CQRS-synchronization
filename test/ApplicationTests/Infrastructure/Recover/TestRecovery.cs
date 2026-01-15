@@ -74,7 +74,7 @@ public class TestRecovery
         // Act
         projector.Lock();
         observer.StartListening(projector.AddEvent, CancellationToken.None);
-        recovery.Recover();
+        _ = recovery.Recover();
 
         // Assert
         SleepTillReady(queryRepository);
@@ -129,7 +129,7 @@ public class TestRecovery
         Recovery recovery = new Recovery(commandRepository, queryRepository, projector, NullLogger<Recovery>.Instance);
 
         // Act
-        recovery.Recover();
+        _ = recovery.Recover();
 
         // Assert
         SleepTillReady(queryRepository);
