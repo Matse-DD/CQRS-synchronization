@@ -93,7 +93,7 @@ Events are structured like this
     */
     "string": "'value'", // don't forget the single quotes around the value
     "number": "123",
-    "boolean": "TRUE" | "FALSE",
+    "boolean": "true" | "false",
   }
 }
 ```
@@ -109,10 +109,10 @@ Below are some examples:
   "occurredAt": "2026-01-03T16:08:01.139Z",
   "payload": {
     "id": "'15c17874-33ce-4d18-ad09-4fec29f22d2e'",
-    "milage": 10,
-    "driving": true,
+    "milage": "10",
+    "driving": "true",
     "name": "'BMW'",
-    "price": 50500.58
+    "price": "50500.58"
   },
   "status": "PENDING"
 }
