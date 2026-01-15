@@ -41,7 +41,6 @@ services:
             command-db: service_healthy
             query-db: service_healthy
         env_file: .cqrs-sync.env
-
 ```
 
 If the environment variables are correcly set, the service will automatically connect to the two databases and update the query database when necessary.
@@ -76,6 +75,16 @@ A short explanation of the necessary environment variables:
 ## Demo
 
 The demo (in the repos below) is a simple user management application using a MongoDB command database and a MySQL query database
+
+## Tests
+In order to run the integration tests you have to first setup the docker environment by running
+```bash
+docker compose -f ./test/IntegrationTests/config/docker-compose.yml up -d
+```
+Then you can run all tests (unit and integration) by running
+```bash
+dotnet test
+```
 
 ## Links
 
