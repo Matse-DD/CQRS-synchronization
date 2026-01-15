@@ -3,6 +3,7 @@ using Application.Contracts.Events.Factory;
 using Application.Contracts.Persistence;
 using Infrastructure.Events.Mappings.MySQL.Shared;
 using Infrastructure.Events.Mappings.Shared;
+using static Mysqlx.Expect.Open.Types.Condition.Types;
 
 namespace Infrastructure.Events.Mappings.MySQL;
 
@@ -32,6 +33,18 @@ public class MySqlUpdateEvent(IntermediateEvent intermediateEvent) : UpdateEvent
         string onProperty = changePart.Key;
         string sign = changePart.Value.ExtractSign();
 
-        return $"{onProperty} {sign} @{prefix}_{onProperty}";
+        if (sign == "") return ImplicitEqualsChange(prefix, onProperty);
+
+        return ExplicitChange(prefix, onProperty, sign);
+    }
+
+    private static string ExplicitChange(string prefix, string onProperty, string sign)
+    {
+        return $"{onProperty} = {onProperty} {sign} @{prefix}_{onProperty}";
+    }
+
+    private static string ImplicitEqualsChange(string prefix, string onProperty)
+    {
+        return $"{onProperty} = @{prefix}_{onProperty}";
     }
 }
