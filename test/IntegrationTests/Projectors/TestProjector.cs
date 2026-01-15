@@ -8,6 +8,7 @@ using Infrastructure.Persistence.QueryRepository;
 using Infrastructure.Projectors;
 using Infrastructure.Recover;
 using Infrastructure.Replay;
+using IntegrationTests.Helpers;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -17,14 +18,10 @@ namespace IntegrationTests.Projectors;
 
 public class TestProjector
 {
-    private const string ConnectionStringToStartRepoMySql = "Server=localhost;Port=13306;User=root;Password=;";
-    private const string ConnectionStringQueryRepoMySql = "Server=localhost;Port=13306;Database=cqrs_read;User=root;Password=;";
-    private const string ConnectionStringCommandRepoMongo = "mongodb://localhost:27017/users?connect=direct&replicaSet=rs0";
-
     [OneTimeSetUp]
     public async Task Set_DatabasesUp()
     {
-        await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringToStartRepoMySql);
+        await using MySqlConnection connectionMySql = new MySqlConnection(TestConnectionStrings.MySqlSetup);
         await connectionMySql.OpenAsync();
 
         string queryToStart = "CREATE DATABASE IF NOT EXISTS cqrs_read; USE cqrs_read;";
@@ -36,13 +33,13 @@ public class TestProjector
     [TearDown]
     public async Task CleanUp()
     {
-        await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection connectionMySql = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await connectionMySql.OpenAsync();
         const string cleanupSql = "DROP TABLE IF EXISTS Products; UPDATE last_info SET last_event_id = NULL WHERE id = 1";
         await using MySqlCommand cmd = new MySqlCommand(cleanupSql, connectionMySql);
         await cmd.ExecuteNonQueryAsync();
 
-        MongoUrl mongoUrl = new(ConnectionStringCommandRepoMongo);
+        MongoUrl mongoUrl = new(TestConnectionStrings.MongoDbCommand);
         MongoClient client = new MongoClient(mongoUrl);
         IMongoDatabase? database = client.GetDatabase(mongoUrl.DatabaseName);
         IMongoCollection<BsonDocument>? collection = database.GetCollection<BsonDocument>("events");
@@ -54,8 +51,8 @@ public class TestProjector
     public async Task Recover_Should_Handle_Events_That_Are_In_Outbox()
     {
         // Arrange
-        ICommandRepository commandRepo = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
-        IQueryRepository queryRepo = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        ICommandRepository commandRepo = new MongoDbCommandRepository(TestConnectionStrings.MongoDbCommand, NullLogger<MongoDbCommandRepository>.Instance);
+        IQueryRepository queryRepo = new MySqlQueryRepository(TestConnectionStrings.MySqlQuery, NullLogger<MySqlQueryRepository>.Instance);
         IEventFactory eventFactory = new MySqlEventFactory();
         ISchemaBuilder schemaBuilder = new MySqlSchemaBuilder();
 
@@ -81,8 +78,8 @@ public class TestProjector
     public async Task Replay_Should_Handle_Events_That_Are_In_Outbox()
     {
         //Arrange
-        ICommandRepository commandRepository = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
-        IQueryRepository queryRepository = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        ICommandRepository commandRepository = new MongoDbCommandRepository(TestConnectionStrings.MongoDbCommand, NullLogger<MongoDbCommandRepository>.Instance);
+        IQueryRepository queryRepository = new MySqlQueryRepository(TestConnectionStrings.MySqlQuery, NullLogger<MySqlQueryRepository>.Instance);
         IEventFactory eventFactory = new MySqlEventFactory();
         ISchemaBuilder schemaBuilder = new MySqlSchemaBuilder();
 
@@ -106,13 +103,13 @@ public class TestProjector
     public async Task ChangeStream_Should_PickUp_New_Events()
     {
         // Arrange
-        ICommandRepository commandRepo = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
-        IQueryRepository queryRepo = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        ICommandRepository commandRepo = new MongoDbCommandRepository(TestConnectionStrings.MongoDbCommand, NullLogger<MongoDbCommandRepository>.Instance);
+        IQueryRepository queryRepo = new MySqlQueryRepository(TestConnectionStrings.MySqlQuery, NullLogger<MySqlQueryRepository>.Instance);
         IEventFactory eventFactory = new MySqlEventFactory();
         ISchemaBuilder schemaBuilder = new MySqlSchemaBuilder();
 
         Projector projector = new Projector(commandRepo, queryRepo, eventFactory, NullLogger<Projector>.Instance, schemaBuilder);
-        MongoDbObserver observer = new MongoDbObserver(ConnectionStringCommandRepoMongo, NullLogger<MongoDbObserver>.Instance);
+        MongoDbObserver observer = new MongoDbObserver(TestConnectionStrings.MongoDbCommand, NullLogger<MongoDbObserver>.Instance);
 
         using CancellationTokenSource cancellationToken = new CancellationTokenSource();
         Task observerTask = observer.StartListening(projector.AddEvent, cancellationToken.Token);
@@ -151,7 +148,7 @@ public class TestProjector
     private ICollection<string> AddEventToOutbox()
     {
         ICollection<string> events = new List<string>();
-        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoUrl url = new(TestConnectionStrings.MongoDbCommand);
         MongoClient client = new MongoClient(url);
         IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events")!;

@@ -1,5 +1,6 @@
 using Application.Contracts.Persistence;
 using Infrastructure.Persistence.QueryRepository;
+using IntegrationTests.Helpers;
 using Microsoft.Extensions.Logging.Abstractions;
 using MySql.Data.MySqlClient;
 
@@ -7,14 +8,12 @@ namespace IntegrationTests.Persistence;
 
 public class TestMySqlQueryRepository
 {
-    private const string ConnectionStringQueryRepoMySql = "Server=localhost;Port=13306;Database=cqrs_read;User=root;Password=;";
     private MySqlQueryRepository _repository;
 
     [OneTimeSetUp]
     public async Task OneTimeSetUp()
     {
-        const string connectionNoDb = "Server=localhost;Port=13306;User=root;Password=;";
-        await using MySqlConnection connection = new MySqlConnection(connectionNoDb);
+        await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlSetup);
         await connection.OpenAsync();
 
         const string setupSql = @"
@@ -33,9 +32,9 @@ public class TestMySqlQueryRepository
     [SetUp]
     public async Task SetUp()
     {
-        _repository = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        _repository = new MySqlQueryRepository(TestConnectionStrings.MySqlQuery, NullLogger<MySqlQueryRepository>.Instance);
 
-        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await connection.OpenAsync();
 
         await using MySqlCommand cmd = new MySqlCommand("UPDATE last_info SET last_event_id = NULL WHERE id = 1; TRUNCATE TABLE TestTable;", connection);
@@ -66,7 +65,7 @@ public class TestMySqlQueryRepository
         Guid storedId = await _repository.GetLastSuccessfulEventId();
         Assert.That(storedId, Is.EqualTo(eventId));
 
-        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await connection.OpenAsync();
         await using MySqlCommand verifyCmd = new MySqlCommand("SELECT count(*) FROM TestTable WHERE name = 'IntegrationTest'", connection);
         long count = (long)(await verifyCmd.ExecuteScalarAsync())!;

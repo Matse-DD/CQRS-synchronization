@@ -17,10 +17,6 @@ namespace IntegrationTests.Projectors;
 
 public class TestHappyFlow
 {
-    private const string ConnectionStringToStartRepoMySql = "Server=localhost;Port=13306;User=root;Password=;";
-    private const string ConnectionStringQueryRepoMySql = "Server=localhost;Port=13306;Database=cqrs_read;User=root;Password=;";
-    private const string ConnectionStringCommandRepoMongo = "mongodb://localhost:27017/users?connect=direct&replicaSet=rs0";
-
     private ICommandRepository _commandRepo;
     private IQueryRepository _queryRepo;
     private Projector _projector;
@@ -29,7 +25,7 @@ public class TestHappyFlow
     [OneTimeSetUp]
     public async Task OneTimeSetUp()
     {
-        await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringToStartRepoMySql);
+        await using MySqlConnection connectionMySql = new MySqlConnection(TestConnectionStrings.MySqlSetup);
         await connectionMySql.OpenAsync();
 
         string queryToStart = "CREATE DATABASE IF NOT EXISTS cqrs_read; USE cqrs_read;";
@@ -48,7 +44,7 @@ public class TestHappyFlow
     [SetUp]
     public async Task SetUp()
     {
-        await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection connectionMySql = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await connectionMySql.OpenAsync();
         const string dropProductsSql = "DROP TABLE IF EXISTS Products";
         await using (MySqlCommand dropProducts = new MySqlCommand(dropProductsSql, connectionMySql))
@@ -68,14 +64,14 @@ public class TestHappyFlow
             await insertLastInfo.ExecuteNonQueryAsync();
         }
 
-        MongoUrl mongoUrl = new(ConnectionStringCommandRepoMongo);
+        MongoUrl mongoUrl = new(TestConnectionStrings.MongoDbCommand);
         MongoClient client = new MongoClient(mongoUrl);
         IMongoDatabase? database = client.GetDatabase(mongoUrl.DatabaseName);
         IMongoCollection<BsonDocument>? collection = database.GetCollection<BsonDocument>("events");
         await collection.DeleteManyAsync(Builders<BsonDocument>.Filter.Empty);
 
-        _commandRepo = new MongoDbCommandRepository(ConnectionStringCommandRepoMongo, NullLogger<MongoDbCommandRepository>.Instance);
-        _queryRepo = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        _commandRepo = new MongoDbCommandRepository(TestConnectionStrings.MongoDbCommand, NullLogger<MongoDbCommandRepository>.Instance);
+        _queryRepo = new MySqlQueryRepository(TestConnectionStrings.MySqlQuery, NullLogger<MySqlQueryRepository>.Instance);
         IEventFactory eventFactory = new MySqlEventFactory();
         ISchemaBuilder schemaBuilder = new MySqlSchemaBuilder();
 
@@ -86,13 +82,13 @@ public class TestHappyFlow
     [TearDown]
     public async Task TearDown()
     {
-        await using MySqlConnection connectionMySql = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection connectionMySql = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await connectionMySql.OpenAsync();
         const string cleanupSql = "UPDATE last_info SET last_event_id = NULL WHERE id = 1";
         await using MySqlCommand cmd = new MySqlCommand(cleanupSql, connectionMySql);
         await cmd.ExecuteNonQueryAsync();
 
-        MongoUrl mongoUrl = new(ConnectionStringCommandRepoMongo);
+        MongoUrl mongoUrl = new(TestConnectionStrings.MongoDbCommand);
         MongoClient client = new MongoClient(mongoUrl);
         IMongoDatabase? database = client.GetDatabase(mongoUrl.DatabaseName);
         IMongoCollection<BsonDocument>? collection = database.GetCollection<BsonDocument>("events");
@@ -129,7 +125,7 @@ public class TestHappyFlow
             .Build();
 
         // Act
-        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoUrl url = new(TestConnectionStrings.MongoDbCommand);
         MongoClient client = new MongoClient(url);
         IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
@@ -142,7 +138,7 @@ public class TestHappyFlow
         {
             try
             {
-                await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+                await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
                 await connection.OpenAsync();
 
                 string checkTableQuery = "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'cqrs_read' AND table_name = 'Products'";
@@ -227,7 +223,7 @@ public class TestHappyFlow
             .Build();
 
         // Act
-        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoUrl url = new(TestConnectionStrings.MongoDbCommand);
         MongoClient client = new MongoClient(url);
         IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
@@ -242,7 +238,7 @@ public class TestHappyFlow
         {
             try
             {
-                await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+                await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
                 await connection.OpenAsync();
 
                 string query = "SELECT COUNT(*) FROM Products WHERE product_id = @productId";
@@ -297,7 +293,7 @@ public class TestHappyFlow
             .Build();
 
         // Act
-        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoUrl url = new(TestConnectionStrings.MongoDbCommand);
         MongoClient client = new MongoClient(url);
         IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
@@ -311,7 +307,7 @@ public class TestHappyFlow
         {
             try
             {
-                await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+                await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
                 await connection.OpenAsync();
 
                 string query = "SELECT COUNT(*) FROM Products WHERE product_id = @productId";
@@ -385,7 +381,7 @@ public class TestHappyFlow
             .Build();
 
         // Act
-        MongoUrl url = new(ConnectionStringCommandRepoMongo);
+        MongoUrl url = new(TestConnectionStrings.MongoDbCommand);
         MongoClient client = new MongoClient(url);
         IMongoDatabase database = client.GetDatabase(url.DatabaseName);
         IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("events");
@@ -403,7 +399,7 @@ public class TestHappyFlow
 
         await AssertEventuallyAsync(async () =>
         {
-            await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+            await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
             await connection.OpenAsync();
             string query = "SELECT last_event_id FROM last_info WHERE id = 1";
             await using MySqlCommand cmd = new MySqlCommand(query, connection);
@@ -411,7 +407,7 @@ public class TestHappyFlow
             return storedEventId == secondEventId.ToString();
         }, timeoutMs: 10000);
 
-        await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
+        await using (MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery))
         {
             await connection.OpenAsync();
             string query = "SELECT last_event_id FROM last_info WHERE id = 1";
@@ -423,7 +419,7 @@ public class TestHappyFlow
 
         await AssertEventuallyAsync(async () =>
         {
-            await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+            await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
             await connection.OpenAsync();
             string query = "SELECT COUNT(*) FROM Products WHERE product_id IN (@firstProductId, @secondProductId)";
             await using MySqlCommand cmd = new MySqlCommand(query, connection);

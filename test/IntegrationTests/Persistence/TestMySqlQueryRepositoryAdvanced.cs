@@ -1,5 +1,6 @@
 using Application.Contracts.Persistence;
 using Infrastructure.Persistence.QueryRepository;
+using IntegrationTests.Helpers;
 using Microsoft.Extensions.Logging.Abstractions;
 using MySql.Data.MySqlClient;
 
@@ -7,14 +8,12 @@ namespace IntegrationTests.Persistence;
 
 public class TestMySqlQueryRepositoryAdvanced
 {
-    private const string ConnectionStringQueryRepoMySql = "Server=localhost;Port=13306;Database=cqrs_read;User=root;Password=;";
     private MySqlQueryRepository _repository;
 
     [OneTimeSetUp]
     public async Task OneTimeSetUp()
     {
-        const string connectionNoDb = "Server=localhost;Port=13306;User=root;Password=;";
-        await using MySqlConnection connection = new MySqlConnection(connectionNoDb);
+        await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlSetup);
         await connection.OpenAsync();
 
         const string setupSql = @"
@@ -33,9 +32,9 @@ public class TestMySqlQueryRepositoryAdvanced
     [SetUp]
     public async Task SetUp()
     {
-        _repository = new MySqlQueryRepository(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        _repository = new MySqlQueryRepository(TestConnectionStrings.MySqlQuery, NullLogger<MySqlQueryRepository>.Instance);
 
-        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await connection.OpenAsync();
 
         await using MySqlCommand cmd = new MySqlCommand(@"
@@ -58,7 +57,7 @@ public class TestMySqlQueryRepositoryAdvanced
         await _repository.Execute(new CommandInfo(command), eventId);
 
         // Assert
-        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await connection.OpenAsync();
         await using MySqlCommand verifyCmd = new MySqlCommand("SELECT COUNT(*) FROM Products", connection);
         long count = (long)(await verifyCmd.ExecuteScalarAsync())!;
@@ -72,7 +71,7 @@ public class TestMySqlQueryRepositoryAdvanced
     public async Task Execute_Should_Handle_Update_Statements()
     {
         // Arrange
-        await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
+        await using (MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery))
         {
             await connection.OpenAsync();
             await using MySqlCommand insertCmd = new MySqlCommand(
@@ -87,7 +86,7 @@ public class TestMySqlQueryRepositoryAdvanced
         await _repository.Execute(new CommandInfo(command), eventId);
 
         // Assert
-        await using MySqlConnection verifyConn = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection verifyConn = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await verifyConn.OpenAsync();
         await using MySqlCommand verifyCmd = new MySqlCommand(
             "SELECT price FROM Products WHERE name = 'Test'", verifyConn);
@@ -99,7 +98,7 @@ public class TestMySqlQueryRepositoryAdvanced
     public async Task Execute_Should_Handle_Delete_Statements()
     {
         // Arrange
-        await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
+        await using (MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery))
         {
             await connection.OpenAsync();
             await using MySqlCommand insertCmd = new MySqlCommand(
@@ -115,7 +114,7 @@ public class TestMySqlQueryRepositoryAdvanced
         await _repository.Execute(new CommandInfo(command), eventId);
 
         // Assert
-        await using MySqlConnection verifyConn = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection verifyConn = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await verifyConn.OpenAsync();
         await using MySqlCommand verifyCmd = new MySqlCommand("SELECT COUNT(*) FROM Products", verifyConn);
         long count = (long)(await verifyCmd.ExecuteScalarAsync())!;
@@ -131,7 +130,7 @@ public class TestMySqlQueryRepositoryAdvanced
     public async Task Execute_Should_Maintain_Transaction_Atomicity()
     {
         // Arrange
-        await using (MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql))
+        await using (MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery))
         {
             await connection.OpenAsync();
             await using MySqlCommand insertCmd = new MySqlCommand(
@@ -157,7 +156,7 @@ public class TestMySqlQueryRepositoryAdvanced
         }
 
         // Verify the Products table was not updated (transaction rolled back)
-        await using MySqlConnection verifyConn = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection verifyConn = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await verifyConn.OpenAsync();
         await using MySqlCommand verifyCmd = new MySqlCommand(
             "SELECT price FROM Products WHERE id = 1", verifyConn);
@@ -186,7 +185,7 @@ public class TestMySqlQueryRepositoryAdvanced
         Guid lastEventId = await _repository.GetLastSuccessfulEventId();
         Assert.That(lastEventId, Is.EqualTo(eventId3));
 
-        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await connection.OpenAsync();
         await using MySqlCommand verifyCmd = new MySqlCommand("SELECT COUNT(*) FROM Products", connection);
         long count = (long)(await verifyCmd.ExecuteScalarAsync())!;
@@ -204,7 +203,7 @@ public class TestMySqlQueryRepositoryAdvanced
         await _repository.Execute(new CommandInfo(command), eventId);
 
         // Assert
-        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await connection.OpenAsync();
         await using MySqlCommand verifyCmd = new MySqlCommand(
             "SELECT name FROM Products", connection);
@@ -220,7 +219,7 @@ public class TestMySqlQueryRepositoryAdvanced
         await _repository.Execute(new CommandInfo("INSERT INTO Products (name, price) VALUES ('Test', 10.00)"), eventId);
 
         // Act
-        MySqlQueryRepository newRepository = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        MySqlQueryRepository newRepository = new(TestConnectionStrings.MySqlQuery, NullLogger<MySqlQueryRepository>.Instance);
         Guid retrievedId = await newRepository.GetLastSuccessfulEventId();
 
         // Assert
@@ -238,7 +237,7 @@ public class TestMySqlQueryRepositoryAdvanced
         await _repository.Execute(new CommandInfo(command), eventId);
 
         // Assert
-        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await connection.OpenAsync();
         await using MySqlCommand verifyCmd = new MySqlCommand(
             "SELECT price FROM Products WHERE name = 'NullTest'", connection);

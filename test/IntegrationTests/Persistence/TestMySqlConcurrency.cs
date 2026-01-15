@@ -1,5 +1,6 @@
 using Application.Contracts.Persistence;
 using Infrastructure.Persistence.QueryRepository;
+using IntegrationTests.Helpers;
 using Microsoft.Extensions.Logging.Abstractions;
 using MySql.Data.MySqlClient;
 
@@ -7,13 +8,10 @@ namespace IntegrationTests.Persistence;
 
 public class TestMySqlConcurrency
 {
-    private const string ConnectionStringQueryRepoMySql = "Server=localhost;Port=13306;Database=cqrs_read;User=root;Password=;";
-    private const string ConnectionStringToStartRepoMySql = "Server=localhost;Port=13306;User=root;Password=;";
-
     [OneTimeSetUp]
     public async Task OneTimeSetUp()
     {
-        await using MySqlConnection connection = new MySqlConnection(ConnectionStringToStartRepoMySql);
+        await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlSetup);
         await connection.OpenAsync();
 
         const string setupSql = @"
@@ -32,7 +30,7 @@ public class TestMySqlConcurrency
     [SetUp]
     public async Task SetUp()
     {
-        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await connection.OpenAsync();
 
         await using MySqlCommand cmd = new MySqlCommand(@"
@@ -45,8 +43,8 @@ public class TestMySqlConcurrency
     public async Task Multiple_Repositories_Should_Share_Same_LastEventId()
     {
         // Arrange
-        MySqlQueryRepository repo1 = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
-        MySqlQueryRepository repo2 = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        MySqlQueryRepository repo1 = new(TestConnectionStrings.MySqlQuery, NullLogger<MySqlQueryRepository>.Instance);
+        MySqlQueryRepository repo2 = new(TestConnectionStrings.MySqlQuery, NullLogger<MySqlQueryRepository>.Instance);
 
         Guid testEventId = Guid.NewGuid();
 
@@ -62,7 +60,7 @@ public class TestMySqlConcurrency
     public async Task Concurrent_Executions_Should_Track_Latest_EventId()
     {
         // Arrange
-        MySqlQueryRepository repository = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        MySqlQueryRepository repository = new(TestConnectionStrings.MySqlQuery, NullLogger<MySqlQueryRepository>.Instance);
 
         List<Task> tasks = new();
         List<Guid> eventIds = new();
@@ -81,7 +79,7 @@ public class TestMySqlConcurrency
         Guid finalEventId = await repository.GetLastSuccessfulEventId();
         Assert.That(eventIds, Contains.Item(finalEventId));
 
-        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await connection.OpenAsync();
         await using MySqlCommand cmd = new MySqlCommand("SELECT COUNT(*) FROM TestTableConcurrency", connection);
         long count = (long)(await cmd.ExecuteScalarAsync())!;
@@ -93,7 +91,7 @@ public class TestMySqlConcurrency
     public async Task Execute_Should_Be_Atomic_With_EventId_Update()
     {
         // Arrange
-        MySqlQueryRepository repository = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        MySqlQueryRepository repository = new(TestConnectionStrings.MySqlQuery, NullLogger<MySqlQueryRepository>.Instance);
         Guid eventId = Guid.NewGuid();
 
         // Act
@@ -116,7 +114,7 @@ public class TestMySqlConcurrency
     public async Task GetLastSuccessfulEventId_Should_Return_Empty_When_No_Events_Processed()
     {
         // Arrange
-        MySqlQueryRepository repository = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        MySqlQueryRepository repository = new(TestConnectionStrings.MySqlQuery, NullLogger<MySqlQueryRepository>.Instance);
 
         // Act
         Guid lastEventId = await repository.GetLastSuccessfulEventId();
@@ -129,7 +127,7 @@ public class TestMySqlConcurrency
     public async Task Execute_Should_Handle_Multiple_Statements()
     {
         // Arrange
-        MySqlQueryRepository repository = new(ConnectionStringQueryRepoMySql, NullLogger<MySqlQueryRepository>.Instance);
+        MySqlQueryRepository repository = new(TestConnectionStrings.MySqlQuery, NullLogger<MySqlQueryRepository>.Instance);
         Guid eventId = Guid.NewGuid();
 
         // Act
@@ -140,7 +138,7 @@ public class TestMySqlConcurrency
         "), eventId);
 
         // Assert
-        await using MySqlConnection connection = new MySqlConnection(ConnectionStringQueryRepoMySql);
+        await using MySqlConnection connection = new MySqlConnection(TestConnectionStrings.MySqlQuery);
         await connection.OpenAsync();
         await using MySqlCommand cmd = new MySqlCommand("SELECT COUNT(*) FROM TestTableConcurrency", connection);
         long count = (long)(await cmd.ExecuteScalarAsync())!;
