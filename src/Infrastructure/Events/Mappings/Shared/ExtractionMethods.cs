@@ -25,7 +25,7 @@ public static class ExtractionMethods
 
         string expectedSign = incoming.Substring(0, startIndexStringForLength);
 
-        return expectedSign;
+        return expectedSign.ExtractSign();
     }
 
     public static object ExtractValue(this string incoming)
