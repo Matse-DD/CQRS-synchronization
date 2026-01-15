@@ -4,6 +4,15 @@ Build a CQRS Synchronization between MongoDB (Write) and MySQL (Read)
 
 By Youri Haentjens, Pratik Lohani, Lander Debeir & Matse De Deyn
 
+## Contents
+- [Usage](#usage)
+- [Configuration](#configuration)
+    - [How to get SEQ api key](#how-to-get-seq-api-key)
+- [Structure of events](#structure-of-events)
+- [Demo](#demo)
+- [Tests](#tests)
+- [Links](#links)
+
 ## Usage
 
 In order to utilize the application, you will have to build the container by running:
