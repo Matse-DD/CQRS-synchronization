@@ -5,15 +5,25 @@ Build a CQRS Synchronization between MongoDB (Write) and MySQL (Read)
 By Youri Haentjens, Pratik Lohani, Lander Debeir & Matse De Deyn
 
 ## Contents
-- [Usage](#usage)
-- [Features](#features)
-- [Configuration](#configuration)
+- [group-05-CQRS-synchronization](#group-05-cqrs-synchronization)
+  - [Contents](#contents)
+  - [Usage](#usage)
+  - [Features](#features)
+  - [Configuration](#configuration)
     - [How to get SEQ api key](#how-to-get-seq-api-key)
-- [Structure of events](#structure-of-events)
-- [Demo](#demo)
-- [Tests](#tests)
-- [Troubleshooting](#troubleshooting)
-- [Links](#links)
+  - [Structure of Events](#structure-of-events)
+  - [Demo](#demo)
+  - [Tests](#tests)
+  - [Troubleshooting](#troubleshooting)
+    - [Databases are not yet started](#databases-are-not-yet-started)
+    - [Events are formatted incorrectly](#events-are-formatted-incorrectly)
+    - [No primary key in my database](#no-primary-key-in-my-database)
+    - [Insert doesn't work](#insert-doesnt-work)
+    - [String is not correctly loaded in the database](#string-is-not-correctly-loaded-in-the-database)
+    - [Update and delete are doing difficult about numbers and booleans](#update-and-delete-are-doing-difficult-about-numbers-and-booleans)
+    - [New events are not getting processed](#new-events-are-not-getting-processed)
+    - [Where are the logs located](#where-are-the-logs-located)
+  - [Links](#links)
 
 ## Usage
 
@@ -104,15 +114,15 @@ Events are structured like this
   "payload": {
     /*
     depends on the type of event
-    - for insert it will be the properties incluiding id,
+    - for insert it will be the properties including id,
     - for update it will be the condition and the changes
     - for delete it will be the condition 
     
     below here are how the types of the values should be structured
     */
     "string": "'value'", // don't forget the single quotes around the value
-    "number": "123",
-    "boolean": "true" | "false",
+    "number": 123, // if using a number inside a update or delete it should be wrapped inside double quotes.
+    "boolean": true | false, // if using a boolean inside a update or delete it should be wrapped inside double quotes.
   }
 }
 ```
@@ -128,10 +138,10 @@ Below are some examples:
   "occurredAt": "2026-01-03T16:08:01.139Z",
   "payload": {
     "id": "'15c17874-33ce-4d18-ad09-4fec29f22d2e'",
-    "milage": "10",
-    "driving": "true",
+    "milage": 10,
+    "driving": true,
     "name": "'BMW'",
-    "price": "50500.58"
+    "price": 50500.58
   },
   "status": "PENDING"
 }
@@ -148,8 +158,9 @@ Below are some examples:
       "price": "price > 50000"
     },
     "change":{
-      "price": "* 5",
-      "name" : "'Audi'"
+      "price": "* 5", // You can place only the wanted change.
+      "milage": "milage * 10", // You can repeat the property name if wanted.
+      "name" : "'Audi'" // "name = 'Audi'" is also correct.
     }
   },
   "status": "PENDING"
@@ -186,6 +197,7 @@ dotnet test
 ```
 
 ## Troubleshooting
+*A failed event shall not block the synchronisation from further processing*
 
 ### Databases are not yet started
 wait until the databases are started and try again later
@@ -193,8 +205,69 @@ wait until the databases are started and try again later
 ### Events are formatted incorrectly
 Problems with events can be found in logging.
 
-## Links
+### No primary key in my database
+The service recognizes the property id as primary key if this is not available it will not put a primary key in the database the format of this id is the size of a GUID.
 
+### Insert doesn't work
+It is possible that the property names used contain illegal characters. The illegal characters are *, /, -, +, =, <, > and depending on the used querydatabase this list may differ.
+
+### String is not correctly loaded in the database
+You have to wrap the string values explicity with single quotes.
+
+```json
+// Correct
+"payload": {
+  "name": "'John'",
+  "lastname": "'West'"
+}
+
+// Incorrect
+"payload": {
+  "name": "John",
+  "lastname": "West"
+}
+```
+
+### Update and delete are doing difficult about numbers and booleans
+You can't use pure booleans and numbers inside update and delete there is a condition or change expected and should be placed inside a string.
+
+```json
+// Correct
+"payload": {
+  "condition": {
+    "milage": "10",
+    "price": "price > 5000",
+    "horsepower": ">120"
+  },
+  "change": {
+    "price": "5",
+    "driving": "true"
+  }
+}
+
+// Incorrect
+"payload": {
+  "condition": {
+    "milage": 10,
+    "price": "price > 5000", // this part is still correct
+    "horsepower": ">120" // this part is still correct
+  },
+  "change": {
+    "price": 5,
+    "driving": true
+  }
+}
+```
+
+### New events are not getting processed
+Verify the status of the event this should be "PENDING" when sending. 
+
+After getting processed the status should update to "DONE" and you will see this inside the logs. If this is not the case check the logs and verify used values in your event.
+
+### Where are the logs located
+The logs can be found inside *SEQ* and in the running synchronisation service.
+
+## Links
 - [Demo frontend](https://github.com/howest-ti-sep/group-05-CQRS-demo-frontend)
 - [Demo backend](https://github.com/howest-ti-sep/group-05-CQRS-synchronization-demo-backend)
 - [Demo environment (one command to run)](https://github.com/howest-ti-sep/group-05-cqrs-synchronization-environment-production)
