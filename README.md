@@ -190,7 +190,7 @@ Below are some examples:
 For usage the following is needed:
 - A mongoDB this is the command database
 - A MySql this is the query database
-- Each connection string must include the database name used and avalaible to connect with.
+- Each connection string must include the database name used and available to connect with.
 
 A short explanation of the necessary environment variables:
 - CONNECTION_STRING_COMMAND_DB= connection string of the command database (MongoDB)
