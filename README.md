@@ -1,11 +1,20 @@
 # group-05-CQRS-synchronization
+## Introduction
+### What is it?
+This project provides a synchronization system between databases that can be used inside a Command Query Responsibility Segregation (CQRS) context where the query and command sides are split up into 2 different databases.
 
-Build a CQRS Synchronization between MongoDB (Write) and MySQL (Read)
+### Who is for?
+Developers building applications with:
+- 
 
 By Youri Haentjens, Pratik Lohani, Lander Debeir & Matse De Deyn
 
 ## Contents
 - [group-05-CQRS-synchronization](#group-05-cqrs-synchronization)
+  - [Introduction](#introduction)
+    - [What is it?](#what-is-it)
+    - [Who is for?](#who-is-for)
+  - [Developers building applications with:](#developers-building-applications-with)
   - [Contents](#contents)
   - [Usage](#usage)
   - [Features](#features)
@@ -24,6 +33,7 @@ By Youri Haentjens, Pratik Lohani, Lander Debeir & Matse De Deyn
     - [New events are not getting processed](#new-events-are-not-getting-processed)
     - [Where are the logs located](#where-are-the-logs-located)
   - [Links](#links)
+
 
 ## Usage
 
