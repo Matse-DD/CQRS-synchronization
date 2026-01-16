@@ -92,7 +92,7 @@ Reliable synchronization between a read and write database.
 - Recovery and Replay mechanisms.
 - Demo app 
   - [Demo frontend](https://github.com/howest-ti-sep/group-05-CQRS-demo-frontend)
-  - [Demo backend (DDD-inspirend)](https://github.com/howest-ti-sep/group-05-CQRS-synchronization-demo-backend)
+  - [Demo backend (DDD-inspired)](https://github.com/howest-ti-sep/group-05-CQRS-synchronization-demo-backend)
   - [Demo environment (one command to run)](https://github.com/howest-ti-sep/group-05-cqrs-synchronization-environment-production)
 - Docker compose setup see Quick Start
 
