@@ -85,10 +85,23 @@ services:
 If the environment variables are correcly set, the service will automatically connect to the two databases and update the query database when necessary.
 
 ## Features
-- (CQRS) Synchronization between a read and write database.
+Reliable synchronization between a read and write database.
+
+**Must-haves**
+- Idempotent (no duplicates)
 - Recovery and Replay mechanisms.
+- Demo app 
+  - [Demo frontend](https://github.com/howest-ti-sep/group-05-CQRS-demo-frontend)
+  - [Demo backend (DDD-inspirend)](https://github.com/howest-ti-sep/group-05-CQRS-synchronization-demo-backend)
+  - [Demo environment (one command to run)](https://github.com/howest-ti-sep/group-05-cqrs-synchronization-environment-production)
+- Docker compose setup see Quick Start
+
+**Could have**
 - Monitoring of logs (via SEQ).
-- Webapi (on the webApi branch and accessible via http://localhost:5000/swagger/index.html once you launch it).
+
+**Extra**
+- Webapi (on the webApi branch and accessible via http://localhost:5000/swagger/index.html once you launch the test environment and run the application).
+- Table gets build automatically based on INSERT-event
 
 ## Usage
 For usage you will have to insert new change events inside the command database these events will be synchronised with the query database. Once synchronised data can then be requested from the query database as usual.
