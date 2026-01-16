@@ -5,7 +5,7 @@ This project provides a synchronization system between databases that can be use
 
 ### For who?
 Developers building applications with:
-- seperated databases for command and query
+- separated databases for command and query
 - need for a reliable data synchronization.
 
 ### Why use it?
