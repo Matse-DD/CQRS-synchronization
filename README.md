@@ -42,7 +42,7 @@ By Youri Haentjens, Pratik Lohani, Lander Debeir & Matse De Deyn
 
 ## Quick start
 
-In order to utilize the application you have to do the following steps:
+To utilize the application, you have to do the following steps:
 
 1. Clone the project to a local space
 ```bash
@@ -82,7 +82,7 @@ services:
         env_file: .cqrs-sync.env
 ```
 
-If the environment variables are correcly set, the service will automatically connect to the two databases and update the query database when necessary.
+If the environment variables are correctly set, the service will automatically connect to the two databases and update the query database when necessary.
 
 ## Features
 Reliable synchronization between a read and write database.
@@ -104,7 +104,7 @@ Reliable synchronization between a read and write database.
 - Table gets build automatically based on INSERT-event
 
 ## Usage
-For usage you will have to insert new change events inside the command database these events will be synchronised with the query database. Once synchronised data can then be requested from the query database as usual.
+For usage, you will have to insert new change events inside the command database. These events will be synchronized with the query database. Once synchronized, data can then be requested from the query database as usual.
 
 Events are structured like this:
 ```json
@@ -187,9 +187,9 @@ Below are some examples:
 ```
 
 ## Configuration
-For usage the following is needed:
-- A mongoDB this is the command database
-- A MySql this is the query database
+For usage, the following is needed:
+- A MongoDB - this is the command database
+- A MySQL - this is the query database
 - Each connection string must include the database name used and available to connect with.
 
 A short explanation of the necessary environment variables:
@@ -209,26 +209,26 @@ SEQ_API_KEY= <seqApiKey>
 ```
 
 ### How to get SEQ api key
-In order to monitor the logs, the seq framework is provided in the docker compose. However the API key will still need to be provided. This section explains how you can obtain it.
+In order to monitor the logs, the SEQ framework is provided in the docker compose. However, the API key will still need to be provided. This section explains how you can obtain it.
 
 First, you will need to compose the containers. Then you visit the seq application (the link to the application can be found in docker).
 
-When you launch the application you will arrive on this screen.
+When you launch the application, you will arrive on this screen.
 ![SEQ dashboard](./images_readme/seq5.png)
 
-From there you will need to click on the icon in the top right corner. This will open a menu in which you will need to select "API keys"(the circled option)
+From there, you will need to click on the icon in the top right corner. This will open a menu in which you will need to select "API keys" (the circled option)
 ![SEQ submenu](./images_readme/seq1.png)
 
 You will arrive on this screen:
 ![SEQ api keys](./images_readme/seq2.png)
 Click on the add API key button and fill in the following form:
 ![SEQ API key form](./images_readme/seq3.png)
-Just give it a title and set the minimum level to Information and click Save changes.
+Just give it a title, set the minimum level to Information, and click Save changes.
 
-You will get a  pop-up showing the api key, which you need to copy and put in the env files.
+You will get a pop-up showing the API key, which you need to copy and put in the env files.
 
 ## Tests
-In order to run the integration tests you have to first setup the docker environment by running
+In order to run the integration tests, you have to first set up the docker environment by running
 ```bash
 docker compose -f ./test/IntegrationTests/config/docker-compose.yml up -d
 ```
@@ -244,11 +244,11 @@ dotnet test
 Wait until the databases are started and try again later.
 
 ### Events are formatted incorrectly
-Problems with events can be found in logging most occurring problems are:
+Problems with events can be found in logging. The most common problems are:
 - strings should be wrapped in single quotes
 - boolean and numbers should be placed inside a string for the change and condition of update and delete
-- illegal signs in property name. The illegal characters are *, /, -, +, =, <, > and depending on the used querydatabase this list may differ.
-- The property id is by default getting recognized as the primary key if id is not available no primary key is set.
+- illegal characters in property name. The illegal characters are *, /, -, +, =, <, > and depending on the used query database, this list may differ.
+- By default, the property id is recognized as the primary key. If id is not available, no primary key is set.
 
 #### Examples wrong event formation
 **String should be wrapped in single quotes**
@@ -296,11 +296,11 @@ Problems with events can be found in logging most occurring problems are:
 ```
 
 ### New events are not getting processed
-Verify the status of the event this should be "PENDING" when sending.
+Verify the status of the event. This should be "PENDING" when sending.
 
-It is also possible that the connectionstrings are incorrect check them again common issues here are forgetting `?connect=direct&replicaSet=rs0` inside the MongoDb connection string or using a database name that is not being used inside the running database.
+It is also possible that the connection strings are incorrect. Check them again. Common issues here are forgetting `?connect=direct&replicaSet=rs0` inside the MongoDB connection string or using a database name that is not being used inside the running database.
 
-After getting processed the status should update to "DONE". If this is not the case check the logs and verify used values and format of your event.
+After getting processed, the status should update to "DONE". If this is not the case, check the logs and verify the used values and format of your event.
 
 ## Demo
 The [demo (in the repos below)](#links) is a simple user management application using a MongoDB command database and a MySQL query database
