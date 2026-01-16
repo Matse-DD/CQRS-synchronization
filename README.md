@@ -244,7 +244,7 @@ dotnet test
 Wait until the databases are started and try again later.
 
 ### Events are formatted incorrectly
-Problems with events can be found in logging most ocurring problems are:
+Problems with events can be found in logging most occurring problems are:
 - strings should be wrapped in single quotes
 - boolean and numbers should be placed inside a string for the change and condition of update and delete
 - illegal signs in property name. The illegal characters are *, /, -, +, =, <, > and depending on the used querydatabase this list may differ.
