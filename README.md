@@ -9,6 +9,28 @@ Developers building applications with:
 
 By Youri Haentjens, Pratik Lohani, Lander Debeir & Matse De Deyn
 
+## Introduction
+
+This project provides a **CQRS (Command Query Responsibility Segregation) synchronization system** that keeps a MongoDB write database and a MySQL read database in sync in near real-time.
+
+**What is it?**  
+A production-ready synchronization service that automatically propagates changes from MongoDB (optimized for writes) to MySQL (optimized for reads and queries), enabling you to separate write and read concerns in your application architecture.
+
+**Who is it for?**  
+Developers and teams building applications that need to:
+- Scale read and write operations independently
+- Use different databases optimized for different purposes (document storage vs. relational queries)
+- Implement event-driven architectures with reliable data synchronization
+
+**Why use it?**  
+- **Separation of Concerns**: Keep write models (MongoDB aggregates/entities) separate from read models (MySQL projections)
+- **Performance**: Optimize each database for its specific purpose
+- **Reliability**: Built-in recovery and replay mechanisms ensure no data loss
+- **Easy Integration**: One-command Docker setup with clear configuration
+- **Production-Ready**: Includes monitoring, logging (SEQ), idempotent updates, and comprehensive error handling
+
+Built with Domain-Driven Design (DDD) principles and follows the Ports-and-Adapters (Hexagonal) architecture pattern.
+
 ## Contents
 - [group-05-CQRS-synchronization](#group-05-cqrs-synchronization)
   - [Introduction](#introduction)
