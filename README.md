@@ -194,7 +194,7 @@ For usage the following is needed:
 
 A short explanation of the necessary environment variables:
 - CONNECTION_STRING_COMMAND_DB= connection string of the command database (MongoDB)
-  - Must `?connect=direct&replicaSet=rs0` contain to activate Change Streams.
+  - Must contain `?connect=direct&replicaSet=rs0` to activate Change Streams.
 - CONNECTION_STRING_QUERY_DB= connection string of the query database (MySql)
 - SEQ_SERVER_URL= url of the SEQ log monitoring dashboard
 - SEQ_API_KEY= API key of the SEQ log monitoring dashboard
