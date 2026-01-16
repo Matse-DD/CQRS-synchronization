@@ -13,7 +13,7 @@ Developers building applications with:
   - Setup with docker image, plug and play.
 - Reliable
   - Lose no data between the databases.
-- Independed
+- Independent
   - The used databases can be swapped for another type when correctly implemented.
 
 By Youri Haentjens, Pratik Lohani, Lander Debeir & Matse De Deyn
