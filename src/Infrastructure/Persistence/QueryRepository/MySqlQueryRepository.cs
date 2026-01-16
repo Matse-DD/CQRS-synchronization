@@ -1,5 +1,4 @@
 ﻿using Application.Contracts.Persistence;
-using Infrastructure.Replay;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using System.Data.Common;
@@ -67,17 +66,13 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         return resultGuid;
     }
 
-    public async static Task CreateBasicStructureQueryDatabase(string queryDatabaseName, string connectionString, ILogger<MySqlQueryRepository> logger)
+    public async static Task CreateBasicStructureQueryDatabase(string connectionString, ILogger<MySqlQueryRepository> logger)
     {
-        string commandCreateDatabase = $"CREATE DATABASE IF NOT EXISTS {queryDatabaseName};";
         string commandCreateTable = $"CREATE TABLE IF NOT EXISTS last_info (id INT, last_event_id VARCHAR(36), PRIMARY KEY (id));";
         string commandInsertTable = $"INSERT IGNORE INTO last_info(id, last_event_id) VALUES(1, '{Guid.Empty}');";
 
         using MySqlConnection connection = new MySqlConnection(connectionString);
         await connection.OpenAsync();
-
-        using MySqlCommand createDatabase = new MySqlCommand(commandCreateDatabase, connection);
-        await createDatabase.ExecuteNonQueryAsync();
 
         using MySqlCommand createTable = new MySqlCommand(commandCreateTable, connection);
         await createTable.ExecuteNonQueryAsync();
@@ -85,7 +80,6 @@ public class MySqlQueryRepository(string connectionString, ILogger<MySqlQueryRep
         using MySqlCommand insertTable = new MySqlCommand(commandInsertTable, connection);
         await insertTable.ExecuteNonQueryAsync();
 
-        logger.LogInformation("Created {queryDatabaseName} database with empty.", queryDatabaseName);
         logger.LogInformation("Initialized 'last_info' table.");
     }
 

@@ -22,7 +22,6 @@ public class SyncBuilder
 
     private readonly string _connectionStringCommandDatabase;
     private readonly string _connectionStringQueryDatabase;
-    private readonly string _queryDatabaseName;
 
     public SyncBuilder()
     {
@@ -40,8 +39,6 @@ public class SyncBuilder
         });
 
         (_connectionStringCommandDatabase, _connectionStringQueryDatabase) = DetermineConnectionStrings(configuration);
-
-        _queryDatabaseName = DetermineQueryDatabaseName(configuration);
     }
 
     private static IConfiguration CreateConfiguration()
@@ -96,11 +93,6 @@ public class SyncBuilder
         string connectionStringQueryDatabase = GetSettingWithLogging("CONNECTION_STRING_QUERY_DB", "QueryDatabase:ConnectionString", configuration);
 
         return (connectionStringCommandDatabase, connectionStringQueryDatabase);
-    }
-
-    private string DetermineQueryDatabaseName(IConfiguration configuration)
-    {
-        return GetSettingWithLogging("QUERY_DATABASE_NAME", "QueryDatabase:QueryDatabaseName", configuration);
     }
 
     public SyncBuilder AddRepositories()
@@ -159,7 +151,7 @@ public class SyncBuilder
         ServiceProvider provider = _services.BuildServiceProvider();
         _logger.LogInformation("Application has finished building.");
 
-        await MySqlQueryRepository.CreateBasicStructureQueryDatabase(_queryDatabaseName, _connectionStringQueryDatabase, provider.GetRequiredService<ILogger<MySqlQueryRepository>>());
+        await MySqlQueryRepository.CreateBasicStructureQueryDatabase(_connectionStringQueryDatabase, provider.GetRequiredService<ILogger<MySqlQueryRepository>>());
 
         return provider.GetRequiredService<SyncApplication>();
     }
