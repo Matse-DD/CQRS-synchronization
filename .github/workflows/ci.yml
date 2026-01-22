@@ -143,4 +143,4 @@ jobs:
       - name: Docker Build
         id: build
         run: |
-          dotnet publish src/Main/Main.csproj --os linux --arch x64 /t:PublishContaine
+          dotnet publish src/Main/Main.csproj --os linux --arch x64 /t:PublishContainer
