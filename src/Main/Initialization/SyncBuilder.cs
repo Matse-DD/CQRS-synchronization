@@ -12,6 +12,7 @@ using Infrastructure.Replay;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Configuration;
 
 namespace Main.Initialization;
 
@@ -34,8 +35,7 @@ public class SyncBuilder
 
         _services.AddLogging(builder =>
         {
-            builder.AddConsole();
-            builder.SetMinimumLevel(LogLevel.Information);
+            ConfigureLogger(builder, configuration);
         });
 
         (_connectionStringCommandDatabase, _connectionStringQueryDatabase) = DetermineConnectionStrings(configuration);
@@ -57,14 +57,24 @@ public class SyncBuilder
     {
         using ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
         {
-            builder.AddConsole();
-            builder.SetMinimumLevel(LogLevel.Information);
+            ConfigureLogger(builder, configuration);
         });
+
+
+        return loggerFactory.CreateLogger<SyncBuilder>();
+    }
+
+    private ILoggingBuilder ConfigureLogger(ILoggingBuilder builder, IConfiguration configuration)
+    {
+        builder.AddConsole();
+        builder.SetMinimumLevel(LogLevel.Information);
 
         string url = GetSetting("SEQ_SERVER_URL", "Logger:DefaultUrl", configuration);
         string apiKey = GetSetting("SEQ_API_KEY", "Logger:ApiKey", configuration);
 
-        return loggerFactory.AddSeq(url, apiKey).CreateLogger<SyncBuilder>();
+        builder.AddSeq(url, apiKey);
+
+        return builder;
     }
 
     private string GetSetting(string envVar, string configPath, IConfiguration configuration)
