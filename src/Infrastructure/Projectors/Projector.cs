@@ -59,7 +59,7 @@ public class Projector
     public void Lock()
     {
         _locked = true;
-        _logger.LogWarning("Projector LOCKED.");
+        _logger.LogInformation("Projector LOCKED.");
     }
 
     public void Unlock()
